@@ -225,6 +225,7 @@ W(f'''<defs>
   <linearGradient id="gWdeep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4A8790"/><stop offset="1" stop-color="#2C5F6A"/></linearGradient>
   <linearGradient id="gGlint" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
   <linearGradient id="gTube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D3DA"/><stop offset=".45" stop-color="#7E8E9A"/><stop offset="1" stop-color="#46535D"/></linearGradient>
+  <linearGradient id="gBlade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EEE6D2"/><stop offset=".5" stop-color="#C7B994"/><stop offset="1" stop-color="#8F8262"/></linearGradient>
   <linearGradient id="gCone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9C4CC"/><stop offset="1" stop-color="#56646F"/></linearGradient>
   <linearGradient id="gTree" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6F9A45"/><stop offset=".55" stop-color="#4A7230"/><stop offset="1" stop-color="#2D4A1F"/></linearGradient>
   <radialGradient id="gGround" cx=".42" cy=".44" r=".5"><stop offset="0" stop-color="#8A8E5E"/><stop offset=".7" stop-color="#737A4C"/><stop offset="1" stop-color="#5C643D"/></radialGradient>
@@ -305,18 +306,19 @@ for (a32, a46), (b32, b46) in segs:       # bank pieces with slanted ends that f
 lp = P(560, 20, 0)
 W(f'<text class="canal-lbl" x="{f(lp[0])}" y="{f(lp[1])}" transform="rotate(30 {f(lp[0])} {f(lp[1])})">←  ASOSIY SUG\'ORISH KANALI</text>')
 
-# fish jumping upstream (+x) now and then: hidden while they wait, a short leap with a splash in and out.
-# Unequal periods (13/17/19/23/29 s) so the leaps never fall into a noticeable rhythm.
-FISH = [(170, 19, 13, 4), (440, 25, 19, 11), (800, 14, 23, 2), (985, 17, 17, 7), (1170, 22, 29, 17)]   # x, y, period s, phase s
+# fish jumping upstream (+x) often: hidden while they wait, a short leap with a splash in and out.
+# Seven fish along the canal (every camera view has one), unequal periods of 5-10 s so that somewhere
+# a fish leaps every second or two, never in a noticeable rhythm.
+FISH = [(130, 19, 6.3, 1.1), (300, 24, 8.9, 5.2), (470, 15, 5.7, 3.4), (640, 22, 9.6, 7.9),
+        (810, 17, 7.1, .6), (975, 21, 5.3, 2.8), (1160, 16, 8.3, 4.4)]          # x, y, period s, phase s
 fish_svg = ('<g transform="scale(1.6)"><ellipse rx="4.6" ry="1.55" fill="#E6EDEE"/><ellipse cx="-.2" cy=".6" rx="4" ry=".85" fill="#3E4F57"/>'
             '<polygon points="-4,0 -7.4,2 -6.5,0 -7.4,-2" fill="#56666D"/><path d="M-.5 1.35 l1.6 1.1 l.9 -1.15z" fill="#56666D"/>'
             '<circle cx="3.1" cy=".4" r=".42" fill="#12191D"/></g>')
 for fx, fy, per, ph in FISH:
-    kind = 'a' if per < 20 else 'b'
     st = f'animation-duration:{per}s;animation-delay:-{ph}s'
-    W(xy(-3) + f'<ellipse class="splash splash--in-{kind}" cx="{fx}" cy="{fy}" rx="4.4" ry="4.4" style="{st}"/>'
-      + f'<ellipse class="splash splash--out-{kind}" cx="{fx + 26}" cy="{fy}" rx="4.4" ry="4.4" style="{st}"/></g>')
-    W(xz(fy) + f'<g transform="translate({fx} -3)"><g class="fish fish--{kind}" style="{st}">{fish_svg}</g></g></g>')
+    W(xy(-3) + f'<ellipse class="splash splash--in" cx="{fx}" cy="{fy}" rx="4.4" ry="4.4" style="{st}"/>'
+      + f'<ellipse class="splash splash--out" cx="{fx + 26}" cy="{fy}" rx="4.4" ry="4.4" style="{st}"/></g>')
+    W(xz(fy) + f'<g transform="translate({fx} -3)"><g class="fish" style="{st}">{fish_svg}</g></g></g>')
 
 # ---------------------------------------------------------------- intake + 400 m channel: one smooth bow
 # Water leaves the canal in its own direction (no right angle), arcs away from the canal and comes back
@@ -358,6 +360,24 @@ for k0, k1 in ((-11.2, -2.3), (2.3, 11.2)):
 W('</g>')
 W('<g class="hoist">' + obox(at(-15.8), Gd, 4, 3.5, 9, 27, *SAFETY) + obox(at(15.8), Gd, 4, 3.5, 9, 27, *SAFETY)
   + obox(G, Gd, 4, 35, 27, 30, *SAFETY) + '</g>')
+
+# trash rack (filter) upstream of the gate: inclined steel bars across the channel stop branches and leaves
+RK = 9                                                       # metres upstream of the gate
+LEAN, TOP = 4.0, 11.0                                        # the screen leans back 4 m over its height, like the real one
+rk = lambda k, back=0.0: (G[0] - Gd[0] * (RK - back) + nx_ * k, G[1] - Gd[1] * (RK - back) + ny_ * k)
+seg = lambda a, za, b, zb: f'M{f(P(a[0], a[1], za)[0])} {f(P(a[0], a[1], za)[1])}L{f(P(b[0], b[1], zb)[0])} {f(P(b[0], b[1], zb)[1])}'
+lean = lambda z: LEAN * (z + 1.5) / (TOP + 1.5)
+bars = ''.join(seg(rk(k), -1.5, rk(k, LEAN), TOP) for k in [-10.5 + 1.0 * i for i in range(22)])     # dense bars across the water
+stiff = ''.join(seg(rk(-11.2, lean(z)), z, rk(11.2, lean(z)), z) for z in (3.5, 7.5))                 # horizontal stiffeners
+frame = (seg(rk(-11.2, LEAN), TOP + .4, rk(11.2, LEAN), TOP + .4)                                    # top beam
+         + seg(rk(-11.2, lean(2)), 2, rk(-11.2, LEAN), TOP + .4) + seg(rk(11.2, lean(2)), 2, rk(11.2, LEAN), TOP + .4))   # posts on the walls
+braces = ''.join(seg(rk(k, LEAN), TOP, rk(k, LEAN + 3.2), 3.5) for k in (-8, -2.7, 2.7, 8))          # rusty braces behind the screen
+leaves = ''.join(f'<ellipse cx="{f(rk(k, -1.2)[0])}" cy="{f(rk(k, -1.2)[1])}" rx="1.5" ry=".7" fill="{c}" transform="rotate({r} {f(rk(k, -1.2)[0])} {f(rk(k, -1.2)[1])})"/>'
+                 for k, c, r in ((-6.5, '#7A5A2E', 25), (-5.2, '#5D7A33', -40), (3.4, '#8A6A35', 70), (8.1, '#5D7A33', 10)))
+W(xy(-3.4) + leaves + '</g>')
+W(f'<g class="rack" fill="none" stroke-linecap="round"><path d="{braces}" stroke="#8A5A3A" stroke-width=".8"/>'
+  f'<path d="{bars}" stroke="#3E474D" stroke-width=".34"/><path d="{stiff}" stroke="#3A4248" stroke-width="1.1"/>'
+  f'<path d="{frame}" stroke="#30373C" stroke-width="1.6"/></g>')
 
 # 400 m: dashed dimension following the arch on its outer side
 dim = [q for q in offset(deriv_line, -26)]
@@ -404,8 +424,10 @@ def unit(yc, k):
     s.append(yz(358) + f'<circle cx="{yc}" cy="{zc}" r="11" fill="#2F3A42"/>'   # intake face with the runner
              f'<circle cx="{yc}" cy="{zc}" r="11" fill="none" stroke="#B5C2CB" stroke-width="1.2"/>'
              f'<g class="runner" style="transform-origin:{yc}px {zc}px">'
-             + ''.join(f'<path d="M{yc} {zc} q4 -3 8.5 -2 l0 1.8 q-4 1 -8.5 0.2z" fill="#DCE4EA" transform="rotate({a} {yc} {zc})"/>' for a in range(0, 360, 72))
-             + f'<circle cx="{yc}" cy="{zc}" r="2.6" fill="#E8F7FF"/></g>'
+             + ''.join(f'<path d="M{yc} {zc}C{f(yc + 2.4)} {f(zc - 3.4)} {f(yc + 8.3)} {f(zc - 4.8)} {f(yc + 9.7)} {f(zc - 1.3)}'
+                       f'C{f(yc + 10)} {f(zc + 1.4)} {f(yc + 5)} {f(zc + 2.7)} {yc} {zc}Z" fill="url(#gBlade)" stroke="#7D7258" stroke-width=".35" '
+                       f'transform="rotate({a} {yc} {zc})"/>' for a in (12, 102, 192, 282))
+             + f'<circle cx="{yc}" cy="{zc}" r="3.3" fill="#C4302B"/><circle cx="{f(yc - .9)}" cy="{f(zc - .9)}" r="1.3" fill="#EA6F63"/></g>'
              f'<circle class="spin-ring" cx="{yc}" cy="{zc}" r="8" fill="none" stroke="#BDEBFF" stroke-width="1" stroke-dasharray="3 5"/>'
              '</g>')
     s.append(f'<g class="gen">' + box(306, 332, yc - 8, yc + 8, 16, 28, *MACHINE)
@@ -517,7 +539,7 @@ def label(cls, world, dx, dy, text, anchor='start'):
     return (f'<g class="lbl {cls}" transform="translate({f(ax)} {f(ay)})"><g class="lbl__s">'
             f'<path d="M0 0L{dx} {dy}" stroke="#4AF745" stroke-width="1"/><circle r="3"/>'
             f'<text x="{tx}" y="{dy + (4 if anchor != "middle" else -6)}" text-anchor="{anchor}">{text}</text></g></g>')
-W(label('lbl-1', (G[0], G[1], 30), -40, -34, 'SUV QABUL QILGICH · ZATVOR', 'end'))
+W(label('lbl-1', (G[0], G[1], 30), -40, -34, 'SUV QABUL QILGICH · FILTR · ZATVOR', 'end'))
 W(label('lbl-2', (route[30][0], route[30][1] - 11, 2), 0, -58, 'DERIVATSIYA KANALI', 'middle'))   # above the arch, on the open ground
 W(label('lbl-3', (358, 96 + DY, -2), -14, 50, '2 × GORIZONTAL TURBINA', 'end'))
 W(label('lbl-4', (319, 96 + DY, 28), -30, -46, '2 × GENERATOR', 'end'))

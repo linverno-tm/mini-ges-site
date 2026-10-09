@@ -320,35 +320,21 @@ main:focus { outline: none; }
 .dia .flow { fill: none; stroke: #EAF6F4; stroke-opacity: .55; stroke-width: 1.1; stroke-linecap: round; stroke-dasharray: 6 20; animation: dash 1.4s linear infinite; }
 .dia .flow--canal { animation-duration: 1.9s; }
 .dia .glint { animation: glint 8s linear infinite reverse; }
-/* fish leaping upstream now and then; invisible between leaps (local coords of the canal plane: y points up) */
-.dia .fish { opacity: 0; animation: fish-a 13s linear infinite; }
-.dia .fish--b { animation-name: fish-b; }
-.dia .splash { fill: none; stroke: #F2FBFA; stroke-width: 1; opacity: 0; transform-box: fill-box; transform-origin: center; animation: splash-in-a 13s ease-out infinite; }
-.dia .splash--out-a { animation-name: splash-out-a; }
-.dia .splash--in-b { animation-name: splash-in-b; }
-.dia .splash--out-b { animation-name: splash-out-b; }
-@keyframes fish-a {
-  0%, 87% { opacity: 0; transform: translate(0, -4px) rotate(55deg); }
-  88% { opacity: 1; transform: translate(1px, 0) rotate(50deg); }
-  90% { transform: translate(7px, 11px) rotate(28deg); }
-  92% { transform: translate(13px, 15px) rotate(0deg); }
-  94% { transform: translate(19px, 11px) rotate(-28deg); }
-  96% { opacity: 1; transform: translate(25px, 0) rotate(-50deg); }
-  97%, 100% { opacity: 0; transform: translate(26px, -4px) rotate(-55deg); }
+/* fish leaping upstream often; invisible between leaps (local coords of the canal plane: y points up) */
+.dia .fish { opacity: 0; animation: fish 6s linear infinite; }
+.dia .splash { fill: none; stroke: #F2FBFA; stroke-width: 1; opacity: 0; transform-box: fill-box; transform-origin: center; animation: splash-in 6s ease-out infinite; }
+.dia .splash--out { animation-name: splash-out; }
+@keyframes fish {                       /* the leap takes the last ~11 % of a 5-10 s cycle: about 0.6-1 s, a real fish's pace */
+  0%, 87.5% { opacity: 0; transform: translate(0, -4px) rotate(55deg); }
+  88.5% { opacity: 1; transform: translate(1px, 0) rotate(50deg); }
+  90.5% { transform: translate(7px, 11px) rotate(28deg); }
+  92.5% { transform: translate(13px, 15px) rotate(0deg); }
+  94.5% { transform: translate(19px, 11px) rotate(-28deg); }
+  96.5% { opacity: 1; transform: translate(25px, 0) rotate(-50deg); }
+  97.5%, 100% { opacity: 0; transform: translate(26px, -4px) rotate(-55deg); }
 }
-@keyframes fish-b {
-  0%, 92.5% { opacity: 0; transform: translate(0, -4px) rotate(55deg); }
-  93% { opacity: 1; transform: translate(1px, 0) rotate(50deg); }
-  94.1% { transform: translate(7px, 11px) rotate(28deg); }
-  95.2% { transform: translate(13px, 15px) rotate(0deg); }
-  96.3% { transform: translate(19px, 11px) rotate(-28deg); }
-  97.4% { opacity: 1; transform: translate(25px, 0) rotate(-50deg); }
-  98%, 100% { opacity: 0; transform: translate(26px, -4px) rotate(-55deg); }
-}
-@keyframes splash-in-a { 0%, 87.5% { opacity: 0; transform: scale(.2); } 88.5% { opacity: .9; transform: scale(.45); } 92%, 100% { opacity: 0; transform: scale(1.8); } }
-@keyframes splash-out-a { 0%, 95.8% { opacity: 0; transform: scale(.2); } 96.8% { opacity: .9; transform: scale(.45); } 100% { opacity: 0; transform: scale(1.9); } }
-@keyframes splash-in-b { 0%, 93% { opacity: 0; transform: scale(.2); } 93.6% { opacity: .9; transform: scale(.45); } 95.6%, 100% { opacity: 0; transform: scale(1.8); } }
-@keyframes splash-out-b { 0%, 97.4% { opacity: 0; transform: scale(.2); } 98% { opacity: .9; transform: scale(.45); } 100% { opacity: 0; transform: scale(1.9); } }
+@keyframes splash-in { 0%, 88% { opacity: 0; transform: scale(.2); } 89% { opacity: .9; transform: scale(.45); } 93%, 100% { opacity: 0; transform: scale(1.8); } }
+@keyframes splash-out { 0%, 96.2% { opacity: 0; transform: scale(.2); } 97.2% { opacity: .9; transform: scale(.45); } 100% { opacity: 0; transform: scale(1.9); } }
 .dia .w-intake, .dia .w-tail { opacity: 0; transition: opacity 1s var(--ease); }
 .dia .gate { transition: transform 1.4s var(--ease); }
 .dia .dim { opacity: .12; transition: opacity .8s var(--ease); }

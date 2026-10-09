@@ -80,7 +80,6 @@
     "Mini-GES maketi": "Макет мини-ГЭС",
     "Mini-GES maketi: sug'orish kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, ikki gorizontal turbinali stansiya, qaytish o'zani, transformator va qishloqqa boruvchi elektr tarmog'i": "Макет мини-ГЭС: ирригационный канал, водозабор с затворами, деривационный канал длиной 400 м, станция с двумя горизонтальными турбинами, отводящее русло, трансформатор и линия электропередачи к посёлку",
     "400 m": "400 м",
-    "SUV QABUL QILGICH · ZATVOR": "ВОДОЗАБОР · ЗАТВОР",
     "DERIVATSIYA KANALI": "ДЕРИВАЦИОННЫЙ КАНАЛ",
     "2 × GORIZONTAL TURBINA": "2 × ГОРИЗОНТАЛЬНАЯ ТУРБИНА",
     "2 × GENERATOR": "2 × ГЕНЕРАТОР",
@@ -364,6 +363,7 @@
     "Tarmoqqa tok berilmoqda": "Энергия идёт в сеть",
     "Soha yangiliklari": "Новости отрасли",
     "Mini-GES bozorida nima gap": "Что происходит на рынке мини-ГЭС",
-    "Yangiliklar": "Новости"
+    "Yangiliklar": "Новости",
+    "SUV QABUL QILGICH · FILTR · ZATVOR": "ВОДОЗАБОР · СОРОУДЕРЖИВАЮЩАЯ РЕШЁТКА · ЗАТВОР"
   }
 }
