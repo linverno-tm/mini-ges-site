@@ -311,7 +311,7 @@ function mainGES() {
       const card = $('.status'), title = $('.hero__title');
       const cr = card ? card.getBoundingClientRect() : null, tr = title ? title.getBoundingClientRect() : null;
       if (narrow) {
-        const lead = $('.hero__quote') || title;                       // first block of the copy: the scene stands above it
+        const lead = $('.pres') || title;                       // first block of the copy: the scene stands above it
         const lr = lead ? lead.getBoundingClientRect() : null;
         const baseY = (lr ? lr.top - hr.top : H * 0.14) - 6;
         const width = Math.min(170, W * 0.45), k = width / 22;

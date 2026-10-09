@@ -223,20 +223,25 @@ main:focus { outline: none; }
 .hero__glow { position: absolute; width: 60vw; height: 60vw; right: -20vw; bottom: -30vw; border-radius: 50%; background: radial-gradient(closest-side, rgba(84, 175, 58, .22), transparent); filter: blur(20px); pointer-events: none; }
 .hero__grid {
   position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 64px; align-items: start;
-  grid-template-areas: "eye eye" "quote quote" "title status" "lead status" "cta status";
+  grid-template-areas: "eye eye" "quote quote" "title title" "lead status" "cta status";
 }
 .hero__copy { display: contents; }
 .hero__eyebrow { grid-area: eye; }
-.hero__title { grid-area: title; font-size: clamp(28px, 3.2vw, 50px); line-height: 1.05; font-weight: 800; letter-spacing: -.03em; margin-bottom: 22px; max-width: 18ch; }
+.hero__title { grid-area: title; font-size: clamp(38px, 6vw, 96px); line-height: .98; font-weight: 800; letter-spacing: -.04em; margin-bottom: clamp(24px, 3.4vw, 40px); max-width: 14ch; }
 .hero__lead { grid-area: lead; }
-/* the President's words come first: verbatim from the official speech text, with source */
-.hero__quote { grid-area: quote; position: relative; margin: 0 0 clamp(26px, 3.4vw, 44px); padding-left: clamp(30px, 3.6vw, 56px); max-width: none; }
-.hero__quote::before { content: "\201C"; position: absolute; left: 0; top: -.08em; font: 800 clamp(64px, 7vw, 120px)/1 var(--f-display); color: var(--volt); opacity: .9; pointer-events: none; }
-.hero__quote p { font: 700 clamp(22px, 2.55vw, 42px)/1.16 var(--f-display); letter-spacing: -.02em; color: var(--white); text-wrap: pretty; max-width: 21em; }
-.hero__q2 { color: rgba(255,255,255,.62); }
-.hero__quote footer { margin-top: 16px; max-width: 70ch; font: 500 12.5px/1.6 var(--f-mono); letter-spacing: .02em; color: var(--muted-d); }
-.hero__quote footer b { color: var(--white); font: 700 15px/1.3 var(--f-display); letter-spacing: 0; }
-.hero__quote a { color: var(--sky); text-decoration: underline; text-underline-offset: 3px; }
+/* the President's words, in their own card: official photo, verbatim quote from the speech, source */
+.pres { grid-area: quote; display: grid; grid-template-columns: 132px minmax(0, 1fr); grid-template-areas: "ph q" "ph by"; gap: 4px 22px; align-items: start;
+  max-width: 760px; margin: 0 0 clamp(26px, 3.4vw, 42px); padding: 16px 22px 16px 16px; border-radius: 22px;
+  background: linear-gradient(135deg, rgba(6, 18, 38, .72), rgba(0, 74, 173, .38)); border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 24px 50px -28px rgba(0, 0, 0, .7); backdrop-filter: blur(8px); }
+.pres__photo { grid-area: ph; width: 132px; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; background: #0B1B33; }
+.pres__q { grid-area: q; margin: 0; padding-top: 2px; }
+.pres__q p { font-size: clamp(15px, 1.15vw, 17px); line-height: 1.55; color: rgba(255, 255, 255, .92); text-wrap: pretty; }
+.pres__by { grid-area: by; display: grid; gap: 1px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .12); }
+.pres__by b { font: 700 16px/1.25 var(--f-display); color: var(--white); }
+.pres__by span { font-size: 13px; color: var(--muted-d); }
+.pres__by small { margin-top: 4px; font: 500 11.5px/1.5 var(--f-mono); color: var(--muted-d); }
+.pres__by a { color: var(--sky); text-decoration: underline; text-underline-offset: 3px; }
 .hero__ctas { grid-area: cta; align-self: start; }
 .status { grid-area: status; justify-self: end; width: 100%; max-width: 440px; }
 .hero__title em { font-style: normal; color: var(--sky); }
@@ -832,6 +837,10 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   .faq__grid { gap: 32px; }
 }
 @media (max-width: 620px) {
+  .pres { grid-template-columns: 84px minmax(0, 1fr); grid-template-areas: "ph by" "q q"; gap: 14px 14px; padding: 14px; border-radius: 18px; }
+  .pres__photo { width: 84px; border-radius: 12px; }
+  .pres__by { margin-top: 0; padding-top: 0; border-top: 0; align-self: center; }
+  .pres__q p { font-size: 15px; }
   .news__chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
   .news__chips::-webkit-scrollbar { display: none; }
   .nchip { flex: none; }

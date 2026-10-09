@@ -1,7 +1,7 @@
 {
   "html": {
     "hero.title": "«Производите <em>электричество</em> из воды на своей земле»",
-    "hero.quote": "<p><span class=\"hero__q1\">Наши предприниматели, эффективно используя водные ресурсы, в этом году также построили малые и микроГЭС на 40 мегаватт.</span> <span class=\"hero__q2\">В результате выработано 120 миллионов киловатт-часов электроэнергии, что обеспечило им дополнительный источник дохода.</span></p><footer><b>Шавкат Мирзиёев</b>, Президент Республики Узбекистан · выступление на конференции «Устойчивая энергетика», 5 декабря 2025 · <a href=\"https://president.uz/ru/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></footer>"
+    "hero.quote": "<img class=\"pres__photo\" src=\"assets/president/mirziyoyev-2025-12-05-sm.webp\" srcset=\"assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w\" sizes=\"(max-width: 620px) 84px, 132px\" width=\"600\" height=\"750\" alt=\"Президент Шавкат Мирзиёев выступает на конференции «Устойчивая энергетика», 5 декабря 2025\" decoding=\"async\"><blockquote class=\"pres__q\"><p>Наши предприниматели, эффективно используя водные ресурсы, в этом году также построили малые и микроГЭС на 40 мегаватт. В результате выработано 120 миллионов киловатт-часов электроэнергии, что обеспечило им дополнительный источник дохода.</p></blockquote><figcaption class=\"pres__by\"><b>Шавкат Мирзиёев</b><span>Президент Республики Узбекистан</span><small>Выступление на конференции «Устойчивая энергетика», 5 декабря 2025 · <a href=\"https://president.uz/ru/lists/view/8751\" target=\"_blank\" rel=\"noopener\">Источник и фото: president.uz</a></small></figcaption>"
   },
   "text": {
     "MINI GES — mini gidroelektrostansiyalar": "MINI GES — мини-гидроэлектростанции",
@@ -368,6 +368,6 @@
     "SUV QABUL QILGICH · FILTR · ZATVOR": "ВОДОЗАБОР · СОРОУДЕРЖИВАЮЩАЯ РЕШЁТКА · ЗАТВОР",
     "Chiqindi tutuvchi panjara (filtr) montaji": "Монтаж сороудерживающей решётки (фильтра)",
     "Kattalashtirish: Chiqindi tutuvchi panjara (filtr) montaji": "Увеличить: Монтаж сороудерживающей решётки (фильтра)",
-    "president.uz": "president.uz"
+    "Президент Шавкат Мирзиёев выступает на конференции «Устойчивая энергетика», 5 декабря 2025": "Президент Шавкат Мирзиёев выступает на конференции «Устойчивая энергетика», 5 декабря 2025"
   }
 }
