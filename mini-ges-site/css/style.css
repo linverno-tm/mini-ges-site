@@ -616,10 +616,6 @@ input[type="range"]:active::-webkit-slider-thumb { box-shadow: 0 0 0 12px rgba(7
 .calc__send { justify-self: stretch; }
 
 /* ---------------- industry news (cards rendered at build time) ---------------- */
-.news__bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px; margin-bottom: 20px; font-size: 12px; color: var(--muted); }
-.news__live { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); }
-.news__live i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: news-ping 1.8s var(--ease) infinite; }
-@keyframes news-ping { 0% { box-shadow: 0 0 0 0 rgba(84,175,58,.55); } 100% { box-shadow: 0 0 0 10px rgba(84,175,58,0); } }
 .news__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
 .nchip { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--white); color: var(--ink); font: 600 13px/1 var(--f-display); transition: background .3s, color .3s, border-color .3s; }
 .nchip sup { font: 500 10px/1 var(--f-mono); color: var(--muted); transition: color .3s; }
@@ -644,7 +640,7 @@ input[type="range"]:active::-webkit-slider-thumb { box-shadow: 0 0 0 12px rgba(7
 .ncard__src .i { width: 16px; height: 16px; flex: none; transition: transform .4s var(--ease); }
 .ncard__a:hover .ncard__src .i { transform: translate(3px, -3px); }
 .news__more { display: flex; width: fit-content; margin: 32px auto 0; }
-.news__note, .news__empty { margin-top: 24px; font-size: 13px; color: var(--muted); }
+.news__empty { margin-top: 24px; font-size: 13px; color: var(--muted); }
 
 /* ---------------- faq ---------------- */
 .faq__grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: start; }

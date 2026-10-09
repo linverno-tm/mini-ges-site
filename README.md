@@ -64,7 +64,7 @@ Tekshiruv o'tmasa, sayt **chiqmaydi**: eski versiya ishlashda davom etadi. Pull 
 
 Qo'lda hech narsa qilish shart emas: GitHub Actions **har soatda** `tools/fetch_news.py` ni ishga tushiradi
 (RSS lentalar har soat, Kun.uz va Daryo qidiruvi har 3 soatda: manbalarga ortiqcha yuk tushmasin).
-Yangi xabar bo'lmasa, repoga commit qilinmaydi; sahifada oxirgi tekshiruv vaqti ko'rinadi.
+Yangi xabar bo'lmasa, repoga commit qilinmaydi.
 Skript GES haqidagi xabarlarni yig'adi:
 - o'zbekcha: Kun.uz va Daryo.uz qidiruvi, Gazeta.uz, UZA, Xabar.uz, UzDaily, Spot, Review, Aniq, Zamin RSS lentalari;
 - ruscha: shu nashrlarning ruscha lentalari va Google News.

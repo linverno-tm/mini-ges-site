@@ -60,9 +60,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           NEWS_FULL: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}   # manual run: include site searches
-        run: |
-          python tools/fetch_news.py
-          echo "NEWS_CHECKED=$(date -u +%Y-%m-%dT%H:%MZ)" >> "$GITHUB_ENV"   # shown on the page as the last check
+        run: python tools/fetch_news.py
       - name: Keep the news history in the repo
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
