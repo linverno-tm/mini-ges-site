@@ -318,15 +318,15 @@ function mainGES() {
         // right edge of the headline's actual text (the h1 box itself is wider than its lines)
         let textRight = tr ? tr.right : 0;
         if (title) { const rg = document.createRange(); rg.selectNodeContents(title); textRight = rg.getBoundingClientRect().right || textRight; }
-        const left = Math.max(tr ? textRight - hr.left + 32 : W * 0.5, cr ? cr.left - hr.left : W * 0.55);
-        const right = W - 32;
+        const left = Math.max(tr ? textRight - hr.left + 24 : W * 0.5, cr ? cr.left - hr.left : W * 0.55);
+        const right = W - 16;
         const nav = $('.nav');
         const top = (nav ? nav.getBoundingClientRect().bottom - hr.top : 80) + 16;
         const baseY = cardTop - 18;
-        // the whole scene (substation + line receding to the right) is ~32 m wide and ~20 m tall
+        // the whole scene (substation + line receding to the right) is ~28 m wide and ~20 m tall
         // at the substation's scale: fit it inside the free box so nothing is cut at the edge
-        const k = Math.max(4, Math.min(18, (right - left) / 32, (baseY - top) / 20));   // px per metre
-        const cx = left + Math.max(0, (right - left - 32 * k) / 2) + 15 * k;
+        const k = Math.max(4, Math.min(20, (right - left) / 28, (baseY - top) / 20));   // px per metre
+        const cx = left + Math.max(0, (right - left - 28 * k) / 2) + 15 * k;
         F = k * subZ;
         VPY = baseY - CAMH * k;
         VPX = cx + 4 * k;
@@ -351,9 +351,9 @@ function mainGES() {
       const sub = substation(nctx, subX, subZ);
       // phones: the outgoing line comes towards the viewer and leaves the screen;
       // desktop: it recedes to the right and stays inside the frame
-      const out1 = narrow ? pylon(nctx, subX + 16, 32) : pylon(nctx, subX + 12, 50);
-      const out2 = narrow ? pylon(nctx, subX + 26, 25) : pylon(nctx, subX + 18, 66);
-      const out3 = narrow ? pylon(nctx, subX + 38, 19) : pylon(nctx, subX + 24, 88);
+      const out1 = narrow ? pylon(nctx, subX + 16, 32) : pylon(nctx, subX + 10, 56);
+      const out2 = narrow ? pylon(nctx, subX + 26, 25) : pylon(nctx, subX + 14, 76);
+      const out3 = narrow ? pylon(nctx, subX + 38, 19) : pylon(nctx, subX + 17, 104);
 
       // conductors and the routes pulses follow (far -> substation -> viewer), one per phase
       routes = [0, 1, 2].map(ph => {
@@ -367,7 +367,7 @@ function mainGES() {
         strokePoly(nctx, inS, 0.45, 0.9);
         const [b0, b1] = sub.bus[ph];
         const o1 = span(sub.exit[ph], out1[ph]), o2 = span(out1[ph], out2[ph]), o3 = span(out2[ph], out3[ph]);
-        const o4 = span(out3[ph], narrow ? [out3[ph][0] + 14, out3[ph][1], 14] : [out3[ph][0] + 6, out3[ph][1], 120]);
+        const o4 = span(out3[ph], narrow ? [out3[ph][0] + 14, out3[ph][1], 14] : [out3[ph][0] + 3, out3[ph][1], 140]);
         [o1, o2, o3, o4].forEach(s => strokePoly(nctx, s, 0.5, 1.1));
         const farPart = pts.slice(), nearPart = [].concat(inS, [b0, b1], o1, o2, o3, o4);
         pts = farPart.concat(nearPart);
