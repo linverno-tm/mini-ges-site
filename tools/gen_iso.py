@@ -226,6 +226,7 @@ W(f'''<defs>
   <linearGradient id="gGlint" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
   <linearGradient id="gTube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D3DA"/><stop offset=".45" stop-color="#7E8E9A"/><stop offset="1" stop-color="#46535D"/></linearGradient>
   <linearGradient id="gBlade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EEE6D2"/><stop offset=".5" stop-color="#C7B994"/><stop offset="1" stop-color="#8F8262"/></linearGradient>
+  <linearGradient id="gPole" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EEF1F2"/><stop offset=".45" stop-color="#C9CFD2"/><stop offset="1" stop-color="#8A9398"/></linearGradient>
   <linearGradient id="gCone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9C4CC"/><stop offset="1" stop-color="#56646F"/></linearGradient>
   <linearGradient id="gTree" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6F9A45"/><stop offset=".55" stop-color="#4A7230"/><stop offset="1" stop-color="#2D4A1F"/></linearGradient>
   <radialGradient id="gGround" cx=".42" cy=".44" r=".5"><stop offset="0" stop-color="#8A8E5E"/><stop offset=".7" stop-color="#737A4C"/><stop offset="1" stop-color="#5C643D"/></radialGradient>
@@ -465,17 +466,58 @@ W(yz(PX1) + rect(PY0, PZ0, PY1 - PY0, 8, PLASTER[2]) + rect(56 + DY, -6, 20, 6, 
 W(f'<polygon points="{pts((PX0, PY0, PZ1), (PX1, PY0, PZ1), (PX1, PY1, PZ1), (PX0, PY1, PZ1))}" fill="#FFFFFF" fill-opacity=".04" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="1" stroke-dasharray="5 4"/>')
 
 # ---------------------------------------------------------------- transformer, pylons, village (downstream side)
-W(shadow(232, 252, 128 + DY, 146 + DY, 16))
-W('<g class="trafo">' + box(232, 252, 128 + DY, 146 + DY, 0, 16, *STEEL)
-  + xz(146 + DY) + ''.join(f'<path d="M{235 + i * 3} 2v11" stroke="#4E585F" stroke-width="1.4"/>' for i in range(5)) + '</g>'
-  + yz(252) + rect(128 + DY, 0, 18, 16, 'none', ' stroke="#4E585F" stroke-width="1"') + '</g>'
-  + xy(.1) + f'<circle class="trafo-glow" cx="242" cy="{137 + DY}" r="30" fill="url(#gGlow)"/></g>' + '</g>')
-c1, c2 = P(292, 116 + DY, 4), P(244, 128 + DY, 10)
+# switchyard as built: concrete pad and panel fence, two portals of galvanized round columns on concrete plinths,
+# a frame-mounted unit with three brown porcelain bushings and a grey control cabinet
+YX0, YX1, YY0, YY1 = 220, 266, 120 + DY, 156 + DY
+def pole(x, y, h, r=.95):
+    """round galvanized column: lit on the left, shaded on the right"""
+    a, b = P(x, y, 0), P(x, y, h)
+    return (f'<polygon points="{f(a[0] - r)},{f(a[1])} {f(a[0] + r)},{f(a[1])} {f(b[0] + r)},{f(b[1])} {f(b[0] - r)},{f(b[1])}" fill="url(#gPole)"/>'
+            f'<ellipse cx="{f(b[0])}" cy="{f(b[1])}" rx="{f(r)}" ry="{f(r * .5)}" fill="#E9EDEF"/>')
+def pipe(a, b, w=1.3, c='#9EA7AC'):
+    return f'<path d="M{f(a[0])} {f(a[1])}L{f(b[0])} {f(b[1])}" stroke="{c}" stroke-width="{w}" stroke-linecap="round"/>'
+def bushing(x, y, z0, n=5):
+    """brown porcelain insulator: a stack of sheds"""
+    out = ''
+    for i in range(n):
+        cx, cy = P(x, y, z0 + i * 1.5)
+        out += f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="1.35" ry=".55" fill="#6B3A20"/><ellipse cx="{f(cx - .3)}" cy="{f(cy - .15)}" rx=".7" ry=".25" fill="#A8683F"/>'
+    top = P(x, y, z0 + n * 1.5)
+    return out + f'<rect x="{f(top[0] - .5)}" y="{f(top[1] - 1.4)}" width="1" height="1.4" fill="#8E969C"/>'
+
+W(xy(0.05) + f'<rect x="{YX0}" y="{YY0}" width="{YX1 - YX0}" height="{YY1 - YY0}" fill="#B9B5AA"/>'
+  + f'<rect x="{YX0}" y="{YY0}" width="{YX1 - YX0}" height="{YY1 - YY0}" fill="url(#pGridW)"/></g>')        # concrete/gravel pad
+W(xz(YY0) + rect(YX0, 0, YX1 - YX0, 3.2, CONC[1]) + '</g>' + yz(YX0) + rect(YY0, 0, YY1 - YY0, 3.2, CONC[1]) + '</g>')   # far fence panels
+W(shadow(236, 248, 131 + DY, 143 + DY, 22, .45))
+cols = [(228, 126 + DY), (228, 150 + DY), (258, 126 + DY), (258, 150 + DY)]
+yard = ['<g class="trafo">']
+for x, y in cols:                                                          # plinths
+    yard.append(box(x - 1.8, x + 1.8, y - 1.8, y + 1.8, 0, 3, *CONC))
+for x, y in cols[:2]:
+    yard.append(pole(x, y, 34))
+yard.append(pipe(P(228, 124 + DY, 31), P(228, 152 + DY, 31), 1.5))          # portal beam
+yard.append(pipe(P(228, 138 + DY, 31), P(222, 138 + DY, 34), 1.1))          # bent arm, as in the photo
+# the unit: steel frame, grey tank, three brown bushings; grey control cabinet on its side
+for x, y in ((237, 132 + DY), (247, 132 + DY), (237, 142 + DY), (247, 142 + DY)):
+    yard.append(pipe(P(x, y, 0), P(x, y, 12), .9, '#7F8A91'))
+yard.append(box(236, 248, 131 + DY, 143 + DY, 12, 18, *STEEL))
+yard.append(box(249, 252, 135 + DY, 141 + DY, 5, 12, '#BCC3C8', '#A3ABB1', '#8B949A'))
+yard += [bushing(x, 137 + DY, 18) for x in (238.5, 242, 245.5)]
+for x, y in cols[2:]:
+    yard.append(pole(x, y, 28))
+yard.append(pipe(P(258, 124 + DY, 25), P(258, 152 + DY, 25), 1.5))
+for x in (238.5, 242, 245.5):                                              # droppers to the portal beam
+    yard.append(f'<path d="{sag(P(x, 137 + DY, 25.6), P(228, 132 + DY + (x - 238.5) * 1.6, 31), 3)}" fill="none" stroke="#3E454B" stroke-width=".5"/>')
+yard.append(xy(.1) + f'<circle class="trafo-glow" cx="242" cy="{137 + DY}" r="30" fill="url(#gGlow)"/></g>')
+yard.append('</g>')
+W(''.join(yard))
+W(xz(YY1) + rect(YX0, 0, YX1 - YX0, 3.2, CONC[1]) + '</g>' + yz(YX1) + rect(YY0, 0, YY1 - YY0, 3.2, CONC[2]) + '</g>')   # near fence panels, low
+c1, c2 = P(292, 116 + DY, 4), P(250, 135 + DY, 8)
 W(f'<path d="M{f(c1[0])} {f(c1[1])}L{f(c2[0])} {f(c2[1])}" stroke="#4AF745" stroke-width="1.4" stroke-opacity=".6" class="cable"/>')
 py1, arms1 = pylon(162, 196 + DY)
 py2, arms2 = pylon(82, 244 + DY)
 W(py1); W(py2)
-tA = P(237, 137 + DY, 18)
+tA = P(222, 138 + DY, 34)                    # line leaves from the portal arm
 vill = P(12, 292 + DY, 20)
 wires = []
 for k in (0, 1):
@@ -524,10 +566,10 @@ for yc in (66 + DY, 96 + DY):
         a_ = P(ax_ + (bx_ - ax_) * t1, ay_ + (by_ - ay_) * t1, 28.4)
         b_ = P(ax_ + (bx_ - ax_) * t2, ay_ + (by_ - ay_) * t2, 28.4)
         gen_arcs.append(bolt(a_, b_, 5, 2.5))
-t0 = P(242, 137 + DY, 16)
+t0 = P(242, 137 + DY, 26)                    # discharges at the bushing tops
 for i in range(2):
     arcs.append(bolt(t0, (t0[0] + rnd.uniform(-10, 10), t0[1] - rnd.uniform(14, 20)), 5, 3.5))
-arcs.append(bolt(P(292, 116 + DY, 4), P(244, 128 + DY, 10), 8, 3))
+arcs.append(bolt(P(292, 116 + DY, 4), P(250, 135 + DY, 8), 8, 3))
 W('<g class="arcs" filter="url(#fArc)">' + ''.join(
     f'<path class="arc" d="{d}" style="animation-delay:-{rnd.uniform(0, 2.4):.2f}s;animation-duration:{rnd.uniform(1.6, 2.8):.2f}s"/>'
     for d in arcs) + ''.join(
@@ -559,7 +601,7 @@ W(label('lbl-1', (G[0], G[1], 30), -40, -34, 'SUV QABUL QILGICH · FILTR · ZATV
 W(label('lbl-2', (route[30][0], route[30][1] - 11, 2), 0, -58, 'DERIVATSIYA KANALI', 'middle'))   # above the arch, on the open ground
 W(label('lbl-3', (358, 96 + DY, -2), -14, 50, '2 × GORIZONTAL TURBINA', 'end'))
 W(label('lbl-4', (319, 96 + DY, 28), -30, -46, '2 × GENERATOR', 'end'))
-W(label('lbl-4b', (242, 137 + DY, 16), 34, 22, 'TRANSFORMATOR'))
+W(label('lbl-4b', (242, 137 + DY, 26), 34, 22, 'TRANSFORMATOR'))
 W(label('lbl-5', (TMID[0], TMID[1], -4), 30, -34, 'SUV KANALGA QAYTADI'))
 W(label('lbl-5b', (17, 290 + DY, 22), 0, -56, 'TARMOQ · ISTE\'MOLCHI', 'middle'))
 
