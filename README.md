@@ -49,12 +49,15 @@ python mini-ges-site/build.py
 
 Natija `mini-ges-site/dist/` papkasida — uni istalgan hostingga ham yuklash mumkin (`.htaccess` gzip va keshni sozlaydi).
 
-## minigesuz.uz domenini ulash
+## O'z domenini ulash (domen sotib olingandan keyin)
+
+Hozircha sayt GitHub manzilida ishlaydi. Domen (masalan, `miniges.uz`) sotib olingach:
 
 1. Domen panelida (DNS) yozuvlar qo'shing:
    - `A` yozuvlari `@` uchun: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
    - `CNAME` yozuvi `www` uchun: `linverno-tm.github.io`
-2. Repo → **Settings → Pages → Custom domain** ga `minigesuz.uz` yozib saqlang va **Enforce HTTPS** ni yoqing.
+2. Repo → **Settings → Pages → Custom domain** ga domen nomini yozib saqlang va **Enforce HTTPS** ni yoqing.
+3. Kerak bo'lsa, saytning aloqa bo'limiga domen nomini qaytarib qo'shing (`index.html`).
 
 ## Muhim sanalar
 
