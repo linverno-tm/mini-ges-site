@@ -313,16 +313,30 @@ function mainGES() {
     const fill = $('#dvClipRect');
     const photo = $('#diaPhoto'), pimgs = $$('img', photo), pcap = $('#diaPhotoCap');
     let front = 0;
-    dia.style.setProperty('--k', kFor(cams['0']));
-    window.addEventListener('resize', () => dia.style.setProperty('--k', kFor(dia.getAttribute('viewBox'))));
+    // Cameras are authored for a 1000x640 frame. On a taller frame (phones) close-ups are
+    // cropped at the sides so the subject gets bigger; the overview is expanded instead.
+    const fit = (key) => {
+      const [x, y, w, h] = cams[key].split(' ').map(Number);
+      const a = dia.clientWidth / Math.max(dia.clientHeight, 1);
+      if (!a || Math.abs(a - w / h) < 0.01) return cams[key];
+      if (a < w / h && key !== '0') { const w2 = h * a; return `${x + (w - w2) / 2} ${y} ${w2} ${h}`; }
+      if (a < w / h) { const h2 = w / a; return `${x} ${y - (h2 - h) / 2} ${w} ${h2}`; }
+      const h2 = w / a; return `${x} ${y + (h - h2) / 2} ${w} ${h2}`;
+    };
+    const applyCam = (key, d) => {
+      const vb = fit(key);
+      gsap.to(dia, { attr: { viewBox: vb }, '--k': kFor(vb), duration: d, ease: 'power3.inOut', overwrite: 'auto' });
+    };
+    applyCam('0', 0);
+    let rz;
+    window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => applyCam(camKey, 0), 150); });
 
     const camTo = (key) => {
       if (key === camKey || !cams[key]) return;
       camKey = key;
-      const vb = cams[key], k = kFor(vb);
-      const d = reduced ? 0 : 1.7;
-      gsap.to(dia, { attr: { viewBox: vb }, '--k': k, duration: d, ease: 'power3.inOut', overwrite: 'auto' });
+      applyCam(key, reduced ? 0 : 1.7);
     };
+    const diaName = $('#diaName');
     const showPhoto = (n) => {
       const [src, cap] = PHOTOS[n - 1] || [];
       if (!src || pimgs[front].dataset.src === src) return;
@@ -341,6 +355,8 @@ function mainGES() {
       dia.dataset.step = n;
       hsteps.forEach(s => s.classList.toggle('is-active', +s.dataset.step === n));
       diaStep.textContent = pad(n) + ' / 05';
+      const h = $('h3', hsteps[n - 1]);
+      if (diaName && h) diaName.textContent = h.textContent;
       gsap.fromTo(diaStep, { y: 8, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5 });
       gsap.to(fill, { attr: { width: n >= 2 ? 600 : 0 }, duration: reduced ? 0 : (n >= 2 && prev < 2 ? 2.6 : 0.9), ease: 'power2.inOut', overwrite: true });
       showPhoto(n);
@@ -408,6 +424,14 @@ function mainGES() {
       gsap.fromTo($('.pcard__logo', card), { y: 40 }, { y: -40, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
   });
+  // phones: no sticky stack, so each card grows into place and its logo floats
+  mm.add('(max-width: 900px)', () => {
+    if (reduced) return;
+    $$('[data-pcard]').forEach((card) => {
+      gsap.fromTo(card, { scale: 0.9, y: 50, autoAlpha: 0.35 }, { scale: 1, y: 0, autoAlpha: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top 98%', end: 'top 50%', scrub: 0.6 } });
+      gsap.fromTo($('.pcard__logo', card), { y: 26, scale: 0.9 }, { y: -26, scale: 1.05, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+  });
 
   // ------------------------------------------------------------------ gallery
   const galTrack = $('#galTrack'), galVp = $('#galVp'), galBar = $('#galBar'), galNow = $('#galNow');
@@ -437,8 +461,25 @@ function mainGES() {
       gsap.from(galItems, { y: 80, autoAlpha: 0, duration: 1.2, stagger: 0.08, scrollTrigger: { trigger: '.gallery__pin', start: 'top 70%', once: true } });
     });
     mm.add('(max-width: 900px)', () => {
-      const onS = () => setGal(galVp.scrollLeft / Math.max(1, galVp.scrollWidth - galVp.clientWidth));
+      const onS = () => {
+        setGal(galVp.scrollLeft / Math.max(1, galVp.scrollWidth - galVp.clientWidth));
+        if (galVp.scrollLeft > 30) $('#galHint')?.classList.add('is-done');
+      };
       galVp.addEventListener('scroll', onS, { passive: true });
+      // one gentle nudge the first time the strip is seen, so people know it swipes
+      if (!reduced) {
+        const io = new IntersectionObserver(([e]) => {
+          if (!e.isIntersecting) return;
+          io.disconnect();
+          const o = { x: 0 };
+          const to = () => galVp.scrollTo({ left: o.x, behavior: 'instant' });
+          galVp.style.scrollSnapType = 'none';      // snapping would cancel the nudge
+          gsap.timeline({ delay: 0.5, onComplete: () => { galVp.style.scrollSnapType = ''; } })
+            .to(o, { x: 90, duration: 0.7, ease: 'power2.out', onUpdate: to })
+            .to(o, { x: 0, duration: 0.9, ease: 'power3.inOut', onUpdate: to });
+        }, { threshold: 0.6 });
+        io.observe(galVp);
+      }
       return () => galVp.removeEventListener('scroll', onS);
     });
 

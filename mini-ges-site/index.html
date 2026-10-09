@@ -255,7 +255,7 @@
 
       <div class="how__stage">
         <div class="dia-wrap">
-          <div class="dia-top mono"><span>Mini-GES maketi</span><span id="diaStep">01 / 05</span></div>
+          <div class="dia-top mono"><span class="dia-top__name">Mini-GES maketi</span><span class="dia-top__step" id="diaName" aria-live="polite">Kanaldan suv olish</span><span id="diaStep">01 / 05</span></div>
           <svg class="dia" id="dia" viewBox="-320.43 -65.42 1290.38 825.84" data-cams='{"0": "-320.43 -65.42 1290.38 825.84", "1": "-125.15 -10.13 359 229.76", "2": "6.06 66.16 585.43 374.68", "3": "404.2 309.28 318.66 203.94", "4": "356.18 298.86 405.91 259.78", "5": "204.41 289.2 752.5 481.6"}' role="img" aria-label="Mini-GES maketi: sug'orish kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, ikki gorizontal turbinali stansiya, qaytish o'zani, transformator va qishloqqa boruvchi elektr tarmog'i"><defs>
   <linearGradient id="gW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4FD0FA"/><stop offset=".55" stop-color="#1AA8E8"/><stop offset="1" stop-color="#0B7FC4"/></linearGradient>
   <linearGradient id="gWdeep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1690D6"/><stop offset="1" stop-color="#0A5E9E"/></linearGradient>
@@ -481,6 +481,7 @@
       <div class="gallery__aside">
         <p data-reveal>Qurilish jarayonidan haqiqiy suratlar: derivatsiya kanali, zatvorlar, ikki gidroagregat montaji va stansiya binosi.</p>
         <span class="gallery__count mono" data-reveal><b id="galNow">01</b> / 11</span>
+        <span class="gallery__hint mono" id="galHint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M15 7l5 5-5 5M9 7l-5 5 5 5"/></svg>Surib ko'ring</span>
       </div>
     </div>
     <div class="gallery__vp" id="galVp">
@@ -763,9 +764,9 @@
               </div>
             </div>
             <ul class="plinks">
-              <li><span class="mono">Tel</span><a href="tel:+998990209711">+998&nbsp;99&nbsp;020&nbsp;97&nbsp;11</a><button class="copy" type="button" data-copy="+998990209711" aria-label="Doniyorbek Ozodbekov raqamini nusxalash">Nusxalash</button></li>
-              <li><span class="mono">TG</span><a href="https://t.me/ozodbekov" target="_blank" rel="noopener">@ozodbekov</a><button class="copy" type="button" data-copy="@ozodbekov" aria-label="Doniyorbek Ozodbekov Telegramini nusxalash">Nusxalash</button></li>
-              <li><span class="mono">IG</span><a href="https://www.instagram.com/d.ozodbekov/" target="_blank" rel="noopener">@d.ozodbekov</a><button class="copy" type="button" data-copy="instagram.com/d.ozodbekov" aria-label="Doniyorbek Ozodbekov Instagramini nusxalash">Nusxalash</button></li>
+              <li><span class="plinks__i plinks__i--tel" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h3.2l1.9 4.7-2.3 1.5a11.5 11.5 0 0 0 6 6l1.5-2.3L20 15.8V19a2 2 0 0 1-2.1 2A16.5 16.5 0 0 1 3 6.1 2 2 0 0 1 5 4Z"/></svg></span><a href="tel:+998990209711"><span class="sr-only">Telefon: </span>+998&nbsp;99&nbsp;020&nbsp;97&nbsp;11</a><button class="copy copy--icon" type="button" data-copy="+998990209711" aria-label="Doniyorbek Ozodbekov raqamini nusxalash" title="Nusxalash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></button></li>
+              <li><span class="plinks__i plinks__i--tg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.2 4.3 2.9 11.4c-.9.4-.9 1.2 0 1.5l4.6 1.4 1.8 5.5c.2.7.6.8 1.1.4l2.6-2.1 4.9 3.6c.6.4 1.1.2 1.3-.6l3-14.2c.3-1.1-.4-1.6-1-1.2Z"/><path d="m7.6 14.3 10.2-6.5-7.6 8.6"/></svg></span><a href="https://t.me/ozodbekov" target="_blank" rel="noopener"><span class="sr-only">Telegram: </span>@ozodbekov</a><button class="copy copy--icon" type="button" data-copy="@ozodbekov" aria-label="Doniyorbek Ozodbekov Telegramini nusxalash" title="Nusxalash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></button></li>
+              <li><span class="plinks__i plinks__i--ig" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></span><a href="https://www.instagram.com/d.ozodbekov/" target="_blank" rel="noopener"><span class="sr-only">Instagram: </span>@d.ozodbekov</a><button class="copy copy--icon" type="button" data-copy="instagram.com/d.ozodbekov" aria-label="Doniyorbek Ozodbekov Instagramini nusxalash" title="Nusxalash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></button></li>
             </ul>
           </article>
           <article class="person">
@@ -790,9 +791,9 @@
               </div>
             </div>
             <ul class="plinks">
-              <li><span class="mono">Tel</span><a href="tel:+998998176885">+998&nbsp;99&nbsp;817&nbsp;68&nbsp;85</a><button class="copy" type="button" data-copy="+998998176885" aria-label="Diyorbek Ozodbekov raqamini nusxalash">Nusxalash</button></li>
-              <li><span class="mono">TG</span><a href="https://t.me/azodbekovd" target="_blank" rel="noopener">@azodbekovd</a><button class="copy" type="button" data-copy="@azodbekovd" aria-label="Diyorbek Ozodbekov Telegramini nusxalash">Nusxalash</button></li>
-              <li><span class="mono">IG</span><a href="https://www.instagram.com/azodbekov_d/" target="_blank" rel="noopener">@azodbekov_d</a><button class="copy" type="button" data-copy="instagram.com/azodbekov_d" aria-label="Diyorbek Ozodbekov Instagramini nusxalash">Nusxalash</button></li>
+              <li><span class="plinks__i plinks__i--tel" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h3.2l1.9 4.7-2.3 1.5a11.5 11.5 0 0 0 6 6l1.5-2.3L20 15.8V19a2 2 0 0 1-2.1 2A16.5 16.5 0 0 1 3 6.1 2 2 0 0 1 5 4Z"/></svg></span><a href="tel:+998998176885"><span class="sr-only">Telefon: </span>+998&nbsp;99&nbsp;817&nbsp;68&nbsp;85</a><button class="copy copy--icon" type="button" data-copy="+998998176885" aria-label="Diyorbek Ozodbekov raqamini nusxalash" title="Nusxalash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></button></li>
+              <li><span class="plinks__i plinks__i--tg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.2 4.3 2.9 11.4c-.9.4-.9 1.2 0 1.5l4.6 1.4 1.8 5.5c.2.7.6.8 1.1.4l2.6-2.1 4.9 3.6c.6.4 1.1.2 1.3-.6l3-14.2c.3-1.1-.4-1.6-1-1.2Z"/><path d="m7.6 14.3 10.2-6.5-7.6 8.6"/></svg></span><a href="https://t.me/azodbekovd" target="_blank" rel="noopener"><span class="sr-only">Telegram: </span>@azodbekovd</a><button class="copy copy--icon" type="button" data-copy="@azodbekovd" aria-label="Diyorbek Ozodbekov Telegramini nusxalash" title="Nusxalash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></button></li>
+              <li><span class="plinks__i plinks__i--ig" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></span><a href="https://www.instagram.com/azodbekov_d/" target="_blank" rel="noopener"><span class="sr-only">Instagram: </span>@azodbekov_d</a><button class="copy copy--icon" type="button" data-copy="instagram.com/azodbekov_d" aria-label="Diyorbek Ozodbekov Instagramini nusxalash" title="Nusxalash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></button></li>
             </ul>
           </article>
         </div>
