@@ -56,13 +56,33 @@ NEWS_L = {
 }
 
 
+def same_story_xlang(a, b):
+    """Uzbek and Russian headlines of one story share figures (13 ta GES / 13 ГЭС), not words."""
+    nums = lambda t: {n.replace(',', '.') for n in re.findall(r'\d+(?:[.,]\d+)?', t)
+                      if len(n) >= 2 and not re.fullmatch(r'(?:19|20)\d\d', n)}
+    days = abs((datetime.date.fromisoformat(a['date']) - datetime.date.fromisoformat(b['date'])).days)
+    return days <= 2 and bool(nums(a['title']) & nums(b['title']))
+
+
 def render_news(lang):
     """Static HTML for the news section: no request to a third party when the page opens."""
     esc = html.escape
     t = NEWS_L[lang]
     path = os.path.join(ROOT, 'data', 'news.json')
     data = json.load(open(path, encoding='utf-8')) if os.path.exists(path) else {'updated': '', 'items': []}
-    items = [i for i in data['items'] if i['url'].startswith('https://')][:NEWS_MAX]
+    items = [i for i in data['items'] if i['url'].startswith('https://')]
+    if lang == 'ru':
+        items = [i for i in items if i['lang'] == 'ru']      # Russian readers: Russian headlines only
+    else:
+        # Uzbek page: both languages, Uzbek first within a day; Russian retelling of an Uzbek item is dropped
+        items.sort(key=lambda i: (i['date'], i['lang'] == 'uz'), reverse=True)
+        kept = []
+        for i in items:
+            if i['lang'] == 'ru' and any(x['lang'] == 'uz' and same_story_xlang(i, x) for x in kept):
+                continue
+            kept.append(i)
+        items = kept
+    items = items[:NEWS_MAX]
 
     def day(iso):
         d = datetime.date.fromisoformat(iso)

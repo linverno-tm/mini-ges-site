@@ -62,10 +62,14 @@ Tekshiruv o'tmasa, sayt **chiqmaydi**: eski versiya ishlashda davom etadi. Pull 
 
 ## Soha yangiliklari
 
-GitHub Actions har kuni soat 06:00 da (Toshkent) `tools/fetch_news.py` ni ishga tushiradi. Skript O'zbekiston
-OAV'larining RSS lentalari va Google News qidiruvidan GES haqidagi xabarlarni yig'adi, saralaydi va
-`mini-ges-site/data/news.json` ga qo'shadi. Keyin sayt qayta yig'ilib chiqariladi. Faqat sarlavha, manba, sana va
-havola saqlanadi, havola asl maqolaga olib boradi.
+Qo'lda hech narsa qilish shart emas: GitHub Actions **har 3 soatda** `tools/fetch_news.py` ni ishga tushiradi.
+Skript GES haqidagi xabarlarni yig'adi:
+- o'zbekcha: Kun.uz va Daryo.uz qidiruvi, Gazeta.uz, UZA, Xabar.uz, UzDaily, Spot, Review, Aniq, Zamin RSS lentalari;
+- ruscha: shu nashrlarning ruscha lentalari va Google News.
+
+Xabarlar saralanadi (chet el va yirik mintaqaviy loyihalar chiqariladi) va `mini-ges-site/data/news.json` ga qo'shiladi,
+keyin sayt qayta yig'ilib chiqariladi. O'zbekcha sahifada ikkala tildagi xabarlar chiqadi (bir kunda o'zbekchasi oldin),
+ruscha sahifada faqat ruschasi. Faqat sarlavha, manba, sana va havola saqlanadi, havola asl maqolaga olib boradi.
 
 - Hozir yangilash: repo → **Actions → CI / Deploy → Run workflow**.
 - Manbalar, kalit so'zlar va mavzular (`TAGS`) — `tools/fetch_news.py` boshida.

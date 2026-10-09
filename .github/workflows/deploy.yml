@@ -6,7 +6,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: "0 1 * * *"   # every day 06:00 Tashkent: refresh the industry news section
+    - cron: "17 */3 * * *"   # every 3 hours: pull fresh industry news, rebuild, deploy (no manual step)
 
 permissions:
   contents: read
