@@ -63,19 +63,21 @@ def tube(x0, r0, x1, r1, yc, zc, fill, extra=''):
 
 def tree(x, y, h):
     bx, by = P(x, y, 0); tx, ty = P(x, y, h * 0.32); cx, cy = P(x, y, h * 0.66)
-    return (xy(0) + f'<ellipse cx="{f(x + 5)}" cy="{f(y + 5)}" rx="7" ry="5" fill="#000" opacity=".28"/></g>'
+    return (xy(0) + f'<ellipse cx="{f(x + h * .32)}" cy="{f(y + 2)}" rx="{f(h * .34)}" ry="4.5" fill="#1B2410" opacity=".3"/></g>'
             f'<line x1="{f(bx)}" y1="{f(by)}" x2="{f(tx)}" y2="{f(ty)}" stroke="#3B2A1A" stroke-width="1.6"/>'
-            f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="{f(h * 0.15)}" ry="{f(h * 0.4)}" fill="url(#gTree)"/>')
+            f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="{f(h * 0.15)}" ry="{f(h * 0.4)}" fill="url(#gTree)"/>'
+            f'<ellipse cx="{f(cx - h * .05)}" cy="{f(cy - h * .08)}" rx="{f(h * 0.06)}" ry="{f(h * 0.26)}" fill="#8DB45C" opacity=".35"/>')
 
 def house(x0, y0, w, d, h):
     x1, y1, ym, hr = x0 + w, y0 + d, y0 + d / 2, h + 7
     out = ['<g class="house3d">']
-    out.append(f'<polygon points="{pts((x0, y0, h), (x1, y0, h), (x1, ym, hr), (x0, ym, hr))}" fill="#152E55"/>')
-    out.append(xz(y1) + rect(x0, 0, w, h, '#2B4A78') + ''.join(
-        rect(x0 + 3 + i * 7, 4, 4, 5, '#0F2747', ' class="win"') for i in range(int((w - 3) // 7))) + '</g>')
-    out.append(yz(x1) + rect(y0, 0, d, h, '#22406B') + rect(y0 + d / 2 - 2, 4, 4, 5, '#0F2747', ' class="win"') + '</g>')
-    out.append(f'<polygon points="{pts((x1, y0, h), (x1, y1, h), (x1, ym, hr))}" fill="#22406B"/>')
-    out.append(f'<polygon points="{pts((x0, ym, hr), (x1, ym, hr), (x1, y1, h), (x0, y1, h))}" fill="#1D3B66" stroke="#2F5A8F" stroke-width=".6"/>')
+    out.append(xy(0) + f'<polygon points="{poly_xy(hull([(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0 + 9, y0 + 2), (x1 + 9, y0 + 2), (x1 + 9, y1 + 2), (x0 + 9, y1 + 2)]))}" fill="#1B2410" opacity=".2"/></g>')
+    out.append(f'<polygon points="{pts((x0, y0, h), (x1, y0, h), (x1, ym, hr), (x0, ym, hr))}" fill="#7E4334"/>')
+    out.append(xz(y1) + rect(x0, 0, w, h, '#E4DCCB') + ''.join(
+        rect(x0 + 3 + i * 7, 4, 4, 5, '#5B6670', ' class="win"') for i in range(int((w - 3) // 7))) + '</g>')
+    out.append(yz(x1) + rect(y0, 0, d, h, '#C9BFAB') + rect(y0 + d / 2 - 2, 4, 4, 5, '#5B6670', ' class="win"') + '</g>')
+    out.append(f'<polygon points="{pts((x1, y0, h), (x1, y1, h), (x1, ym, hr))}" fill="#C9BFAB"/>')
+    out.append(f'<polygon points="{pts((x0, ym, hr), (x1, ym, hr), (x1, y1, h), (x0, y1, h))}" fill="#A35A45" stroke="#7A3F31" stroke-width=".6"/>')
     out.append('</g>')
     return ''.join(out)
 
@@ -90,7 +92,7 @@ def pylon(bx, by, h=62):
         d += 'M' + 'L'.join(f'{f(a)} {f(b)}' for a, b in q) + 'Z'
     a1, a2 = P(bx, by - 12, h - 4), P(bx, by + 12, h - 4)
     d += f'M{f(a1[0])} {f(a1[1])}L{f(a2[0])} {f(a2[1])}'
-    return f'<path d="{d}" fill="none" stroke="#8FA8CC" stroke-width="1.1"/>', (a1, a2)
+    return f'<path d="{d}" fill="none" stroke="#6E767C" stroke-width="1.2"/>', (a1, a2)
 
 def hermite(p0, t0, p1, t1, n=28):
     """cubic Hermite segment p0 -> p1 with end tangents t0, t1 (world xy)"""
@@ -149,15 +151,22 @@ def visible_runs(line, side):
         runs.append(cur)
     return runs
 
-def band(center, half, coping=4, wall='#3A5F94', top='#5A80B6', face='#2B4A78', y_min=31):
+def band(center, half, coping=4, wall=None, top=None, face=None, y_min=31):
     """open channel along a curve: returns (bed+walls svg, coping svg, water polygon in world xy)
     Parts inside the main canal (y < y_min) are trimmed: the mouth merges with the canal water."""
+    wall, top, face = wall or CONC[1], top or CONC[0], face or CONC[2]
     hs = half if isinstance(half, list) else [half] * len(center)
     L, R = offset(center, hs), offset(center, [-h for h in hs])
     Lo, Ro = offset(center, [h + coping for h in hs]), offset(center, [-h - coping for h in hs])
     keep = lambda pts_, lim=y_min: [q for q in pts_ if q[1] >= lim]
     water = L + list(reversed(R))
-    under = xy(-12) + f'<g clip-path="url(#landClip)"><polygon points="{poly_xy(water)}" fill="#0B1730"/></g></g>'
+    # bed: only the part a viewer can see in an empty trench, from the far wall's foot (z -12)
+    # up to the near coping (z 2), which hides the rest; otherwise it shows as a dark seam
+    ns = normals(center)
+    lback = [nx + ny < 0 for nx, ny in ns]
+    idx = [i for i, q in enumerate(center) if q[1] >= y_min]
+    bed = [P(*L[i], -12 if lback[i] else 2) for i in idx] + [P(*R[i], 2 if lback[i] else -12) for i in reversed(idx)]
+    under = f'<polygon points="{" ".join(f"{f(a)},{f(b)}" for a, b in bed)}" fill="{CONC_BED}"/>'
     for edge, side in ((L, 1), (R, -1)):
         for run in visible_runs(keep(edge), side):
             under += ribbon(run, -12, 2, wall)
@@ -192,30 +201,45 @@ def sag(a, b, k=10):
     mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + k
     return f'M{f(a[0])} {f(a[1])}Q{f(mx)} {f(my)} {f(b[0])} {f(b[1])}'
 
+# ---------------------------------------------------------------- daylight palette
+CONC = ('#C7C4BA', '#A9A69D', '#8F8C84')        # concrete: top, +y face, +x face (sun from the left)
+CONC_BED = '#55554E'                             # wet channel bed
+PLASTER = ('#D8D0BE', '#C9C0AC', '#B4AB97')      # powerhouse walls
+STEEL = ('#9AA6AF', '#7F8B94', '#66717A')
+SAFETY = ('#E3B23E', '#C6952C', '#A97E23')       # hoist and crane paint
+MACHINE = ('#6E8A78', '#5A7464', '#4A6153')      # generator housing
+NOISE = 'data:image/png;base64,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'
+
+def shadow(x0, x1, y0, y1, h, k=.55):
+    """soft ground shadow of a box, cast toward +x (sun on the left, high)"""
+    dx, dy = h * k, h * k * .25
+    poly = hull([(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0 + dx, y0 + dy), (x1 + dx, y0 + dy), (x1 + dx, y1 + dy), (x0 + dx, y1 + dy)])
+    return xy(0) + f'<polygon points="{poly_xy(poly)}" fill="#1B2410" opacity=".22"/></g>'
+
 o = []
 W = o.append
 
 # ---------------------------------------------------------------- defs
-W('''<defs>
-  <linearGradient id="gW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4FD0FA"/><stop offset=".55" stop-color="#1AA8E8"/><stop offset="1" stop-color="#0B7FC4"/></linearGradient>
-  <linearGradient id="gWdeep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1690D6"/><stop offset="1" stop-color="#0A5E9E"/></linearGradient>
+W(f'''<defs>
+  <linearGradient id="gW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#79B1B3"/><stop offset=".5" stop-color="#4C8D96"/><stop offset="1" stop-color="#336D79"/></linearGradient>
+  <linearGradient id="gWdeep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4A8790"/><stop offset="1" stop-color="#2C5F6A"/></linearGradient>
   <linearGradient id="gGlint" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-  <linearGradient id="gTube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5AA9FF"/><stop offset=".45" stop-color="#1E6FD9"/><stop offset="1" stop-color="#0B3F8F"/></linearGradient>
-  <linearGradient id="gCone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7BBDFF"/><stop offset="1" stop-color="#1450A8"/></linearGradient>
-  <linearGradient id="gTree" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3FA066"/><stop offset="1" stop-color="#14472C"/></linearGradient>
-  <radialGradient id="gGround" cx=".55" cy=".45" r=".7"><stop offset="0" stop-color="#11305C"/><stop offset="1" stop-color="#081631"/></radialGradient>
+  <linearGradient id="gTube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D3DA"/><stop offset=".45" stop-color="#7E8E9A"/><stop offset="1" stop-color="#46535D"/></linearGradient>
+  <linearGradient id="gCone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9C4CC"/><stop offset="1" stop-color="#56646F"/></linearGradient>
+  <linearGradient id="gTree" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6F9A45"/><stop offset=".55" stop-color="#4A7230"/><stop offset="1" stop-color="#2D4A1F"/></linearGradient>
+  <radialGradient id="gGround" cx=".42" cy=".44" r=".5"><stop offset="0" stop-color="#8A8E5E"/><stop offset=".7" stop-color="#737A4C"/><stop offset="1" stop-color="#5C643D"/></radialGradient>
   <radialGradient id="gGlow"><stop offset="0" stop-color="#4AF745" stop-opacity=".7"/><stop offset="1" stop-color="#4AF745" stop-opacity="0"/></radialGradient>
   <radialGradient id="gLamp"><stop offset="0" stop-color="#FFD66B" stop-opacity=".55"/><stop offset="1" stop-color="#FFD66B" stop-opacity="0"/></radialGradient>
-  <pattern id="pRows" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#13304F"/><path d="M0 4h8" stroke="#2E7D4F" stroke-width="2.2" stroke-opacity=".55"/></pattern>
-  <pattern id="pRows2" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#152F4A"/><path d="M4 0v8" stroke="#3A8A52" stroke-width="2" stroke-opacity=".45"/></pattern>
-  <pattern id="pGridW" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0v50" fill="none" stroke="#2A5590" stroke-opacity=".22" stroke-width=".8"/></pattern>
+  <pattern id="pRows" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#6F7E3C"/><path d="M0 4h8" stroke="#4B6327" stroke-width="2.6" stroke-opacity=".8"/><path d="M0 1.6h8" stroke="#8E9C57" stroke-width=".8" stroke-opacity=".6"/></pattern>
+  <pattern id="pRows2" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#B09E5E"/><path d="M4 0v8" stroke="#8F7E43" stroke-width="2.2" stroke-opacity=".7"/></pattern>
+  <pattern id="pGridW" width="96" height="96" patternUnits="userSpaceOnUse"><image href="{NOISE}" width="96" height="96"/></pattern>
   <filter id="fArc" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <clipPath id="dvClip" clipPathUnits="userSpaceOnUse"><rect id="dvClipRect" x="1080" y="0" width="0" height="260"/></clipPath>
   <clipPath id="landClip" clipPathUnits="userSpaceOnUse"><rect x="-300" y="31" width="1700" height="600"/></clipPath>
 </defs>''')
 
 # ---------------------------------------------------------------- ground, fields, grid
-W(xy(0) + rect(-260, -140, 1560, 760, 'url(#gGround)') + rect(-260, -140, 1560, 760, 'url(#pGridW)') + '</g>')
+W(xy(0) + rect(-900, -800, 2900, 2000, 'url(#gGround)') + rect(-900, -800, 2900, 2000, 'url(#pGridW)') + '</g>')   # ground reaches past every camera edge
 # Scene body, v2: the canal flows toward -x (up-left on screen), so every part of the
 # derivation scheme is laid out mirrored along the canal: m(x) = 1092 - x.
 # Intake (upstream) on the right, 400 m channel running left, powerhouse, tailrace, grid, village.
@@ -227,21 +251,21 @@ fields = [(-120, 130, 230, 150, 'pRows'), (150, 140, 200, 140, 'pRows2'), (380, 
           (-140, -130, 330, 90, 'pRows2'), (240, -130, 330, 95, 'pRows'), (620, -130, 360, 100, 'pRows2'),
           (640, 200, 150, 110, 'pRows'), (-130, 300, 260, 110, 'pRows2'), (180, 300, 300, 100, 'pRows')]
 fields = [(M(x + w), y + (FY if y > 0 else 0), w, h, p) for x, y, w, h, p in fields]
-W(xy(0) + ''.join(rect(x, y, w, h, f'url(#{p})', ' rx="3" stroke="#2E7D4F" stroke-opacity=".35" stroke-width="1"') for x, y, w, h, p in fields) + '</g>')
-W(xy(0) + rect(-260, -34, 1560, 12, '#1A2F4E') + '</g>')                    # dirt road, far side
+W(xy(0) + ''.join(rect(x, y, w, h, f'url(#{p})', ' rx="3" stroke="#5E5435" stroke-opacity=".45" stroke-width="1.2"') for x, y, w, h, p in fields) + '</g>')
+W(xy(0) + rect(-260, -34, 1560, 12, '#A08C67') + rect(-260, -34, 1560, 12, 'url(#pGridW)') + '</g>')   # dirt road, far side
 for x in range(-180, 1240, 34):                                             # far poplar row
     W(tree(x, -42, 46 + (x * 7 % 13)))
 
 # ---------------------------------------------------------------- main canal (flows toward -x)
 X0, X1 = -260, 1300
-W(xy(0) + rect(X0, -12, X1 - X0, 16, '#3B5C8C') + '</g>')
-W(f'<polygon points="{pts((X0, 4, 0), (X1, 4, 0), (X1, 11, -11), (X0, 11, -11))}" fill="#4F75AA"/>')
+W(xy(0) + rect(X0, -12, X1 - X0, 16, CONC[0]) + '</g>')
+W(f'<polygon points="{pts((X0, 4, 0), (X1, 4, 0), (X1, 11, -11), (X0, 11, -11))}" fill="{CONC[1]}"/>')
 W(xy(-3) + f'<rect x="{X0}" y="6" width="{X1 - X0}" height="25" fill="url(#gW)"/>'
   + f'<rect class="glint" x="{X0}" y="9" width="220" height="16" fill="url(#gGlint)" opacity=".35"/>'
   + ''.join(f'<path class="flow flow--canal" d="M{X1} {yy}H{X0}" style="animation-delay:-{d}s"/>' for yy, d in ((11, 0), (17, .7), (23, .3), (28, 1.1)))
   + '</g>')
-W(xy(0) + rect(X0, 32, X1 - X0, 14, '#35558A') + '</g>')                    # near bank (the intake and tailrace cut it)
-W(xz(46) + rect(X0, -3, X1 - X0, 3, '#22406B') + '</g>')
+W(xy(0) + rect(X0, 32, X1 - X0, 14, CONC[0]) + '</g>')                    # near bank (the intake and tailrace cut it)
+W(xz(46) + rect(X0, -3, X1 - X0, 3, CONC[2]) + '</g>')
 lp = P(560, 20, 0)
 W(f'<text class="canal-lbl" x="{f(lp[0])}" y="{f(lp[1])}" transform="rotate(30 {f(lp[0])} {f(lp[1])})">←  ASOSIY SUG\'ORISH KANALI</text>')
 
@@ -256,8 +280,8 @@ G, Gd = route[gi], unit_vec(route[gi + 1][0] - route[gi - 1][0], route[gi + 1][1
 under, coping, water = band(route, 11)
 W(under)
 FB = f'422,{70 + DY} 380,{54 + DY} 380,{108 + DY} 422,{92 + DY}'          # forebay widening at the powerhouse
-W(xy(-12) + f'<polygon points="{FB}" fill="#0B1730"/>' + '</g>')
-W(f'<polygon points="{pts((380, 54 + DY, 2), (422, 70 + DY, 2), (422, 70 + DY, -12), (380, 54 + DY, -12))}" fill="#33568A"/>')
+W(f'<polygon points="{pts((422, 70 + DY, -12), (380, 54 + DY, -12), (380, 108 + DY, 2), (422, 92 + DY, 2))}" fill="{CONC_BED}"/>')   # forebay bed, visible part
+W(f'<polygon points="{pts((380, 54 + DY, 2), (422, 70 + DY, 2), (422, 70 + DY, -12), (380, 54 + DY, -12))}" fill="{CONC[1]}"/>')
 intake_line, deriv_line = route[:gi + 1], route[gi:]
 inner = lambda line: [q for q in line if q[1] >= 31]
 W(f'<g class="w-intake">' + xy(-4) + '<g clip-path="url(#landClip)">'
@@ -271,24 +295,23 @@ W(f'<g class="w-deriv">' + xy(-4) + '<g clip-path="url(#dvClip)">'
             for k, d in ((-6, 0), (0, .5), (6, .25)))
   + '</g></g></g>')
 W(coping)
-W(xy(2) + f'<polygon points="380,{50 + DY} 422,{66 + DY} 422,{70 + DY} 380,{54 + DY}" fill="#5A80B6"/>'
-  + f'<polygon points="422,{92 + DY} 380,{108 + DY} 380,{112 + DY} 422,{96 + DY}" fill="#5A80B6"/></g>')
-W(f'<polygon points="{pts((422, 96 + DY, 2), (380, 112 + DY, 2), (380, 112 + DY, 0), (422, 96 + DY, 0))}" fill="#2B4A78"/>')
+W(xy(2) + f'<polygon points="380,{50 + DY} 422,{66 + DY} 422,{70 + DY} 380,{54 + DY}" fill="{CONC[0]}"/>'
+  + f'<polygon points="422,{92 + DY} 380,{108 + DY} 380,{112 + DY} 422,{96 + DY}" fill="{CONC[0]}"/></g>')
+W(f'<polygon points="{pts((422, 96 + DY, 2), (380, 112 + DY, 2), (380, 112 + DY, 0), (422, 96 + DY, 0))}" fill="{CONC[2]}"/>')
 
 # gate across the flow: three piers, two lifting leaves, red hoist frame (all turned to the channel axis)
 nx_, ny_ = -Gd[1], Gd[0]
 at = lambda k: (G[0] + nx_ * k, G[1] + ny_ * k)
 for k, z0 in ((-13.5, 2), (0, -4), (13.5, 2)):                              # side piers stand on the walls, the middle one in the water
-    W(obox(at(k), Gd, 8, 4.5, z0, 9, '#4B6FA3', '#2F5185', '#24467A'))
+    W(obox(at(k), Gd, 8, 4.5, z0, 9, *CONC))
 W('<g class="gates">')
 for k0, k1 in ((-11.2, -2.3), (2.3, 11.2)):
     a_, b_ = at(k0), at(k1)
-    lines = ''.join(f'<path d="M{f(P(a_[0], a_[1], zz)[0])} {f(P(a_[0], a_[1], zz)[1])}L{f(P(b_[0], b_[1], zz)[0])} {f(P(b_[0], b_[1], zz)[1])}" stroke="#5C7397" stroke-width=".8"/>' for zz in (-1, 2, 5))
-    W(f'<g class="gate"><polygon points="{pts((a_[0], a_[1], -4), (b_[0], b_[1], -4), (b_[0], b_[1], 6), (a_[0], a_[1], 6))}" fill="#7C93B5"/>{lines}</g>')
+    lines = ''.join(f'<path d="M{f(P(a_[0], a_[1], zz)[0])} {f(P(a_[0], a_[1], zz)[1])}L{f(P(b_[0], b_[1], zz)[0])} {f(P(b_[0], b_[1], zz)[1])}" stroke="{STEEL[2]}" stroke-width=".8"/>' for zz in (-1, 2, 5))
+    W(f'<g class="gate"><polygon points="{pts((a_[0], a_[1], -4), (b_[0], b_[1], -4), (b_[0], b_[1], 6), (a_[0], a_[1], 6))}" fill="{STEEL[0]}"/>{lines}</g>')
 W('</g>')
-W('<g class="hoist">' + obox(at(-15.8), Gd, 4, 3.5, 9, 27, '#F05A55', '#C62828', '#A61E1E')
-  + obox(at(15.8), Gd, 4, 3.5, 9, 27, '#F05A55', '#C62828', '#A61E1E')
-  + obox(G, Gd, 4, 35, 27, 30, '#F26A65', '#D32F2F', '#B71C1C') + '</g>')
+W('<g class="hoist">' + obox(at(-15.8), Gd, 4, 3.5, 9, 27, *SAFETY) + obox(at(15.8), Gd, 4, 3.5, 9, 27, *SAFETY)
+  + obox(G, Gd, 4, 35, 27, 30, *SAFETY) + '</g>')
 
 # 400 m: dashed dimension following the arch on its outer side
 dim = [q for q in offset(deriv_line, -26)]
@@ -319,51 +342,53 @@ TMID = tail[len(tail) // 2]
 
 # ---------------------------------------------------------------- powerhouse (cutaway); water enters at x=380, leaves at x=270
 PX0, PX1, PY0, PY1, PZ0, PZ1 = 270, 380, 46 + DY, 116 + DY, -6, 34
-W(xy(PZ0) + rect(PX0, PY0, PX1 - PX0, PY1 - PY0, '#1A355E') + '</g>')
+W(shadow(PX0, PX1, PY0, PY1, 30))
+W(xy(PZ0) + rect(PX0, PY0, PX1 - PX0, PY1 - PY0, '#86837A') + '</g>')
 W(xy(PZ0 + .2) + f'<circle class="ph-glow" cx="325" cy="{81 + DY}" r="58" fill="url(#gGlow)"/></g>')
-W(xz(PY0) + rect(PX0, PZ0, PX1 - PX0, PZ1 - PZ0, '#29497A') + ''.join(
-    rect(PX0 + 12 + i * 26, 14, 14, 12, '#16325C') for i in range(4)) + '</g>')
-W(yz(PX0) + rect(PY0, PZ0, PY1 - PY0, PZ1 - PZ0, '#203F6D') + rect(58 + DY, -4, 16, 18, '#0B1730') + rect(88 + DY, -4, 16, 18, '#0B1730') + '</g>')
+W(xz(PY0) + rect(PX0, PZ0, PX1 - PX0, PZ1 - PZ0, PLASTER[1]) + ''.join(
+    rect(PX0 + 12 + i * 26, 14, 14, 12, '#5D6B74') + rect(PX0 + 12 + i * 26, 14, 14, 3, '#7F8E97') for i in range(4)) + '</g>')
+W(yz(PX0) + rect(PY0, PZ0, PY1 - PY0, PZ1 - PZ0, PLASTER[2]) + rect(58 + DY, -4, 16, 18, '#3A3B37') + rect(88 + DY, -4, 16, 18, '#3A3B37') + '</g>')
 
 def unit(yc, k):
     zc = 6
     s = [f'<g class="unit unit--{k}">']
-    s.append(xy(PZ0 + .1) + f'<ellipse cx="326" cy="{yc + 3}" rx="44" ry="13" fill="#000" opacity=".35"/></g>')
+    s.append(xy(PZ0 + .1) + f'<ellipse cx="326" cy="{yc + 3}" rx="44" ry="13" fill="#000" opacity=".25"/></g>')
     s.append(tube(280, 9, 292, 11, yc, zc, 'url(#gCone)'))                 # draft tube toward the outlet
     s.append(tube(292, 11, 358, 11, yc, zc, 'url(#gTube)'))
     for fx_ in (300, 324, 346):
-        s.append(tube(fx_, 12, fx_ + 2.2, 12, yc, zc, '#0E4AA6'))
-    s.append(yz(358) + f'<circle cx="{yc}" cy="{zc}" r="11" fill="#08306E"/>'   # intake face with the runner
-             f'<circle cx="{yc}" cy="{zc}" r="11" fill="none" stroke="#5AA9FF" stroke-width="1.2"/>'
+        s.append(tube(fx_, 12, fx_ + 2.2, 12, yc, zc, STEEL[2]))
+    s.append(yz(358) + f'<circle cx="{yc}" cy="{zc}" r="11" fill="#2F3A42"/>'   # intake face with the runner
+             f'<circle cx="{yc}" cy="{zc}" r="11" fill="none" stroke="#B5C2CB" stroke-width="1.2"/>'
              f'<g class="runner" style="transform-origin:{yc}px {zc}px">'
-             + ''.join(f'<path d="M{yc} {zc} q4 -3 8.5 -2 l0 1.8 q-4 1 -8.5 0.2z" fill="#9FE3FF" transform="rotate({a} {yc} {zc})"/>' for a in range(0, 360, 72))
+             + ''.join(f'<path d="M{yc} {zc} q4 -3 8.5 -2 l0 1.8 q-4 1 -8.5 0.2z" fill="#DCE4EA" transform="rotate({a} {yc} {zc})"/>' for a in range(0, 360, 72))
              + f'<circle cx="{yc}" cy="{zc}" r="2.6" fill="#E8F7FF"/></g>'
              f'<circle class="spin-ring" cx="{yc}" cy="{zc}" r="8" fill="none" stroke="#BDEBFF" stroke-width="1" stroke-dasharray="3 5"/>'
              '</g>')
-    s.append(f'<g class="gen">' + box(306, 332, yc - 8, yc + 8, 16, 28, '#183A6A', '#0F2A52', '#0B2346')
+    s.append(f'<g class="gen">' + box(306, 332, yc - 8, yc + 8, 16, 28, *MACHINE)
              + xz(yc + 8) + f'<path class="gen-bolt" d="M322 25 l-5 -7 h4 l-2 -6 l7 8 h-4z" fill="#4AF745"/>'
-             + rect(306, 16, 26, 12, 'none', ' stroke="#4AF745" stroke-width=".9"') + '</g>'
-             + yz(332) + rect(yc - 8, 16, 16, 12, 'none', ' stroke="#4AF745" stroke-width=".9"') + '</g>'
+             + rect(306, 16, 26, 12, 'none', ' stroke="#4AF745" stroke-width=".6" stroke-opacity=".55"') + '</g>'
+             + yz(332) + rect(yc - 8, 16, 16, 12, 'none', ' stroke="#4AF745" stroke-width=".6" stroke-opacity=".55"') + '</g>'
              + '</g>')
     s.append('</g>')
     return ''.join(s)
 
 W(unit(66 + DY, 'a'))
 W(unit(96 + DY, 'b'))
-W(f'<g class="crane">' + box(PX0 + 4, PX1 - 4, 48 + DY, 50 + DY, 31, 32.5, '#F05A55', '#C62828', '#A61E1E')
-  + box(PX0 + 4, PX1 - 4, 112 + DY, 114 + DY, 31, 32.5, '#F05A55', '#C62828', '#A61E1E')
-  + box(300, 306, 48 + DY, 114 + DY, 32, 34, '#FF7A70', '#D32F2F', '#B71C1C')
-  + box(300, 306, 62 + DY, 70 + DY, 26, 32, '#FF7A70', '#D32F2F', '#B71C1C') + '</g>')
+W(f'<g class="crane">' + box(PX0 + 4, PX1 - 4, 48 + DY, 50 + DY, 31, 32.5, *SAFETY)
+  + box(PX0 + 4, PX1 - 4, 112 + DY, 114 + DY, 31, 32.5, *SAFETY)
+  + box(300, 306, 48 + DY, 114 + DY, 32, 34, *SAFETY)
+  + box(300, 306, 62 + DY, 70 + DY, 26, 32, *SAFETY) + '</g>')
 for cx_, cy_ in ((PX1, PY1), (PX1, PY0), (PX0, PY1)):
-    W(box(cx_ - 3, cx_, cy_ - 3, cy_, PZ0, PZ1, '#5A80B6', '#3A5F94', '#2F5185'))
-W(xz(PY1) + rect(PX0, PZ0, PX1 - PX0, 8, '#2B4A78') + '</g>')
-W(yz(PX1) + rect(PY0, PZ0, PY1 - PY0, 8, '#22406B') + rect(56 + DY, -6, 20, 6, '#0B1730') + rect(86 + DY, -6, 20, 6, '#0B1730') + '</g>')
-W(f'<polygon points="{pts((PX0, PY0, PZ1), (PX1, PY0, PZ1), (PX1, PY1, PZ1), (PX0, PY1, PZ1))}" fill="#46C6F7" fill-opacity=".05" stroke="#46C6F7" stroke-opacity=".45" stroke-width="1" stroke-dasharray="5 4"/>')
+    W(box(cx_ - 3, cx_, cy_ - 3, cy_, PZ0, PZ1, *CONC))
+W(xz(PY1) + rect(PX0, PZ0, PX1 - PX0, 8, PLASTER[1]) + '</g>')
+W(yz(PX1) + rect(PY0, PZ0, PY1 - PY0, 8, PLASTER[2]) + rect(56 + DY, -6, 20, 6, '#3A3B37') + rect(86 + DY, -6, 20, 6, '#3A3B37') + '</g>')
+W(f'<polygon points="{pts((PX0, PY0, PZ1), (PX1, PY0, PZ1), (PX1, PY1, PZ1), (PX0, PY1, PZ1))}" fill="#FFFFFF" fill-opacity=".04" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="1" stroke-dasharray="5 4"/>')
 
 # ---------------------------------------------------------------- transformer, pylons, village (downstream side)
-W('<g class="trafo">' + box(232, 252, 128 + DY, 146 + DY, 0, 16, '#183A6A', '#0F2A52', '#0B2346')
-  + xz(146 + DY) + ''.join(f'<path d="M{235 + i * 3} 2v11" stroke="#4AF745" stroke-opacity=".7" stroke-width=".9"/>' for i in range(5)) + '</g>'
-  + yz(252) + rect(128 + DY, 0, 18, 16, 'none', ' stroke="#4AF745" stroke-width="1"') + '</g>'
+W(shadow(232, 252, 128 + DY, 146 + DY, 16))
+W('<g class="trafo">' + box(232, 252, 128 + DY, 146 + DY, 0, 16, *STEEL)
+  + xz(146 + DY) + ''.join(f'<path d="M{235 + i * 3} 2v11" stroke="#4E585F" stroke-width="1.4"/>' for i in range(5)) + '</g>'
+  + yz(252) + rect(128 + DY, 0, 18, 16, 'none', ' stroke="#4E585F" stroke-width="1"') + '</g>'
   + xy(.1) + f'<circle class="trafo-glow" cx="242" cy="{137 + DY}" r="30" fill="url(#gGlow)"/></g>' + '</g>')
 c1, c2 = P(292, 116 + DY, 4), P(244, 128 + DY, 10)
 W(f'<path d="M{f(c1[0])} {f(c1[1])}L{f(c2[0])} {f(c2[1])}" stroke="#4AF745" stroke-width="1.4" stroke-opacity=".6" class="cable"/>')
