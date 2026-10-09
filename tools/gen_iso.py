@@ -164,11 +164,11 @@ def band(center, half, coping=4, wall=None, top=None, face=None, y_min=31):
     # up to the near coping (z 2), which hides the rest; otherwise it shows as a dark seam
     ns = normals(center)
     lback = [nx + ny < 0 for nx, ny in ns]
-    idx = [i for i, q in enumerate(center) if q[1] >= y_min]
+    idx = [i for i, q in enumerate(center) if q[1] >= y_min + 14]   # starts inside the bank: water hides the cut
     bed = [P(*L[i], -12 if lback[i] else 2) for i in idx] + [P(*R[i], 2 if lback[i] else -12) for i in reversed(idx)]
     under = f'<polygon points="{" ".join(f"{f(a)},{f(b)}" for a, b in bed)}" fill="{CONC_BED}"/>'
     for edge, side in ((L, 1), (R, -1)):
-        for run in visible_runs(keep(edge), side):
+        for run in visible_runs(keep(edge, 44), side):      # inside the bank the cut face belongs to the bank
             under += ribbon(run, -12, 2, wall)
     cop = ''
     for e, eo, side in ((L, Lo, 1), (R, Ro, -1)):
@@ -221,7 +221,7 @@ W = o.append
 
 # ---------------------------------------------------------------- defs
 W(f'''<defs>
-  <linearGradient id="gW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#79B1B3"/><stop offset=".5" stop-color="#4C8D96"/><stop offset="1" stop-color="#336D79"/></linearGradient>
+  <linearGradient id="gW" gradientUnits="userSpaceOnUse" x1="-260" y1="0" x2="1300" y2="90"><stop offset="0" stop-color="#5F9EA4"/><stop offset=".5" stop-color="#4C8D96"/><stop offset="1" stop-color="#3D7B86"/></linearGradient>
   <linearGradient id="gWdeep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4A8790"/><stop offset="1" stop-color="#2C5F6A"/></linearGradient>
   <linearGradient id="gGlint" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
   <linearGradient id="gTube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D3DA"/><stop offset=".45" stop-color="#7E8E9A"/><stop offset="1" stop-color="#46535D"/></linearGradient>
@@ -235,7 +235,7 @@ W(f'''<defs>
   <pattern id="pGridW" width="96" height="96" patternUnits="userSpaceOnUse"><image href="{NOISE}" width="96" height="96"/></pattern>
   <filter id="fArc" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <clipPath id="dvClip" clipPathUnits="userSpaceOnUse"><rect id="dvClipRect" x="1080" y="0" width="0" height="260"/></clipPath>
-  <clipPath id="landClip" clipPathUnits="userSpaceOnUse"><rect x="-300" y="31" width="1700" height="600"/></clipPath>
+  <clipPath id="landClip" clipPathUnits="userSpaceOnUse"><rect x="-300" y="27" width="1700" height="600"/></clipPath>
 </defs>''')
 
 # ---------------------------------------------------------------- ground, fields, grid
@@ -264,29 +264,62 @@ W(xy(-3) + f'<rect x="{X0}" y="6" width="{X1 - X0}" height="25" fill="url(#gW)"/
   + f'<rect class="glint" x="{X0}" y="9" width="220" height="16" fill="url(#gGlint)" opacity=".35"/>'
   + ''.join(f'<path class="flow flow--canal" d="M{X1} {yy}H{X0}" style="animation-delay:-{d}s"/>' for yy, d in ((11, 0), (17, .7), (23, .3), (28, 1.1)))
   + '</g>')
-W(xy(0) + rect(X0, 32, X1 - X0, 14, CONC[0]) + '</g>')                    # near bank (the intake and tailrace cut it)
-W(xz(46) + rect(X0, -3, X1 - X0, 3, CONC[2]) + '</g>')
+# water routes (drawn further down) are laid out first: the near bank gets real openings where they cross it
+K0, K1, K2 = (1060, 16), (700, 178), (422, 81 + DY)
+t0 = unit_vec(-1, .38)
+route = hermite(K0, (t0[0] * 420, t0[1] * 420), K1, (-380, 0), 30)[:-1] + hermite(K1, (-380, 0), K2, (-300, 0), 26)
+gi = next(i for i, q in enumerate(route) if q[1] >= 66)      # the gate stands just past the canal bank
+# flared mouth: 22 wide at the gate, opening to ~42 where it meets the canal
+rh = [11 + 10 * ((gi - i) / gi) ** 1.4 if i < gi else 11 for i in range(len(route))]
+tail = hermite((270, 81 + DY), (-200, 0), (40, 14), (-230, -95), 30)        # mirror of the intake: leaves level, joins the canal at a shallow angle
+th = [31 - 17 * (i / (len(tail) - 1)) ** .8 for i in range(len(tail))]       # 62 wide at the outlet, 28 at the canal
+th = [h + 8 * max(0, (i - len(tail) * .8) / (len(tail) * .2)) for i, h in enumerate(th)]   # and a slight flare into the canal
+
+def cross_x(edge, yv):
+    """x where a polyline first crosses the line y = yv (its ends are extended straight, in case they stop short)"""
+    def ext(p, q, k=80):
+        dx, dy = unit_vec(p[0] - q[0], p[1] - q[1])
+        return (p[0] + dx * k, p[1] + dy * k)
+    edge = [ext(edge[0], edge[1])] + list(edge) + [ext(edge[-1], edge[-2])]
+    for (xa, ya), (xb, yb) in zip(edge, edge[1:]):
+        if (ya - yv) * (yb - yv) <= 0 and ya != yb:
+            return xa + (xb - xa) * (yv - ya) / (yb - ya)
+    return None
+
+def opening(center, half):
+    """the bank's cut for a channel: x on the bank's water line (y 32) and outer line (y 46) for both channel edges"""
+    L, R = offset(center, half), offset(center, [-h for h in half])
+    xs = {k: (cross_x(e, 32), cross_x(e, 46)) for k, e in (('L', L), ('R', R))}
+    lo_edge = min(xs, key=lambda k: min(xs[k]))
+    hi_edge = 'R' if lo_edge == 'L' else 'L'
+    return xs[lo_edge], xs[hi_edge]      # ((x@32, x@46) on the downstream edge, same on the upstream edge)
+
+cuts = sorted([opening(tail, th), opening(route, rh)], key=lambda c: c[0][0])
+segs, start = [], ((X0, X0))
+for lo, hi in cuts:
+    segs.append((start, lo)); start = hi
+segs.append((start, (X1, X1)))
+for (a32, a46), (b32, b46) in segs:       # bank pieces with slanted ends that follow the channel walls
+    W(xy(0) + f'<polygon points="{f(a32)},32 {f(b32)},32 {f(b46)},46 {f(a46)},46" fill="{CONC[0]}"/></g>')
+    W(xz(46) + rect(a46, -3, b46 - a46, 3, CONC[2]) + '</g>')
 lp = P(560, 20, 0)
 W(f'<text class="canal-lbl" x="{f(lp[0])}" y="{f(lp[1])}" transform="rotate(30 {f(lp[0])} {f(lp[1])})">←  ASOSIY SUG\'ORISH KANALI</text>')
 
 # ---------------------------------------------------------------- intake + 400 m channel: one smooth bow
 # Water leaves the canal in its own direction (no right angle), arcs away from the canal and comes back
 # level into the forebay. Hermite tangents keep the curve smooth at every joint.
-K0, K1, K2 = (1060, 16), (700, 178), (422, 81 + DY)
-t0 = unit_vec(-1, .38)
-route = hermite(K0, (t0[0] * 420, t0[1] * 420), K1, (-380, 0), 30)[:-1] + hermite(K1, (-380, 0), K2, (-300, 0), 26)
-gi = next(i for i, q in enumerate(route) if q[1] >= 66)      # the gate stands just past the canal bank
 G, Gd = route[gi], unit_vec(route[gi + 1][0] - route[gi - 1][0], route[gi + 1][1] - route[gi - 1][1])
-under, coping, water = band(route, 11)
+under, coping, water = band(route, rh)
 W(under)
 FB = f'422,{70 + DY} 380,{54 + DY} 380,{108 + DY} 422,{92 + DY}'          # forebay widening at the powerhouse
 W(f'<polygon points="{pts((422, 70 + DY, -12), (380, 54 + DY, -12), (380, 108 + DY, 2), (422, 92 + DY, 2))}" fill="{CONC_BED}"/>')   # forebay bed, visible part
 W(f'<polygon points="{pts((380, 54 + DY, 2), (422, 70 + DY, 2), (422, 70 + DY, -12), (380, 54 + DY, -12))}" fill="{CONC[1]}"/>')
 intake_line, deriv_line = route[:gi + 1], route[gi:]
+ih = rh[:gi + 1]
 inner = lambda line: [q for q in line if q[1] >= 31]
 W(f'<g class="w-intake">' + xy(-4) + '<g clip-path="url(#landClip)">'
-  + f'<polygon points="{poly_xy(offset(intake_line, 11) + list(reversed(offset(intake_line, -11))))}" fill="url(#gW)"/>'
-  + ''.join(f'<path class="flow flow--intake" d="{path_xy(inner(offset(intake_line, k)))}"/>' for k in (-6, 0, 6))
+  + f'<polygon points="{poly_xy(offset(intake_line, ih) + list(reversed(offset(intake_line, [-h for h in ih]))))}" fill="url(#gW)"/>'
+  + ''.join(f'<path class="flow flow--intake" d="{path_xy(inner(offset(intake_line, [h * k for h in ih])))}"/>' for k in (-.55, 0, .55))
   + '</g></g></g>')
 W(f'<g class="w-deriv">' + xy(-4) + '<g clip-path="url(#dvClip)">'
   + f'<polygon points="{poly_xy(offset(deriv_line, 11) + list(reversed(offset(deriv_line, -11))))}" fill="url(#gW)"/>'
@@ -325,8 +358,6 @@ for x in range(452, 1192, 46):                                              # ne
     W(tree(x, 232 + (x * 3 % 7), 30 + (x * 5 % 9)))
 
 # ---------------------------------------------------------------- tailrace: curves back into the canal (downstream)
-tail = hermite((270, 81 + DY), (-200, 0), (40, 14), (-230, -95), 30)        # mirror of the intake: leaves level, joins the canal at a shallow angle
-th = [31 - 17 * (i / (len(tail) - 1)) ** .8 for i in range(len(tail))]       # 62 wide at the outlet, 28 at the canal
 t_under, t_coping, t_water = band(tail, th)
 W(t_under)
 W(f'<g class="w-tail">' + xy(-4) + '<g clip-path="url(#landClip)">'
