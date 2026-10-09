@@ -12,6 +12,7 @@ from html.parser import HTMLParser
 SITE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'mini-ges-site')
 PAGES = ('index.html', '404.html')
 SKIP = ('http://', 'https://', 'tel:', 'mailto:', 'data:', 'javascript:')
+GENERATED = ('ru/', 'sw.js')      # produced by build.py, not present in the source tree
 VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr'}
 
 problems = []
@@ -24,6 +25,8 @@ def local_path(ref):
 
 def check_ref(page, ref, what):
     if not ref or ref.startswith(SKIP) or ref.startswith('#'):
+        return
+    if ref.replace('%SITE_URL%', '').split('?')[0] in GENERATED:
         return
     p = local_path(ref)
     if p and not os.path.exists(p):

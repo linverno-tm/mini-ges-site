@@ -4,6 +4,37 @@
 // JS is running: the CSS failsafe that hides the loader is no longer needed
 document.documentElement.classList.add('js-on');
 
+// Site root, derived from this script's URL: works for /, /ru/ and sub-path hosting.
+const SITE_BASE = (() => {
+  const src = document.currentScript && document.currentScript.src;
+  return src ? new URL('../', src).href : new URL('./', location.href).href;
+})();
+
+// UI strings created by script (static text is localised at build time, see tools/i18n.py)
+const LANG = document.documentElement.lang === 'ru' ? 'ru' : 'uz';
+const L = {
+  uz: {
+    tashkent: 'Toshkent', launched: 'Ishga tushirildi', running: 'Ishlab turibdi',
+    offline: "Internet yo'q — saqlangan versiya ko'rsatilmoqda", online: 'Internet tiklandi',
+    calcAdded: "Hisob-kitob arizaga qo'shildi", copied: 'Nusxalandi: ', copyFail: "Nusxalab bo'lmadi — matnni belgilab oling",
+    errWrap: list => `Iltimos, ${list} kiriting.`, errName: 'ismingizni', errPhone: 'telefon raqamingizni (kamida 9 raqam)', errRegion: 'hududni',
+    leadHello: "Assalomu alaykum! Mini-GES loyihasi bo'yicha ariza.", fName: 'Ism', fPhone: 'Telefon', fRegion: 'Hudud', fSource: "Yo'nalish", fMsg: 'Izoh',
+    calcMsg: (q, h, p, e) => `Kalkulyator: Q = ${q} m³/s, H = ${h} m → taxminan ${p} kVt, ${e} kVt·soat/yil.`,
+    uQ: ' m³/s', uH: ' m',
+    photos: ["G'ildirakli po'lat zatvor", '400 metrlik beton kanal', 'Ikki gorizontal turbina montaji', "Stansiya binosi va ko'prik krani", 'Stansiya va elektr uzatish liniyasi'],
+  },
+  ru: {
+    tashkent: 'Ташкент', launched: 'Запущена', running: 'Работает',
+    offline: 'Нет интернета — показана сохранённая версия', online: 'Интернет восстановлен',
+    calcAdded: 'Расчёт добавлен в заявку', copied: 'Скопировано: ', copyFail: 'Не удалось скопировать — выделите текст вручную',
+    errWrap: list => `Пожалуйста, укажите ${list}.`, errName: 'имя', errPhone: 'номер телефона (не меньше 9 цифр)', errRegion: 'регион',
+    leadHello: 'Здравствуйте! Заявка по проекту мини-ГЭС.', fName: 'Имя', fPhone: 'Телефон', fRegion: 'Регион', fSource: 'Направление', fMsg: 'Комментарий',
+    calcMsg: (q, h, p, e) => `Калькулятор: Q = ${q} м³/с, H = ${h} м → примерно ${p} кВт, ${e} кВт·ч/год.`,
+    uQ: ' м³/с', uH: ' м',
+    photos: ['Стальной колёсный затвор', 'Бетонный канал длиной 400 м', 'Монтаж двух горизонтальных турбин', 'Здание станции и мостовой кран', 'Станция и линия электропередачи'],
+  },
+}[LANG];
+
 function mainGES() {
   'use strict';
 
@@ -199,11 +230,11 @@ function mainGES() {
   const pad = n => String(n).padStart(2, '0');
   const countdowns = $$('[data-countdown]');
   const tick = () => {
-    if (clock) clock.textContent = 'Toshkent ' + tashkent.format(new Date());
+    if (clock) clock.textContent = L.tashkent + ' ' + tashkent.format(new Date());
     const diff = LAUNCH - Date.now();
     if (diff <= 0) {
-      countdowns.forEach(c => { c.innerHTML = '<span class="mono">Ishga tushirildi</span>'; });
-      $$('.pill--build').forEach(p => { p.className = p.className.replace('pill--build', 'pill--live'); p.lastChild.textContent = 'Ishlab turibdi'; });
+      countdowns.forEach(c => { c.innerHTML = `<span class="mono">${L.launched}</span>`; });
+      $$('.pill--build').forEach(p => { p.className = p.className.replace('pill--build', 'pill--live'); p.lastChild.textContent = L.running; });
       return false;
     }
     const s = Math.floor(diff / 1000);
@@ -232,6 +263,20 @@ function mainGES() {
       new IntersectionObserver(([e]) => { if (e.isIntersecting !== on) { on = e.isIntersecting; on ? gsap.ticker.add(drawWave) : gsap.ticker.remove(drawWave); } }).observe(wave);
     }
   }
+
+  // ------------------------------------------------------------------ live energy counter (Ulug'nor GES)
+  // Estimate from the station's real annual output (5.2 GWh) since launch in September 2024.
+  const LIVE = { start: Date.parse('2024-09-01T00:00:00+05:00'), perSec: 5.2e6 / (365.25 * 86400), co2: 4700 / 5.2e6, coal: 2000 / 5.2e6 };
+  const liveKwh = $$('[data-live-kwh]'), liveCo2 = $$('[data-live-co2]'), liveCoal = $$('[data-live-coal]');
+  const tickLive = (force) => {
+    if (document.hidden && force !== true) return;   // no work in background tabs
+    const kwh = (Date.now() - LIVE.start) / 1000 * LIVE.perSec;
+    const whole = fmt(Math.floor(kwh)), frac = Math.floor((kwh % 1) * 10);
+    liveKwh.forEach(el => { el.innerHTML = `${whole}<small>,${frac}</small>`; });
+    liveCo2.forEach(el => { el.textContent = fmt(kwh * LIVE.co2); });
+    liveCoal.forEach(el => { el.textContent = fmt(kwh * LIVE.coal); });
+  };
+  if (liveKwh.length) { tickLive(true); setInterval(tickLive, reduced ? 5000 : 200); }
 
   // ------------------------------------------------------------------ marquee: scroll velocity
   const marquee = $('#marquee');
@@ -298,13 +343,8 @@ function mainGES() {
   const dia = $('#dia');
   const diaStep = $('#diaStep');
   const hsteps = $$('.hstep');
-  const PHOTOS = [
-    ['assets/gallery/ges-05-sm.webp', "G'ildirakli po'lat zatvor"],
-    ['assets/timeline/tl-10-sm.webp', '400 metrlik beton kanal'],
-    ['assets/gallery/ges-07-sm.webp', 'Ikki gorizontal turbina montaji'],
-    ['assets/gallery/ges-10-sm.webp', "Stansiya binosi va ko'prik krani"],
-    ['assets/how/how-5.webp', 'Stansiya va elektr uzatish liniyasi'],
-  ];
+  const PHOTOS = ['assets/gallery/ges-05-sm.webp', 'assets/timeline/tl-10-sm.webp', 'assets/gallery/ges-07-sm.webp',
+    'assets/gallery/ges-10-sm.webp', 'assets/how/how-5.webp'].map((src, i) => [SITE_BASE + src, L.photos[i]]);
   let currentStep = 0, camKey = '0';
   if (dia) {
     const cams = JSON.parse(dia.dataset.cams);
@@ -339,7 +379,7 @@ function mainGES() {
     const diaName = $('#diaName');
     const showPhoto = (n) => {
       const [src, cap] = PHOTOS[n - 1] || [];
-      if (!src || pimgs[front].dataset.src === src) return;
+      if (!src || new URL(pimgs[front].dataset.src || '', location.href).href === src) return;
       const back = pimgs[1 - front];
       const swap = () => { back.classList.remove('is-out'); pimgs[front].classList.add('is-out'); front = 1 - front; };
       back.alt = cap; back.dataset.src = src; pcap.textContent = cap;
@@ -608,8 +648,8 @@ function mainGES() {
     const E = P * 8760 * CALC.load;
     const target = { P, E, R: (E * T) / 1e6, Hh: E / CALC.household, C: (E * CALC.co2) / 1000 };
     lastCalc = { Q, H, ...target };
-    $('#outQ').textContent = fmt(Q, 1) + ' m³/s';
-    $('#outH').textContent = fmt(H, H % 1 ? 1 : 0) + ' m';
+    $('#outQ').textContent = fmt(Q, 1) + L.uQ;
+    $('#outH').textContent = fmt(H, H % 1 ? 1 : 0) + L.uH;
     fillRange(inQ); fillRange(inH);
     gsap.to(shown, { ...target, duration: animate ? 0.9 : 0, ease: 'power3.out', overwrite: true, onUpdate: renderCalc });
     gsap.to(arc, { attr: { 'stroke-dashoffset': 1 - Math.sqrt(clamp(P / PMAX, 0, 1)) }, duration: animate ? 1 : 0, ease: 'power3.out', overwrite: true });
@@ -638,10 +678,10 @@ function mainGES() {
     }
     $('#calcSend').addEventListener('click', () => {
       const c = lastCalc;
-      $('#fMsg').value = `Kalkulyator: Q = ${fmt(c.Q, 1)} m³/s, H = ${fmt(c.H, 1)} m → taxminan ${fmt(c.P)} kVt, ${fmt(c.E)} kVt·soat/yil.`;
+      $('#fMsg').value = L.calcMsg(fmt(c.Q, 1), fmt(c.H, 1), fmt(c.P), fmt(c.E));
       scrollToEl($('#contact'));
       setTimeout(() => $('#fName').focus({ preventScroll: true }), 1200);
-      toast('Hisob-kitob arizaga qo\'shildi');
+      toast(L.calcAdded);
     });
   }
 
@@ -680,6 +720,10 @@ function mainGES() {
   });
   if (!reduced && $('.team')) gsap.from('.vcard', { y: 80, rotationX: 30, autoAlpha: 0, duration: 1.4, stagger: 0.15, scrollTrigger: { trigger: '.team', start: 'top 88%', once: true } });
 
+  // ------------------------------------------------------------------ connectivity notice
+  window.addEventListener('offline', () => toast(L.offline));
+  window.addEventListener('online', () => toast(L.online));
+
   // ------------------------------------------------------------------ copy + toast
   const toastEl = $('#toast');
   function toast(msg) {
@@ -694,7 +738,7 @@ function mainGES() {
   }
   $$('[data-copy]').forEach((b) => {
     b.addEventListener('click', () => {
-      copyText(b.dataset.copy).then(ok => toast(ok ? 'Nusxalandi: ' + b.dataset.copy : 'Nusxalab bo\'lmadi — matnni belgilab oling'));
+      copyText(b.dataset.copy).then(ok => toast(ok ? L.copied + b.dataset.copy : L.copyFail));
     });
   });
 
@@ -711,23 +755,23 @@ function mainGES() {
       const msg = $('#fMsg').value.trim();
       $$('.fl', form).forEach(f => f.classList.remove('is-bad'));
       const problems = [];
-      if (name.length < 2) { problems.push('ismingizni'); $('#fName').parentElement.classList.add('is-bad'); }
-      if (phone.replace(/\D/g, '').length < 9) { problems.push('telefon raqamingizni (kamida 9 raqam)'); $('#fPhone').parentElement.classList.add('is-bad'); }
-      if (!region) { problems.push('hududni'); $('#fRegion').parentElement.classList.add('is-bad'); }
+      if (name.length < 2) { problems.push(L.errName); $('#fName').parentElement.classList.add('is-bad'); }
+      if (phone.replace(/\D/g, '').length < 9) { problems.push(L.errPhone); $('#fPhone').parentElement.classList.add('is-bad'); }
+      if (!region) { problems.push(L.errRegion); $('#fRegion').parentElement.classList.add('is-bad'); }
       if (problems.length) {
-        err.textContent = 'Iltimos, ' + problems.join(', ') + ' kiriting.';
+        err.textContent = L.errWrap(problems.join(', '));
         err.hidden = false;
         gsap.fromTo(err, { x: -8 }, { x: 0, duration: 0.6, ease: 'elastic.out(1, .3)' });
         return;
       }
       err.hidden = true;
       const text = [
-        "Assalomu alaykum! Mini-GES loyihasi bo'yicha ariza.",
-        'Ism: ' + name,
-        'Telefon: ' + phone,
-        'Hudud: ' + region,
-        'Yo\'nalish: ' + source,
-        msg ? 'Izoh: ' + msg : null,
+        L.leadHello,
+        `${L.fName}: ${name}`,
+        `${L.fPhone}: ${phone}`,
+        `${L.fRegion}: ${region}`,
+        `${L.fSource}: ${source}`,
+        msg ? `${L.fMsg}: ${msg}` : null,
       ].filter(Boolean).join('\n');
       txt.textContent = text;
       const tg = 'https://t.me/ozodbekov?text=' + encodeURIComponent(text);
@@ -816,6 +860,13 @@ function mainGES() {
 
   if (document.readyState === 'complete') ScrollTrigger.refresh();
   else window.addEventListener('load', () => ScrollTrigger.refresh());
+}
+
+// Offline copy: registered only on built pages (versioned main.js), never during local editing.
+if ('serviceWorker' in navigator && document.querySelector('script[src*="main.js?v="]')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(SITE_BASE + 'sw.js', { scope: SITE_BASE }).catch(() => {});
+  });
 }
 
 // Boot once the animation libraries are present. Some hosts inject external
