@@ -6,7 +6,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: "17 */3 * * *"   # every 3 hours: pull fresh industry news, rebuild, deploy (no manual step)
+    - cron: "17 * * * *"   # every hour: pull fresh industry news, rebuild, deploy (no manual step)
 
 permissions:
   contents: read
@@ -58,7 +58,11 @@ jobs:
           python-version: "3.12"
       - name: Fetch industry news (daily or manual run)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        run: python tools/fetch_news.py
+        env:
+          NEWS_FULL: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}   # manual run: include site searches
+        run: |
+          python tools/fetch_news.py
+          echo "NEWS_CHECKED=$(date -u +%Y-%m-%dT%H:%MZ)" >> "$GITHUB_ENV"   # shown on the page as the last check
       - name: Keep the news history in the repo
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |

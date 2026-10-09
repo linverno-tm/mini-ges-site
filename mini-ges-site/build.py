@@ -41,13 +41,13 @@ def write(rel, text):
 # ---------------------------------------------------------------- industry news (data/news.json, tools/fetch_news.py)
 NEWS_SHOWN, NEWS_MAX = 8, 24
 NEWS_L = {
-    'uz': {'live': 'Har kuni yangilanadi', 'updated': 'Oxirgi yangilanish', 'filters': 'Mavzu bo‘yicha saralash',
+    'uz': {'live': 'Har soatda yangilanadi', 'updated': 'Oxirgi yangilanish', 'filters': 'Mavzu bo‘yicha saralash',
            'all': 'Barchasi', 'more': 'Yana ko‘rsatish', 'less': 'Qisqartirish', 'newtab': 'yangi oynada ochiladi',
            'empty': 'Hozircha yangi xabar yo‘q. Bo‘lim har kuni avtomatik yangilanadi.',
            'tags': {'tariff': 'Tarif', 'law': 'Qonunchilik', 'invest': 'Investitsiya', 'project': 'Loyihalar', 'news': 'Soha'},
            'months': 'yanvar fevral mart aprel may iyun iyul avgust sentabr oktabr noyabr dekabr'.split(),
            'date': '{d}-{m}, {y}'},
-    'ru': {'live': 'Обновляется ежедневно', 'updated': 'Последнее обновление', 'filters': 'Фильтр по теме',
+    'ru': {'live': 'Обновляется каждый час', 'updated': 'Последнее обновление', 'filters': 'Фильтр по теме',
            'all': 'Все', 'more': 'Показать ещё', 'less': 'Свернуть', 'newtab': 'откроется в новом окне',
            'empty': 'Пока нет новых сообщений. Раздел обновляется автоматически каждый день.',
            'tags': {'tariff': 'Тарифы', 'law': 'Законодательство', 'invest': 'Инвестиции', 'project': 'Проекты', 'news': 'Отрасль'},
@@ -88,10 +88,21 @@ def render_news(lang):
         d = datetime.date.fromisoformat(iso)
         return f'<time datetime="{iso}">{t["date"].format(d=d.day, m=t["months"][d.month - 1], y=d.year)}</time>'
 
+    def checked(fallback):
+        # CI sets NEWS_CHECKED (UTC) right after fetching: show that moment in Tashkent time
+        stamp = os.environ.get('NEWS_CHECKED', '')
+        try:
+            at = datetime.datetime.strptime(stamp, '%Y-%m-%dT%H:%MZ') + datetime.timedelta(hours=5)
+        except ValueError:
+            return day(fallback)
+        d = at.date()
+        label = t['date'].format(d=d.day, m=t['months'][d.month - 1], y=d.year)
+        return f'<time datetime="{at:%Y-%m-%dT%H:%M}+05:00">{label}, {at:%H:%M}</time>'
+
     if not items:
         return f'<p class="news__empty">{t["empty"]}</p>'
     out = [f'<div class="news__bar" data-reveal><span class="news__live mono"><i aria-hidden="true"></i>{t["live"]}</span>'
-           f'<span class="news__upd mono">{t["updated"]}: {day(data["updated"])}</span></div>']
+           f'<span class="news__upd mono">{t["updated"]}: {checked(data["updated"])}</span></div>']
     counts = {}
     for i in items:
         counts[i['tag']] = counts.get(i['tag'], 0) + 1

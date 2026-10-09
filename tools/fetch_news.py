@@ -7,7 +7,8 @@ Daryo.uz (Uzbek-language archive; both robots.txt allow it, Gazeta.uz forbids se
 its RSS is used), and Google News searches (Russian-language coverage, several months back).
 Only the headline, outlet, date and link are stored; the page links to the original article.
 Items accumulate across runs, so a quiet day never empties the section. A source that fails is
-skipped; the script never fails the build. CI runs it every 3 hours (.github/workflows/deploy.yml).
+skipped; the script never fails the build. CI runs it every hour (.github/workflows/deploy.yml);
+the site searches run every third hour (or with NEWS_FULL=1) to keep the load on the outlets low.
 """
 import datetime as dt, email.utils, html, json, os, re, sys, urllib.parse, urllib.request
 
@@ -149,7 +150,8 @@ def main():
             ok += 1
         except Exception as e:  # one dead source must not stop the others
             print(f'skip {url[:70]}: {type(e).__name__}', file=sys.stderr)
-    for tpl, pattern, base, outlet in SEARCH:
+    full = os.environ.get('NEWS_FULL') == '1' or dt.datetime.now(dt.timezone.utc).hour % 3 == 0
+    for tpl, pattern, base, outlet in (SEARCH if full else []):
         for q in SEARCH_QUERIES:
             url = tpl.format(urllib.parse.quote(q))
             try:
@@ -173,10 +175,11 @@ def main():
     items.sort(key=lambda x: x['date'], reverse=True)
     items = items[:KEEP]
 
-    data = {'updated': dt.date.today().isoformat(), 'items': items}
-    if data['items'] == old.get('items') and old.get('updated') == data['updated']:
-        print('no changes')
+    # the file changes only when the list does: hourly runs without news leave no commit behind
+    if items == old.get('items'):
+        print(f'no changes ({len(found)} matches, {ok} requests ok)')
         return
+    data = {'updated': dt.date.today().isoformat(), 'items': items}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(data, f, ensure_ascii=False, indent=1)

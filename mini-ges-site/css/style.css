@@ -176,7 +176,9 @@ main:focus { outline: none; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font: 800 17px/1 var(--f-display); letter-spacing: .02em; }
 .brand img { width: 22px; height: auto; }
 .nav__links { display: flex; gap: 28px; margin-left: auto; }
-.nav__links a { position: relative; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.78); transition: color .3s; padding-block: 6px; }
+.nav__links a { position: relative; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.78); transition: color .3s; padding-block: 6px; white-space: nowrap; }
+.brand { flex: none; white-space: nowrap; }
+.nav__right { flex: none; }
 .nav__links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1.5px; background: var(--sky); transform: scaleX(0); transform-origin: right; transition: transform .5s var(--ease); }
 .nav__links a:hover, .nav__links a.is-active { color: var(--white); }
 .nav__links a:hover::after, .nav__links a.is-active::after { transform: scaleX(1); transform-origin: left; }
@@ -751,11 +753,19 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
 .grain { position: fixed; inset: 0; z-index: 70; pointer-events: none; opacity: .045; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
 /* ---------------- responsive ---------------- */
-@media (max-width: 1100px) {
-  .news__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* full menu (eight links + phone + CTA) needs ~1470px; narrower: tighter links, phone stays in the contact section */
+@media (max-width: 1519px) {
+  .nav__links { gap: 22px; }
+  .nav__phone { display: none; }
+}
+/* below ~1280px even that does not fit: the menu folds into the burger */
+@media (max-width: 1279px) {
   .nav__links { display: none; }
   .nav__right { margin-left: auto; }
   .burger { display: block; }
+}
+@media (max-width: 1100px) {
+  .news__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "eye" "title" "lead" "cta" "status"; }
   .status { justify-self: start; max-width: 480px; margin-top: 48px; }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
