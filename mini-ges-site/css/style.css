@@ -236,7 +236,8 @@ main:focus { outline: none; }
   box-shadow: 0 24px 50px -28px rgba(0, 0, 0, .7); backdrop-filter: blur(8px); }
 .pres__photo { grid-area: ph; width: 132px; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; background: #0B1B33; }
 .pres__q { grid-area: q; margin: 0; padding-top: 2px; }
-.pres__q p { font-size: clamp(15px, 1.15vw, 17px); line-height: 1.55; color: rgba(255, 255, 255, .92); text-wrap: pretty; }
+.pres__q p { font: 600 clamp(17px, 1.5vw, 22px)/1.4 var(--f-display); letter-spacing: -.01em; color: rgba(255, 255, 255, .9); text-wrap: pretty; }
+.pres__q strong { display: block; margin-top: 8px; font-weight: 800; color: var(--white); background: linear-gradient(95deg, #fff 30%, var(--volt)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .pres__by { grid-area: by; display: grid; gap: 1px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .12); }
 .pres__by b { font: 700 16px/1.25 var(--f-display); color: var(--white); }
 .pres__by span { font-size: 13px; color: var(--muted-d); }
@@ -840,7 +841,7 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   .pres { grid-template-columns: 84px minmax(0, 1fr); grid-template-areas: "ph by" "q q"; gap: 14px 14px; padding: 14px; border-radius: 18px; }
   .pres__photo { width: 84px; border-radius: 12px; }
   .pres__by { margin-top: 0; padding-top: 0; border-top: 0; align-self: center; }
-  .pres__q p { font-size: 15px; }
+  .pres__q p { font-size: 17px; }
   .news__chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
   .news__chips::-webkit-scrollbar { display: none; }
   .nchip { flex: none; }
