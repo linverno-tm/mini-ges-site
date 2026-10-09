@@ -173,7 +173,8 @@ function mainGES() {
     const far = document.createElement('canvas'), near = document.createElement('canvas'), glow = document.createElement('canvas');
     const fctx = far.getContext('2d'), nctx = near.getContext('2d'), gctx = glow.getContext('2d');
     let W = 0, H = 0, dpr = 1, running = true, routes = [], arcs = [], pulses = [], sparks = [];
-    let VPX = 0, VPY = 0, F = 1, CAMH = 6, arc = null, nextArc = 0, ready = false;
+    let VPX = 0, VPY = 0, F = 1, CAMH = 6, nextArc = 0, ready = false;
+    let liveArcs = [], corona = [], targets = [], strike = null, nextStrike = 0;   // more lightning: arcs, crackle, sky strikes
     const px = { x: 0, y: 0, tx: 0, ty: 0 };
     const SKY = '70,198,247', VOLT = '74,247,69';
 
@@ -283,6 +284,7 @@ function mainGES() {
       });
       strings.forEach(x => sites.push([P(x, 9.2, Z), P(x, 10.2, Z)]));   // string flashover
       return {
+        tops: [L, CX, R].map(x => P(x, 11, Z)),
         bus: bus.map(([a, b]) => [a, b]),
         entry: phases.map(y => [L, y, Z]),
         exit: phases.map(y => [R, y, Z]),
@@ -385,6 +387,11 @@ function mainGES() {
       // only flash where the scene is clearly visible (the left side fades under the copy)
       arcs = sub.sites.filter(([a]) => a[1] < visibleTop && (narrow || a[0] > W * 0.55));
       if (!arcs.length) arcs = sub.sites;
+      // crackle on every bushing / insulator tip that is clearly visible
+      corona = sub.sites.map(([a]) => a).filter(q => q[1] < visibleTop && (narrow || q[0] > W * 0.45));
+      // sky strikes hit a gantry top or the first outgoing pylon (never behind the headline)
+      const o0 = outs[0][2];
+      targets = [...sub.tops, P(o0[0] - 3.6, 21, o0[2])].filter(q => q[1] > 8 && q[0] < W - 8 && (narrow || q[0] > W * 0.5));
       // soft bloom of the near layer, computed once
       glow.width = near.width; glow.height = near.height;
       gctx.setTransform(1, 0, 0, 1, 0, 0); gctx.clearRect(0, 0, glow.width, glow.height);
@@ -413,6 +420,27 @@ function mainGES() {
       pts.push(b);
       return pts;
     }
+
+    // forked bolt from the sky to (x, y): main channel + a few side branches
+    function skyBolt(x, y) {
+      const top = [x + (Math.random() - 0.5) * W * 0.25, -10];
+      const main = jag(top, [x, y], 14, Math.max(14, (y - top[1]) * 0.08));
+      const branches = [];
+      for (let i = 0; i < 3; i++) {
+        const from = main[2 + ((Math.random() * (main.length - 5)) | 0)];
+        const len = 30 + Math.random() * 70, ang = Math.PI / 2 + (Math.random() - 0.5) * 1.8;
+        branches.push(jag(from, [from[0] + Math.cos(ang) * len * (Math.random() > 0.5 ? 1 : -1), from[1] + Math.sin(ang) * len], 6, 8));
+      }
+      return { main, branches };
+    }
+    const strokeBolt = (pts, glowW, coreW, alpha) => {
+      ctx.beginPath(); pts.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])));
+      ctx.strokeStyle = `rgba(${VOLT},${(0.5 * alpha).toFixed(2)})`; ctx.lineWidth = glowW; ctx.stroke();
+      ctx.strokeStyle = `rgba(255,255,255,${(0.95 * alpha).toFixed(2)})`; ctx.lineWidth = coreW; ctx.stroke();
+    };
+    const burst = (x, y, n, power = 1) => {
+      for (let i = 0; i < n; i++) sparks.push({ x, y, vx: (Math.random() - 0.5) * 3.2 * power, vy: -Math.random() * 2.6 * power, life: 1 });
+    };
 
     function frame(now) {
       ctx.clearRect(0, 0, W, H);
@@ -444,28 +472,55 @@ function mainGES() {
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rad * 5, 0, 6.283); ctx.fill();
       }
 
-      // short-circuit arc
-      if (!arc && now > nextArc && arcs.length) {
+      // short-circuit arcs: frequent, up to three at once
+      if (now > nextArc && arcs.length && liveArcs.length < (lite ? 1 : 3)) {
         const [a, b] = arcs[(Math.random() * arcs.length) | 0];
-        arc = { a, b, until: now + 320 + Math.random() * 200 };
-        for (let i = 0; i < (lite ? 12 : 30); i++) {
-          sparks.push({ x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2, vx: (Math.random() - 0.5) * 3.2, vy: -Math.random() * 2.6, life: 1 });
+        liveArcs.push({ a, b, until: now + 320 + Math.random() * 200, big: !liveArcs.length });
+        burst((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, lite ? 12 : 30);
+        nextArc = now + (lite ? 3000 : 1500) + Math.random() * 2000;
+      }
+      for (const arc of liveArcs) {
+        const mx = (arc.a[0] + arc.b[0]) / 2, my = (arc.a[1] + arc.b[1]) / 2;
+        const flicker = Math.random() > 0.25 ? 1 : 0.35, R = arc.big ? 260 : 150;
+        const flash = ctx.createRadialGradient(mx, my, 0, mx, my, R);
+        flash.addColorStop(0, `rgba(210,255,200,${0.42 * flicker})`); flash.addColorStop(0.35, `rgba(120,220,255,${0.12 * flicker})`); flash.addColorStop(1, 'rgba(120,220,255,0)');
+        ctx.fillStyle = flash; ctx.beginPath(); ctx.arc(mx, my, R, 0, 6.283); ctx.fill();
+        const amp = Math.max(3, Math.hypot(arc.b[0] - arc.a[0], arc.b[1] - arc.a[1]) * 0.35);
+        for (let k = 0; k < 2; k++) strokeBolt(jag(arc.a, arc.b, 7, amp), 5, 1.4, 1);
+      }
+      liveArcs = liveArcs.filter(arc => now <= arc.until);
+
+      // corona: tiny crackling discharges on bushing and insulator tips, all the time
+      if (corona.length) {
+        const n = lite ? 1 : 3;
+        for (let i = 0; i < n; i++) {
+          if (Math.random() > 0.35) continue;
+          const q = corona[(Math.random() * corona.length) | 0];
+          const ang = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, len = 6 + Math.random() * 12;
+          const tip = [q[0] + Math.cos(ang) * len, q[1] + Math.sin(ang) * len];
+          const g = ctx.createRadialGradient(q[0], q[1], 0, q[0], q[1], 14);
+          g.addColorStop(0, `rgba(${VOLT},.45)`); g.addColorStop(1, `rgba(${VOLT},0)`);
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(q[0], q[1], 14, 0, 6.283); ctx.fill();
+          strokeBolt(jag(q, tip, 4, 3), 2.6, 0.9, 0.8);
         }
       }
-      if (arc) {
-        const mx = (arc.a[0] + arc.b[0]) / 2, my = (arc.a[1] + arc.b[1]) / 2;
-        const flicker = Math.random() > 0.25 ? 1 : 0.35;
-        const flash = ctx.createRadialGradient(mx, my, 0, mx, my, 260);
-        flash.addColorStop(0, `rgba(210,255,200,${0.42 * flicker})`); flash.addColorStop(0.35, `rgba(120,220,255,${0.12 * flicker})`); flash.addColorStop(1, 'rgba(120,220,255,0)');
-        ctx.fillStyle = flash; ctx.beginPath(); ctx.arc(mx, my, 260, 0, 6.283); ctx.fill();
-        const amp = Math.max(3, Math.hypot(arc.b[0] - arc.a[0], arc.b[1] - arc.a[1]) * 0.35);
-        for (let k = 0; k < 2; k++) {
-          const pts = jag(arc.a, arc.b, 7, amp);
-          ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
-          ctx.strokeStyle = `rgba(${VOLT},.55)`; ctx.lineWidth = 5; ctx.stroke();
-          ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1.4; ctx.stroke();
-        }
-        if (now > arc.until) { arc = null; nextArc = now + 6000 + Math.random() * 3000; }
+
+      // lightning from the sky: a forked bolt hits a gantry or pylon top, the scene lights up
+      if (!strike && now > nextStrike && targets.length) {
+        const [x, y] = targets[(Math.random() * targets.length) | 0];
+        strike = { x, y, start: now, until: now + 420, bolt: skyBolt(x, y), next: now + 90 };
+        burst(x, y, lite ? 16 : 40, 1.6);
+      }
+      if (strike) {
+        if (now > strike.next) { strike.bolt = skyBolt(strike.x, strike.y); strike.next = now + 70 + Math.random() * 90; }   // re-strike flicker
+        const t = (now - strike.start) / (strike.until - strike.start), on = Math.random() > 0.2 ? 1 : 0.3, a = (1 - t * 0.6) * on;
+        ctx.fillStyle = `rgba(170,215,255,${(0.07 * a).toFixed(3)})`; ctx.fillRect(-40, -40, W + 80, H + 80);   // sky flash
+        const g = ctx.createRadialGradient(strike.x, strike.y, 0, strike.x, strike.y, 180);
+        g.addColorStop(0, `rgba(220,255,210,${(0.5 * a).toFixed(2)})`); g.addColorStop(1, 'rgba(120,220,255,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(strike.x, strike.y, 180, 0, 6.283); ctx.fill();
+        strokeBolt(strike.bolt.main, 7, 2, a);
+        strike.bolt.branches.forEach(b => strokeBolt(b, 3.5, 1, a * 0.8));
+        if (now > strike.until) { strike = null; nextStrike = now + 8000 + Math.random() * 6000; }
       }
       sparks = sparks.filter(s => s.life > 0);
       for (const s of sparks) {
@@ -495,7 +550,8 @@ function mainGES() {
     hero.addEventListener('pointerleave', () => { px.tx = px.ty = 0; });
     new IntersectionObserver(([en]) => { running = en.isIntersecting && !document.hidden; }).observe(cvs);
     document.addEventListener('visibilitychange', () => { running = !document.hidden; });
-    nextArc = performance.now() + 1500;
+    nextArc = performance.now() + 1200;
+    nextStrike = performance.now() + 3500;
     requestAnimationFrame(loop);
   })();
 
