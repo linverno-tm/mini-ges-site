@@ -1,0 +1,10 @@
+Copyright (c) 2026 MINI GES (Ulug'nor GES MCHJ, Baliqchi GES MCHJ). All rights reserved.
+
+The source code, texts, photographs, logos and design of this website are the
+property of MINI GES. The repository is public for transparency and deployment;
+this does not grant permission to copy, modify or redistribute its contents.
+
+Third-party components keep their own licenses:
+  - GSAP and ScrollTrigger (mini-ges-site/js/vendor) — GreenSock Standard License
+  - Lenis (mini-ges-site/js/vendor) — MIT License
+  - Montserrat, Inter, JetBrains Mono (loaded from Google Fonts) — SIL Open Font License 1.1

@@ -1,6 +1,9 @@
 /* MINI GES — interaction & motion layer.
    GSAP + ScrollTrigger for scroll choreography, Lenis for smooth scroll,
    two hand-rolled canvases (hero flow field, project ripples). */
+// JS is running: the CSS failsafe that hides the loader is no longer needed
+document.documentElement.classList.add('js-on');
+
 function mainGES() {
   'use strict';
 
@@ -51,6 +54,7 @@ function mainGES() {
     e.preventDefault();
     if (menuOpen) closeMenu();
     scrollToEl(target);
+    if (a.classList.contains('skip')) target.focus({ preventScroll: true });
   });
 
   // ------------------------------------------------------------------ split text

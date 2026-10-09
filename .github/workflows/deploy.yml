@@ -1,8 +1,9 @@
-name: Deploy to GitHub Pages
+name: CI / Deploy
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -11,29 +12,53 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  checks:
+    name: Quality checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build (minify + cache-busting)
+      - name: JavaScript syntax
+        run: node --check mini-ges-site/js/main.js
+      - name: HTML validation
+        run: npx --yes html-validate@8.24.1 mini-ges-site/index.html mini-ges-site/404.html
+      - name: Links, assets, ids, alt text, labels
+        run: python tools/check_site.py
+
+  build:
+    name: Build
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build (minify, cache-busting, templated URLs)
         run: python mini-ges-site/build.py
       - uses: actions/configure-pages@v5
+        if: github.ref == 'refs/heads/main'
       - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
         with:
           path: mini-ges-site/dist
 
   deploy:
+    name: Deploy to GitHub Pages
     needs: build
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

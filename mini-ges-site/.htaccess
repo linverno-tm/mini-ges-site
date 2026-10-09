@@ -1,0 +1,30 @@
+# Used only when dist/ is uploaded to an Apache host (GitHub Pages ignores it).
+
+ErrorDocument 404 /404.html
+
+# gzip text assets
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/manifest+json image/svg+xml
+</IfModule>
+
+# long cache for images and versioned css/js; html always fresh
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# security headers (meta CSP covers the rest)
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+AddType image/webp .webp
+AddType application/manifest+json .webmanifest
