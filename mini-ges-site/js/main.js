@@ -295,12 +295,38 @@ function mainGES() {
       if (!ready) return;
       [cvs, far, near].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
       [ctx, fctx, nctx].forEach(c => c.setTransform(dpr, 0, 0, dpr, 0, 0));
-      // desktop: substation sits in the gap between the copy and the status card;
-      // phones: the scene rises behind the headline
+      // Composition is measured from the real layout, so nothing overlaps at any width:
+      // desktop: the substation stands on a horizon just above the status card, right of the headline;
+      // phones: it stands on the headline's top edge, top-right, and the outgoing line leaves the screen.
       const narrow = W < 700;
-      VPX = W * (narrow ? 0.62 : 0.66);
-      VPY = H * (narrow ? 0.2 : 0.52);
-      F = narrow ? W * 1.05 : Math.min(W, H * 1.6) * 0.5;
+      const subZ = 40;
+      let subX, visibleTop = H;
+      const hr = cvs.getBoundingClientRect();
+      const card = $('.status'), title = $('.hero__title');
+      const cr = card ? card.getBoundingClientRect() : null, tr = title ? title.getBoundingClientRect() : null;
+      if (narrow) {
+        const baseY = (tr ? tr.top - hr.top : H * 0.14) - 6;
+        const width = Math.min(170, W * 0.45), k = width / 22;
+        const cx = W - 16 - width / 2;
+        F = k * subZ;
+        VPY = baseY - CAMH * k;
+        VPX = cx + 4 * k;
+        subX = (cx - VPX) / k;
+        visibleTop = baseY + 4;
+      } else {
+        const cardTop = cr ? cr.top - hr.top : H * 0.62;
+        const left = Math.max(tr ? tr.right - hr.left + 28 : W * 0.5, cr ? cr.left - hr.left : W * 0.55);
+        const right = W - 24;
+        const width = Math.max(220, Math.min(400, (right - left) * 0.85));   // substation width on screen
+        const k = width / 22;                                                 // px per metre at the substation
+        const cx = Math.min(right - width / 2, left + (right - left) / 2);
+        const baseY = cardTop - 16;
+        F = k * subZ;
+        VPY = baseY - CAMH * k;
+        VPX = cx + 4 * k;
+        subX = (cx - VPX) / k;
+        visibleTop = cardTop - 4;
+      }
 
       // far layer: perspective ground grid + incoming line
       fctx.clearRect(0, 0, W, H);
@@ -311,7 +337,6 @@ function mainGES() {
       const haze = fctx.createLinearGradient(0, VPY - 70, 0, VPY + 90);
       haze.addColorStop(0, 'rgba(70,198,247,0)'); haze.addColorStop(0.45, 'rgba(70,198,247,.09)'); haze.addColorStop(1, 'rgba(70,198,247,0)');
       fctx.fillStyle = haze; fctx.fillRect(0, VPY - 70, W, 160);
-      const subZ = 40, subX = narrow ? 4 : 6;
       const farPylons = [];
       for (let z = 330; z >= 70; z -= 37) farPylons.push(pylon(fctx, subX - 1, z));
 
@@ -347,7 +372,7 @@ function mainGES() {
         return { pts, lens, total: lens[lens.length - 1] };
       });
       // only flash where the scene is clearly visible (the left side fades under the copy)
-      arcs = sub.sites.filter(([a]) => narrow ? a[1] < H * 0.45 : a[0] > W * 0.5);
+      arcs = sub.sites.filter(([a]) => a[1] < visibleTop);
       if (!arcs.length) arcs = sub.sites;
       // soft bloom of the near layer, computed once
       glow.width = near.width; glow.height = near.height;
@@ -447,6 +472,7 @@ function mainGES() {
       requestAnimationFrame(loop);
     };
     build();
+    if (document.fonts) document.fonts.ready.then(build);          // headline width changes once fonts arrive
     window.addEventListener('resize', () => { clearTimeout(build._t); build._t = setTimeout(build, 150); });
     if (reduced) { if (ready) frame(0); return; }
     const hero = $('#hero');
