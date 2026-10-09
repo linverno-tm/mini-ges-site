@@ -169,24 +169,28 @@ function mainGES() {
     const cvs = $('#flow');
     if (!cvs) return;
     const ctx = cvs.getContext('2d');
-    const far = document.createElement('canvas'), near = document.createElement('canvas');
-    const fctx = far.getContext('2d'), nctx = near.getContext('2d');
+    const far = document.createElement('canvas'), near = document.createElement('canvas'), glow = document.createElement('canvas');
+    const fctx = far.getContext('2d'), nctx = near.getContext('2d'), gctx = glow.getContext('2d');
     let W = 0, H = 0, dpr = 1, running = true, routes = [], arcs = [], pulses = [], sparks = [];
-    let VPX = 0, VPY = 0, F = 1, CAMH = 6, arc = null, nextArc = 0;
+    let VPX = 0, VPY = 0, F = 1, CAMH = 6, arc = null, nextArc = 0, ready = false;
     const px = { x: 0, y: 0, tx: 0, ty: 0 };
     const SKY = '70,198,247', VOLT = '74,247,69';
 
     // world (X right, Y up, Z depth) -> screen
     const P = (X, Y, Z) => [VPX + (X * F) / Z, VPY + ((CAMH - Y) * F) / Z];
-    const depthAlpha = Z => Math.max(0.12, Math.min(0.75, 34 / Z));
+    const depthAlpha = Z => Math.max(0.1, Math.min(0.85, 30 / Z));
+    // atmospheric perspective: distant steel turns deep blue, near steel is pale cyan
+    const steel = (Z) => { const t = Math.max(0, Math.min(1, (Z - 30) / 220)); return `${Math.round(150 - 90 * t)},${Math.round(215 - 60 * t)},${Math.round(250 - 10 * t)}`; };
+    let curZ = 40;
 
     function line(c, a, b, alpha, width) {
-      c.strokeStyle = `rgba(${SKY},${alpha})`; c.lineWidth = width;
+      c.strokeStyle = `rgba(${steel(curZ)},${alpha})`; c.lineWidth = width;
       c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
     }
 
     // lattice pylon; returns the three conductor attach points
     function pylon(c, X, Z) {
+      curZ = Z;
       const al = depthAlpha(Z), lw = Math.max(0.6, 26 / Z);
       const b1 = P(X - 3, 0, Z), b2 = P(X + 3, 0, Z), t1 = P(X - 0.8, 21, Z), t2 = P(X + 0.8, 21, Z);
       line(c, b1, t1, al, lw); line(c, b2, t2, al, lw);
@@ -226,7 +230,8 @@ function mainGES() {
 
     // substation in elevation at depth Z, centred on X; returns busbar, entry/exit points and arc sites
     function substation(c, CX, Z) {
-      const al = 0.7, lw = Math.max(0.8, 34 / Z), k = F / Z;
+      curZ = Z;
+      const al = 0.8, lw = Math.max(0.8, 34 / Z), k = F / Z;
       const L = CX - 11, R = CX + 11;
       // fence
       line(c, P(L - 2, 1.8, Z - 4), P(R + 2, 1.8, Z - 4), 0.25, lw * 0.6);
@@ -286,27 +291,36 @@ function mainGES() {
     function build() {
       dpr = lite ? 1 : Math.min(window.devicePixelRatio || 1, 1.6);
       W = cvs.clientWidth; H = cvs.clientHeight;
+      ready = W > 0 && H > 0;            // layout not ready yet (hidden, first paint): retry on resize
+      if (!ready) return;
       [cvs, far, near].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
       [ctx, fctx, nctx].forEach(c => c.setTransform(dpr, 0, 0, dpr, 0, 0));
       // desktop: substation sits in the gap between the copy and the status card;
       // phones: the scene rises behind the headline
       const narrow = W < 700;
       VPX = W * (narrow ? 0.62 : 0.66);
-      VPY = H * (narrow ? 0.2 : 0.6);
+      VPY = H * (narrow ? 0.2 : 0.52);
       F = narrow ? W * 1.05 : Math.min(W, H * 1.6) * 0.5;
 
       // far layer: perspective ground grid + incoming line
       fctx.clearRect(0, 0, W, H);
+      curZ = 200;
       for (let x = -400; x <= 400; x += 25) line(fctx, P(x, 0, 30), P(x, 0, 2000), 0.05, 1);
       for (let z = 30; z < 600; z *= 1.22) line(fctx, P(-400, 0, z), P(400, 0, z), Math.min(0.08, 6 / z), 1);
-      const subZ = 40, subX = narrow ? 4 : -12;
+      // horizon haze
+      const haze = fctx.createLinearGradient(0, VPY - 70, 0, VPY + 90);
+      haze.addColorStop(0, 'rgba(70,198,247,0)'); haze.addColorStop(0.45, 'rgba(70,198,247,.09)'); haze.addColorStop(1, 'rgba(70,198,247,0)');
+      fctx.fillStyle = haze; fctx.fillRect(0, VPY - 70, W, 160);
+      const subZ = 40, subX = narrow ? 4 : 6;
       const farPylons = [];
       for (let z = 330; z >= 70; z -= 37) farPylons.push(pylon(fctx, subX - 1, z));
 
       // near layer: substation + outgoing line
       nctx.clearRect(0, 0, W, H);
       const sub = substation(nctx, subX, subZ);
-      const out1 = pylon(nctx, subX + 16, 32), out2 = pylon(nctx, subX + 26, 25), out3 = pylon(nctx, subX + 38, 19);
+      const out1 = narrow ? pylon(nctx, subX + 16, 32) : pylon(nctx, subX + 9, 31);
+      const out2 = narrow ? pylon(nctx, subX + 26, 25) : pylon(nctx, subX + 14, 24);
+      const out3 = narrow ? pylon(nctx, subX + 38, 19) : pylon(nctx, subX + 20, 18);
 
       // conductors and the routes pulses follow (far -> substation -> viewer), one per phase
       routes = [0, 1, 2].map(ph => {
@@ -322,13 +336,24 @@ function mainGES() {
         const o1 = span(sub.exit[ph], out1[ph]), o2 = span(out1[ph], out2[ph]), o3 = span(out2[ph], out3[ph]);
         const o4 = span(out3[ph], [out3[ph][0] + 14, out3[ph][1], 14]);
         [o1, o2, o3, o4].forEach(s => strokePoly(nctx, s, 0.5, 1.1));
-        pts = pts.concat(inS, [b0, b1], o1, o2, o3, o4);
+        const farPart = pts.slice(), nearPart = [].concat(inS, [b0, b1], o1, o2, o3, o4);
+        pts = farPart.concat(nearPart);
+        [[fctx, farPart, 0.06, 2], [nctx, nearPart, 0.1, 3.2]].forEach(([c, part, al, lw]) => {   // energised underglow
+          c.strokeStyle = `rgba(${VOLT},${al})`; c.lineWidth = lw;
+          c.beginPath(); part.forEach((q, i) => (i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]))); c.stroke();
+        });
         const lens = [0];
         for (let i = 1; i < pts.length; i++) lens.push(lens[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
         return { pts, lens, total: lens[lens.length - 1] };
       });
-      arcs = sub.sites;
-      const per = lite ? 2 : 4;
+      // only flash where the scene is clearly visible (the left side fades under the copy)
+      arcs = sub.sites.filter(([a]) => narrow ? a[1] < H * 0.45 : a[0] > W * 0.5);
+      if (!arcs.length) arcs = sub.sites;
+      // soft bloom of the near layer, computed once
+      glow.width = near.width; glow.height = near.height;
+      gctx.setTransform(1, 0, 0, 1, 0, 0); gctx.clearRect(0, 0, glow.width, glow.height);
+      gctx.filter = 'blur(6px)'; gctx.drawImage(near, 0, 0); gctx.filter = 'none';
+      const per = lite ? 3 : 6;
       pulses = [];
       routes.forEach((r, ri) => { for (let i = 0; i < per; i++) pulses.push({ r: ri, d: (r.total * (i + ri / 3)) / per, v: 0.9 + Math.random() * 0.5 }); });
     }
@@ -357,6 +382,7 @@ function mainGES() {
       ctx.clearRect(0, 0, W, H);
       px.x += (px.tx - px.x) * 0.05; px.y += (px.ty - px.y) * 0.05;
       ctx.drawImage(far, px.x * 0.4, px.y * 0.4, W, H);
+      ctx.globalAlpha = 0.55; ctx.drawImage(glow, px.x, px.y, W, H); ctx.globalAlpha = 1;
       ctx.drawImage(near, px.x, px.y, W, H);
       ctx.save(); ctx.translate(px.x, px.y);
       ctx.globalCompositeOperation = 'lighter';
@@ -367,30 +393,35 @@ function mainGES() {
         const [x, y] = at(r, p.d), nr = nearness(y);
         p.d += p.v * (0.6 + nr * 5.5);
         if (p.d > r.total) p.d = 0;
-        const rad = 1.4 + nr * 4.5;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, rad * 4);
-        g.addColorStop(0, `rgba(255,255,255,${0.9})`); g.addColorStop(0.25, `rgba(${VOLT},.8)`); g.addColorStop(1, `rgba(${VOLT},0)`);
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rad * 4, 0, 6.283); ctx.fill();
-        // short trail behind the head
-        const [tx, ty] = at(r, Math.max(0, p.d - 14 - nr * 60));
-        const lg = ctx.createLinearGradient(tx, ty, x, y);
-        lg.addColorStop(0, `rgba(${VOLT},0)`); lg.addColorStop(1, `rgba(${VOLT},.7)`);
-        ctx.strokeStyle = lg; ctx.lineWidth = rad * 0.9; ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(x, y); ctx.stroke();
+        const rad = 1.2 + nr * 3.6;
+        // light streak running along the conductor (follows the wire's curve)
+        const len = 40 + nr * 180, steps = 10;
+        ctx.lineCap = 'round';
+        for (let i = steps; i > 0; i--) {
+          const d0 = Math.max(0, p.d - (len * i) / steps), d1 = Math.max(0, p.d - (len * (i - 1)) / steps);
+          const [x0, y0] = at(r, d0), [x1, y1] = at(r, d1), k = 1 - i / steps;
+          ctx.strokeStyle = `rgba(${VOLT},${(0.08 + 0.6 * k).toFixed(2)})`; ctx.lineWidth = rad * (0.5 + k);
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        }
+        const g = ctx.createRadialGradient(x, y, 0, x, y, rad * 5);
+        g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(0.3, `rgba(${VOLT},.7)`); g.addColorStop(1, `rgba(${VOLT},0)`);
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rad * 5, 0, 6.283); ctx.fill();
       }
 
       // short-circuit arc
       if (!arc && now > nextArc && arcs.length) {
         const [a, b] = arcs[(Math.random() * arcs.length) | 0];
-        arc = { a, b, until: now + 220 + Math.random() * 160 };
-        for (let i = 0; i < (lite ? 8 : 18); i++) {
+        arc = { a, b, until: now + 320 + Math.random() * 200 };
+        for (let i = 0; i < (lite ? 12 : 30); i++) {
           sparks.push({ x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2, vx: (Math.random() - 0.5) * 3.2, vy: -Math.random() * 2.6, life: 1 });
         }
       }
       if (arc) {
         const mx = (arc.a[0] + arc.b[0]) / 2, my = (arc.a[1] + arc.b[1]) / 2;
-        const flash = ctx.createRadialGradient(mx, my, 0, mx, my, 120);
-        flash.addColorStop(0, 'rgba(200,255,190,.35)'); flash.addColorStop(1, 'rgba(200,255,190,0)');
-        ctx.fillStyle = flash; ctx.beginPath(); ctx.arc(mx, my, 120, 0, 6.283); ctx.fill();
+        const flicker = Math.random() > 0.25 ? 1 : 0.35;
+        const flash = ctx.createRadialGradient(mx, my, 0, mx, my, 260);
+        flash.addColorStop(0, `rgba(210,255,200,${0.42 * flicker})`); flash.addColorStop(0.35, `rgba(120,220,255,${0.12 * flicker})`); flash.addColorStop(1, 'rgba(120,220,255,0)');
+        ctx.fillStyle = flash; ctx.beginPath(); ctx.arc(mx, my, 260, 0, 6.283); ctx.fill();
         const amp = Math.max(3, Math.hypot(arc.b[0] - arc.a[0], arc.b[1] - arc.a[1]) * 0.35);
         for (let k = 0; k < 2; k++) {
           const pts = jag(arc.a, arc.b, 7, amp);
@@ -398,7 +429,7 @@ function mainGES() {
           ctx.strokeStyle = `rgba(${VOLT},.55)`; ctx.lineWidth = 5; ctx.stroke();
           ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1.4; ctx.stroke();
         }
-        if (now > arc.until) { arc = null; nextArc = now + 2000 + Math.random() * 3200; }
+        if (now > arc.until) { arc = null; nextArc = now + 6000 + Math.random() * 3000; }
       }
       sparks = sparks.filter(s => s.life > 0);
       for (const s of sparks) {
@@ -410,10 +441,14 @@ function mainGES() {
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    const loop = (now) => { if (running) frame(now); requestAnimationFrame(loop); };
+    const loop = (now) => {
+      if (!ready && cvs.clientWidth > 0) build();
+      if (running && ready) frame(now);
+      requestAnimationFrame(loop);
+    };
     build();
     window.addEventListener('resize', () => { clearTimeout(build._t); build._t = setTimeout(build, 150); });
-    if (reduced) { frame(0); return; }
+    if (reduced) { if (ready) frame(0); return; }
     const hero = $('#hero');
     hero.addEventListener('pointermove', (e) => {
       const r = hero.getBoundingClientRect();

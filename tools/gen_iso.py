@@ -285,18 +285,39 @@ def bolt(a, b, n=7, amp=4.5):
     d += f'M{f(bx)} {f(by)}l{f(rnd.uniform(-9, 9))} {f(rnd.uniform(-9, -3))}l{f(rnd.uniform(-5, 5))} {f(rnd.uniform(-6, -2))}'
     return d
 
-arcs = []
+arcs, gen_arcs = [], []
 for yc in (66, 96):
     top = P(319, yc, 28)
     for i in range(3):
-        arcs.append(bolt(top, (top[0] + rnd.uniform(-14, 14), top[1] - rnd.uniform(16, 26)), 6, 4))
+        gen_arcs.append(bolt(top, (top[0] + rnd.uniform(-14, 14), top[1] - rnd.uniform(16, 26)), 6, 4))
+    # small discharges crawling along the generator's top edges
+    edges = [((306, yc - 8), (332, yc - 8)), ((332, yc - 8), (332, yc + 8)), ((306, yc + 8), (332, yc + 8))]
+    for (ax_, ay_), (bx_, by_) in edges:
+        t1, t2 = sorted((rnd.uniform(0, 1), rnd.uniform(0, 1)))
+        a_ = P(ax_ + (bx_ - ax_) * t1, ay_ + (by_ - ay_) * t1, 28.4)
+        b_ = P(ax_ + (bx_ - ax_) * t2, ay_ + (by_ - ay_) * t2, 28.4)
+        gen_arcs.append(bolt(a_, b_, 5, 2.5))
 t0 = P(242, 137, 16)
 for i in range(2):
     arcs.append(bolt(t0, (t0[0] + rnd.uniform(-10, 10), t0[1] - rnd.uniform(14, 20)), 5, 3.5))
 arcs.append(bolt(P(292, 116, 4), P(244, 128, 10), 8, 3))
 W('<g class="arcs" filter="url(#fArc)">' + ''.join(
     f'<path class="arc" d="{d}" style="animation-delay:-{rnd.uniform(0, 2.4):.2f}s;animation-duration:{rnd.uniform(1.6, 2.8):.2f}s"/>'
-    for d in arcs) + '</g>')
+    for d in arcs) + ''.join(
+    f'<path class="arc arc--gen" d="{d}" style="animation-delay:-{rnd.uniform(0, 1.6):.2f}s;animation-duration:{rnd.uniform(1.1, 1.9):.2f}s"/>'
+    for d in gen_arcs) + '</g>')
+
+# energy links (turbine shaft -> generator) and a floating bolt above each generator
+fx = []
+for i, yc in enumerate((66, 96)):
+    a_, b_ = P(319, yc, 17), P(319, yc, 16)
+    s_ = P(352, yc, 12)
+    fx.append(f'<path class="gen-link" d="M{f(s_[0])} {f(s_[1])}Q{f((s_[0] + a_[0]) / 2)} {f(a_[1] - 6)} {f(a_[0])} {f(a_[1])}"/>')
+    zx, zy = P(319, yc, 46)
+    fx.append(f'<g class="gen-zap" style="animation-delay:-{i * .8}s" transform="translate({f(zx)} {f(zy)})">'
+              '<circle r="11" class="gen-zap__halo"/>'
+              '<path d="M1.5 -9 L-5 1.5 H-0.5 L-2.5 9 L5 -2 H0.5 L3 -9Z"/></g>')
+W('<g class="genfx" filter="url(#fArc)">' + ''.join(fx) + '</g>')
 
 # ---------------------------------------------------------------- labels (scale-compensated by JS)
 def label(cls, world, dx, dy, text, anchor='start'):
@@ -307,7 +328,7 @@ def label(cls, world, dx, dy, text, anchor='start'):
             f'<text x="{tx}" y="{dy + 4}" text-anchor="{anchor}">{text}</text></g></g>')
 W(label('lbl-1', (931, 51, 30), -40, -34, 'SUV QABUL QILGICH · ZATVOR', 'end'))
 W(label('lbl-2', (662, 81, 2), 20, -46, 'DERIVATSIYA KANALI'))
-W(label('lbl-3', (358, 66, 6), -24, -56, '2 × GORIZONTAL TURBINA', 'end'))
+W(label('lbl-3', (358, 96, -2), -14, 50, '2 × GORIZONTAL TURBINA', 'end'))
 W(label('lbl-4', (319, 96, 28), -30, -46, '2 × GENERATOR', 'end'))
 W(label('lbl-4b', (242, 137, 16), 34, 22, 'TRANSFORMATOR'))
 W(label('lbl-5', (152, 70, -4), 30, -34, 'SUV KANALGA QAYTADI'))
