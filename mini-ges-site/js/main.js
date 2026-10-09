@@ -713,7 +713,7 @@ function mainGES() {
       const h = $('h3', hsteps[n - 1]);
       if (diaName && h) diaName.textContent = h.textContent;
       gsap.fromTo(diaStep, { y: 8, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5 });
-      gsap.to(fill, { attr: n >= 2 ? { x: 350, width: 600 } : { x: 950, width: 0 }, duration: reduced ? 0 : (n >= 2 && prev < 2 ? 2.6 : 0.9), ease: 'power2.inOut', overwrite: true });
+      gsap.to(fill, { attr: n >= 2 ? { x: 350, width: 730 } : { x: 1080, width: 0 }, duration: reduced ? 0 : (n >= 2 && prev < 2 ? 2.6 : 0.9), ease: 'power2.inOut', overwrite: true });
       showPhoto(n);
     };
     const go = (n) => { setStep(n); camTo(String(n)); };
@@ -728,7 +728,7 @@ function mainGES() {
     });
     ScrollTrigger.create({ trigger: '#howSteps', start: 'top 62%', onLeaveBack: () => camTo('0') });
     gsap.to('#diaBar', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '#howSteps', start: 'top 62%', end: 'bottom 62%', scrub: true } });
-    if (reduced) { for (let i = 1; i <= 5; i++) dia.classList.add('on-' + i); fill.setAttribute('x', 350); fill.setAttribute('width', 600); }
+    if (reduced) { for (let i = 1; i <= 5; i++) dia.classList.add('on-' + i); fill.setAttribute('x', 350); fill.setAttribute('width', 730); }
   }
 
   // ------------------------------------------------------------------ project ripples
