@@ -238,9 +238,19 @@ main:focus { outline: none; }
 .status__row + .status__row { border-top: 1px solid rgba(255,255,255,.08); }
 .status__row img { width: 26px; height: auto; }
 .status__row strong { display: block; font: 700 15px/1.2 var(--f-display); margin-bottom: 6px; }
-.status__kw { font-size: 11px; font-weight: 400; color: var(--sky); margin-left: 6px; }
-.status__wave { width: 96px; height: 32px; }
-.status__wave path { fill: none; stroke: var(--volt); stroke-width: 1.6; stroke-linecap: round; }
+.status__kw { font-size: 11px; font-weight: 400; color: var(--sky); margin-left: 6px; white-space: nowrap; display: inline-block; }
+/* status card: water turns into current and goes to the grid */
+.flowmeter { display: grid; justify-items: end; gap: 4px; }
+.flowmeter svg { width: 112px; height: 28px; overflow: visible; }
+.fm__drop { fill: var(--sky); }
+.fm__bolt { fill: var(--volt); filter: drop-shadow(0 0 4px rgba(74,247,69,.7)); animation: fm-bolt 1.6s ease-in-out infinite; }
+.fm__track { stroke: rgba(255,255,255,.14); stroke-width: 2; stroke-linecap: round; }
+.fm__flow { stroke: var(--volt); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 4 7; animation: fm-dash .7s linear infinite; }
+.fm__dot { fill: #fff; filter: drop-shadow(0 0 4px var(--volt)); animation: fm-dot 1.6s ease-in infinite; }
+.fm__lbl { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--volt); opacity: .85; }
+@keyframes fm-dash { to { stroke-dashoffset: -11; } }
+@keyframes fm-dot { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translateX(66px); opacity: 0; } }
+@keyframes fm-bolt { 0%, 70%, 100% { opacity: .75; } 85% { opacity: 1; } }
 .status__count { font-size: 15px; color: #FFC24A; white-space: nowrap; }
 .status__count b { font-weight: 500; }
 .status__live { display: grid; gap: 6px; margin-top: 10px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.1); }
@@ -299,7 +309,7 @@ main:focus { outline: none; }
 .dia { --k: 1; }
 .dia .canal-lbl { font: 600 9px var(--f-mono); letter-spacing: .14em; fill: #DFF4FF; opacity: .7; }
 .dia .flow { fill: none; stroke: #fff; stroke-opacity: .75; stroke-width: 1.1; stroke-linecap: round; stroke-dasharray: 6 20; animation: dash 1.4s linear infinite; }
-.dia .flow--canal { animation-duration: 1.9s; animation-direction: reverse; }   /* canal runs toward the far side */
+.dia .flow--canal { animation-duration: 1.9s; }
 .dia .glint { animation: glint 8s linear infinite reverse; }
 .dia .w-intake, .dia .w-tail { opacity: 0; transition: opacity 1s var(--ease); }
 .dia .gate { transition: transform 1.4s var(--ease); }
@@ -357,7 +367,7 @@ main:focus { outline: none; }
 @keyframes spark { to { stroke-dashoffset: 0; } }
 @keyframes pulse { 50% { opacity: .45; } }
 @keyframes glint { from { transform: translateX(0); } to { transform: translateX(1500px); } }
-@keyframes spray { from { transform: translate(0, 0); opacity: .9; } to { transform: translate(12px, -9px); opacity: 0; } }
+@keyframes spray { from { transform: translate(0, 0); opacity: .9; } to { transform: translate(-12px, -8px); opacity: 0; } }
 @keyframes flicker { 0%, 100% { opacity: 1; } 47% { opacity: .35; } 53% { opacity: 1; } }
 
 /* ---------------- projects ---------------- */
@@ -739,7 +749,8 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   .nav .btn--sm { display: none; }
   .hero { padding-block: calc(104px + env(safe-area-inset-top, 0px)) 88px; }
   .hero__ctas .btn { width: 100%; }
-  .status__wave { width: 64px; }
+  .flowmeter svg { width: 88px; }
+  .fm__lbl { display: none; }
   .facts { grid-template-columns: minmax(0, 1fr); }
   .fact + .fact { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
   .svc-grid { grid-template-columns: minmax(0, 1fr); }

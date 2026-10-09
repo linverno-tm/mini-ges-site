@@ -32,6 +32,8 @@ mini-ges-site/
   404.html  robots.txt  sitemap.xml  manifest.webmanifest  .htaccess
   build.py              production build -> dist/
 tools/check_site.py     statik sifat tekshiruvi (CI'da ishlaydi)
+tools/i18n.py           tarjima: o'zbekcha manbadan /ru/ sahifasi (lug'at: mini-ges-site/i18n/ru.json)
+tools/gen_iso.py        'Qanday ishlaydi' izometrik maketini yaratadi (SVG)
 .github/workflows/      CI: tekshiruv -> build -> GitHub Pages
 ```
 

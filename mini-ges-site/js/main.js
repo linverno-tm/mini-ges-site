@@ -1,6 +1,6 @@
 /* MINI GES — interaction & motion layer.
    GSAP + ScrollTrigger for scroll choreography, Lenis for smooth scroll,
-   two hand-rolled canvases (hero flow field, project ripples). */
+   two hand-rolled canvases (hero power-grid scene, project ripples). */
 // JS is running: the CSS failsafe that hides the loader is no longer needed
 document.documentElement.classList.add('js-on');
 
@@ -161,64 +161,270 @@ function mainGES() {
     });
   }
 
-  // ------------------------------------------------------------------ hero flow field
-  (function flowField() {
+  // ------------------------------------------------------------------ hero: power grid scene
+  // A transmission line comes in from the horizon, passes a substation and leaves toward the
+  // viewer. Current pulses travel the conductors; now and then a short-circuit arc flashes.
+  // Static geometry is painted once into two offscreen layers (far / near) for cheap parallax.
+  (function powerGrid() {
     const cvs = $('#flow');
     if (!cvs) return;
     const ctx = cvs.getContext('2d');
-    let w = 0, h = 0, dpr = 1, parts = [], running = true, t = 0;
-    const mouse = { x: -9999, y: -9999 };
-    const COLORS = ['70,198,247', '0,160,227', '160,220,255'];
+    const far = document.createElement('canvas'), near = document.createElement('canvas');
+    const fctx = far.getContext('2d'), nctx = near.getContext('2d');
+    let W = 0, H = 0, dpr = 1, running = true, routes = [], arcs = [], pulses = [], sparks = [];
+    let VPX = 0, VPY = 0, F = 1, CAMH = 6, arc = null, nextArc = 0;
+    const px = { x: 0, y: 0, tx: 0, ty: 0 };
+    const SKY = '70,198,247', VOLT = '74,247,69';
 
-    const make = (anyX) => ({
-      x: anyX ? Math.random() * w : -20 - Math.random() * 80,
-      y: Math.random() * h,
-      s: 0.6 + Math.random() * 1.6,
-      life: 200 + Math.random() * 400,
-      c: Math.random() < 0.07 ? 'volt' : COLORS[(Math.random() * COLORS.length) | 0],
-    });
-    const resize = () => {
-      dpr = lite ? 1 : Math.min(window.devicePixelRatio || 1, 1.6);
-      w = cvs.clientWidth; h = cvs.clientHeight;
-      cvs.width = w * dpr; cvs.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const n = Math.min(lite ? 300 : 900, Math.round((w * h) / (lite ? 3000 : 1500)));
-      parts = Array.from({ length: n }, () => make(true));
-    };
-    const field = (x, y) => 0.55 * Math.sin(y * 0.0042 + x * 0.0016 + t * 0.0006) + 0.35 * Math.cos(x * 0.0031 - t * 0.0004) + 0.18 * Math.sin((x + y) * 0.009);
+    // world (X right, Y up, Z depth) -> screen
+    const P = (X, Y, Z) => [VPX + (X * F) / Z, VPY + ((CAMH - Y) * F) / Z];
+    const depthAlpha = Z => Math.max(0.12, Math.min(0.75, 34 / Z));
 
-    const step = () => {
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.fillStyle = 'rgba(0,0,0,0.075)';
-      ctx.fillRect(0, 0, w, h);
-      ctx.globalCompositeOperation = 'lighter';
-      for (const p of parts) {
-        const a = field(p.x, p.y);
-        let vx = Math.cos(a) * p.s * 1.5, vy = Math.sin(a) * p.s * 1.1;
-        const dx = p.x - mouse.x, dy = p.y - mouse.y, d2 = dx * dx + dy * dy;
-        if (d2 < 22000) { const f = (1 - d2 / 22000) * 3.2; const d = Math.sqrt(d2) || 1; vx += (dx / d) * f; vy += (dy / d) * f; }
-        const nx = p.x + vx, ny = p.y + vy;
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny);
-        if (p.c === 'volt') { ctx.strokeStyle = 'rgba(74,247,69,0.9)'; ctx.lineWidth = 1.8; }
-        else { ctx.strokeStyle = `rgba(${p.c},${0.18 + p.s * 0.16})`; ctx.lineWidth = 1; }
-        ctx.stroke();
-        p.x = nx; p.y = ny; p.life--;
-        if (p.x > w + 20 || p.y < -20 || p.y > h + 20 || p.life < 0) Object.assign(p, make(p.life < 0));
+    function line(c, a, b, alpha, width) {
+      c.strokeStyle = `rgba(${SKY},${alpha})`; c.lineWidth = width;
+      c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+    }
+
+    // lattice pylon; returns the three conductor attach points
+    function pylon(c, X, Z) {
+      const al = depthAlpha(Z), lw = Math.max(0.6, 26 / Z);
+      const b1 = P(X - 3, 0, Z), b2 = P(X + 3, 0, Z), t1 = P(X - 0.8, 21, Z), t2 = P(X + 0.8, 21, Z);
+      line(c, b1, t1, al, lw); line(c, b2, t2, al, lw);
+      for (let y = 3; y < 19; y += 4) {                      // cross bracing
+        const k1 = 3 - 2.2 * (y / 21), k2 = 3 - 2.2 * ((y + 4) / 21);
+        line(c, P(X - k1, y, Z), P(X + k2, y + 4, Z), al * 0.7, lw * 0.7);
+        line(c, P(X + k1, y, Z), P(X - k2, y + 4, Z), al * 0.7, lw * 0.7);
       }
-      t += 16;
-    };
-    const loop = () => { if (running) step(); requestAnimationFrame(loop); };
+      line(c, P(X - 6, 16, Z), P(X + 6, 16, Z), al, lw);      // cross arms
+      line(c, P(X - 4, 20, Z), P(X + 4, 20, Z), al, lw);
+      const att = [[X - 5.6, 14.6], [X + 5.6, 14.6], [X + 3.6, 18.6]];
+      att.forEach(([ax, ay]) => {                            // insulator strings
+        const top = P(ax, ay === 14.6 ? 16 : 20, Z), bot = P(ax, ay, Z);
+        line(c, top, bot, al, lw * 0.8);
+        c.fillStyle = `rgba(${SKY},${al})`;
+        for (let i = 1; i <= 3; i++) {
+          const yy = top[1] + ((bot[1] - top[1]) * i) / 4;
+          c.fillRect(top[0] - lw * 1.4, yy - lw * 0.3, lw * 2.8, lw * 0.6);
+        }
+      });
+      return att.map(([ax, ay]) => [ax, ay, Z]);
+    }
 
-    resize();
-    window.addEventListener('resize', () => { clearTimeout(resize._t); resize._t = setTimeout(resize, 150); });
-    if (reduced) { for (let i = 0; i < 160; i++) step(); return; }
+    // conductor between two world points, sagging; returns screen polyline
+    function span(a, b, steps = 18) {
+      const pts = [];
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps, sag = 1.6 * 4 * t * (1 - t);
+        pts.push(P(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t - sag, a[2] + (b[2] - a[2]) * t));
+      }
+      return pts;
+    }
+    const strokePoly = (c, pts, alpha, width) => {
+      c.strokeStyle = `rgba(${SKY},${alpha})`; c.lineWidth = width;
+      c.beginPath(); pts.forEach((p, i) => (i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]))); c.stroke();
+    };
+
+    // substation in elevation at depth Z, centred on X; returns busbar, entry/exit points and arc sites
+    function substation(c, CX, Z) {
+      const al = 0.7, lw = Math.max(0.8, 34 / Z), k = F / Z;
+      const L = CX - 11, R = CX + 11;
+      // fence
+      line(c, P(L - 2, 1.8, Z - 4), P(R + 2, 1.8, Z - 4), 0.25, lw * 0.6);
+      for (let x = L - 2; x <= R + 2; x += 2.2) line(c, P(x, 0, Z - 4), P(x, 1.8, Z - 4), 0.2, lw * 0.5);
+      // gantries
+      [L, CX, R].forEach(x => { line(c, P(x - 0.5, 0, Z), P(x - 0.5, 11, Z), al, lw); line(c, P(x + 0.5, 0, Z), P(x + 0.5, 11, Z), al, lw); });
+      line(c, P(L - 0.5, 11, Z), P(R + 0.5, 11, Z), al, lw * 1.2);
+      line(c, P(L - 0.5, 10.2, Z), P(R + 0.5, 10.2, Z), al * 0.6, lw * 0.7);
+      // insulator strings + busbars (three phases)
+      const phases = [9.2, 8.6, 8.0];
+      const strings = [L + 2, CX - 3, CX + 3, R - 2];
+      strings.forEach(x => {
+        const top = P(x, 10.2, Z), bot = P(x, 9.2, Z);
+        line(c, top, bot, al, lw * 0.8);
+        c.fillStyle = `rgba(${SKY},${al})`;
+        [0.33, 0.66].forEach(f => c.fillRect(top[0] - lw * 1.6, top[1] + (bot[1] - top[1]) * f - lw * 0.3, lw * 3.2, lw * 0.6));
+      });
+      const bus = phases.map(y => [P(L, y, Z), P(R, y, Z)]);
+      bus.forEach(([a, b], i) => line(c, a, b, 0.55 - i * 0.08, lw));
+      // transformers with radiators and bushings
+      const sites = [];
+      [CX - 6.5, CX + 6.5].forEach(tx => {
+        const a = P(tx - 3, 0, Z), b = P(tx + 3, 4.6, Z);
+        c.fillStyle = 'rgba(8,26,54,.85)'; c.fillRect(a[0], b[1], b[0] - a[0], a[1] - b[1]);
+        c.strokeStyle = `rgba(${SKY},${al})`; c.lineWidth = lw; c.strokeRect(a[0], b[1], b[0] - a[0], a[1] - b[1]);
+        for (let i = 0; i < 6; i++) {                        // radiator fins
+          const fx = a[0] + ((b[0] - a[0]) * (i + 0.5)) / 6;
+          line(c, [fx, b[1] + k * 0.6], [fx, a[1] - k * 0.5], 0.35, lw * 0.6);
+        }
+        [-1.8, 0, 1.8].forEach((dx, i) => {                  // bushings + droppers to the busbar
+          const base = P(tx + dx, 4.6, Z), tip = P(tx + dx, 6.4, Z);
+          line(c, base, tip, al, lw * 1.3);
+          for (let j = 1; j <= 3; j++) {
+            const yy = base[1] + ((tip[1] - base[1]) * j) / 4;
+            c.fillStyle = `rgba(${SKY},${al})`; c.fillRect(base[0] - lw * 1.8, yy - lw * 0.35, lw * 3.6, lw * 0.7);
+          }
+          const drop = P(tx + dx, phases[i], Z);
+          line(c, tip, drop, 0.3, lw * 0.6);
+          sites.push([tip, drop]);                           // bushing <-> busbar
+        });
+        sites.push([P(tx - 1.8, 6.4, Z), P(tx, 6.4, Z)]);    // phase to phase
+      });
+      // circuit breakers
+      [CX - 1.2, CX, CX + 1.2].forEach(x => {
+        line(c, P(x, 0, Z), P(x, 3.4, Z), al, lw * 1.4);
+        const hd = P(x, 3.6, Z); c.fillStyle = `rgba(${SKY},${al})`; c.fillRect(hd[0] - lw * 2, hd[1] - lw, lw * 4, lw * 2);
+      });
+      strings.forEach(x => sites.push([P(x, 9.2, Z), P(x, 10.2, Z)]));   // string flashover
+      return {
+        bus: bus.map(([a, b]) => [a, b]),
+        entry: phases.map(y => [L, y, Z]),
+        exit: phases.map(y => [R, y, Z]),
+        sites,
+      };
+    }
+
+    function build() {
+      dpr = lite ? 1 : Math.min(window.devicePixelRatio || 1, 1.6);
+      W = cvs.clientWidth; H = cvs.clientHeight;
+      [cvs, far, near].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
+      [ctx, fctx, nctx].forEach(c => c.setTransform(dpr, 0, 0, dpr, 0, 0));
+      // desktop: substation sits in the gap between the copy and the status card;
+      // phones: the scene rises behind the headline
+      const narrow = W < 700;
+      VPX = W * (narrow ? 0.62 : 0.66);
+      VPY = H * (narrow ? 0.2 : 0.6);
+      F = narrow ? W * 1.05 : Math.min(W, H * 1.6) * 0.5;
+
+      // far layer: perspective ground grid + incoming line
+      fctx.clearRect(0, 0, W, H);
+      for (let x = -400; x <= 400; x += 25) line(fctx, P(x, 0, 30), P(x, 0, 2000), 0.05, 1);
+      for (let z = 30; z < 600; z *= 1.22) line(fctx, P(-400, 0, z), P(400, 0, z), Math.min(0.08, 6 / z), 1);
+      const subZ = 40, subX = narrow ? 4 : -12;
+      const farPylons = [];
+      for (let z = 330; z >= 70; z -= 37) farPylons.push(pylon(fctx, subX - 1, z));
+
+      // near layer: substation + outgoing line
+      nctx.clearRect(0, 0, W, H);
+      const sub = substation(nctx, subX, subZ);
+      const out1 = pylon(nctx, subX + 16, 32), out2 = pylon(nctx, subX + 26, 25), out3 = pylon(nctx, subX + 38, 19);
+
+      // conductors and the routes pulses follow (far -> substation -> viewer), one per phase
+      routes = [0, 1, 2].map(ph => {
+        let pts = [];
+        for (let i = 0; i < farPylons.length - 1; i++) {
+          const s = span(farPylons[i][ph], farPylons[i + 1][ph], 10);
+          strokePoly(fctx, s, depthAlpha(farPylons[i][ph][2]) * 0.8, 0.8);
+          pts = pts.concat(s);
+        }
+        const inS = span(farPylons[farPylons.length - 1][ph], sub.entry[ph], 14);
+        strokePoly(nctx, inS, 0.45, 0.9);
+        const [b0, b1] = sub.bus[ph];
+        const o1 = span(sub.exit[ph], out1[ph]), o2 = span(out1[ph], out2[ph]), o3 = span(out2[ph], out3[ph]);
+        const o4 = span(out3[ph], [out3[ph][0] + 14, out3[ph][1], 14]);
+        [o1, o2, o3, o4].forEach(s => strokePoly(nctx, s, 0.5, 1.1));
+        pts = pts.concat(inS, [b0, b1], o1, o2, o3, o4);
+        const lens = [0];
+        for (let i = 1; i < pts.length; i++) lens.push(lens[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+        return { pts, lens, total: lens[lens.length - 1] };
+      });
+      arcs = sub.sites;
+      const per = lite ? 2 : 4;
+      pulses = [];
+      routes.forEach((r, ri) => { for (let i = 0; i < per; i++) pulses.push({ r: ri, d: (r.total * (i + ri / 3)) / per, v: 0.9 + Math.random() * 0.5 }); });
+    }
+
+    const at = (r, d) => {
+      let lo = 0, hi = r.lens.length - 1;
+      while (lo < hi - 1) { const m = (lo + hi) >> 1; if (r.lens[m] < d) lo = m; else hi = m; }
+      const seg = r.lens[hi] - r.lens[lo] || 1, t = (d - r.lens[lo]) / seg;
+      return [r.pts[lo][0] + (r.pts[hi][0] - r.pts[lo][0]) * t, r.pts[lo][1] + (r.pts[hi][1] - r.pts[lo][1]) * t];
+    };
+    // speed and size grow toward the viewer (lower on screen = nearer)
+    const nearness = y => Math.max(0, Math.min(1, (y - VPY) / (H - VPY)));
+
+    function jag(a, b, n = 7, amp = 6) {
+      const pts = [a];
+      for (let i = 1; i < n; i++) {
+        const t = i / n, o = (Math.random() - 0.5) * 2 * amp;
+        const nx = -(b[1] - a[1]), ny = b[0] - a[0], L = Math.hypot(nx, ny) || 1;
+        pts.push([a[0] + (b[0] - a[0]) * t + (nx / L) * o, a[1] + (b[1] - a[1]) * t + (ny / L) * o]);
+      }
+      pts.push(b);
+      return pts;
+    }
+
+    function frame(now) {
+      ctx.clearRect(0, 0, W, H);
+      px.x += (px.tx - px.x) * 0.05; px.y += (px.ty - px.y) * 0.05;
+      ctx.drawImage(far, px.x * 0.4, px.y * 0.4, W, H);
+      ctx.drawImage(near, px.x, px.y, W, H);
+      ctx.save(); ctx.translate(px.x, px.y);
+      ctx.globalCompositeOperation = 'lighter';
+
+      // current pulses
+      for (const p of pulses) {
+        const r = routes[p.r];
+        const [x, y] = at(r, p.d), nr = nearness(y);
+        p.d += p.v * (0.6 + nr * 5.5);
+        if (p.d > r.total) p.d = 0;
+        const rad = 1.4 + nr * 4.5;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, rad * 4);
+        g.addColorStop(0, `rgba(255,255,255,${0.9})`); g.addColorStop(0.25, `rgba(${VOLT},.8)`); g.addColorStop(1, `rgba(${VOLT},0)`);
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rad * 4, 0, 6.283); ctx.fill();
+        // short trail behind the head
+        const [tx, ty] = at(r, Math.max(0, p.d - 14 - nr * 60));
+        const lg = ctx.createLinearGradient(tx, ty, x, y);
+        lg.addColorStop(0, `rgba(${VOLT},0)`); lg.addColorStop(1, `rgba(${VOLT},.7)`);
+        ctx.strokeStyle = lg; ctx.lineWidth = rad * 0.9; ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(x, y); ctx.stroke();
+      }
+
+      // short-circuit arc
+      if (!arc && now > nextArc && arcs.length) {
+        const [a, b] = arcs[(Math.random() * arcs.length) | 0];
+        arc = { a, b, until: now + 220 + Math.random() * 160 };
+        for (let i = 0; i < (lite ? 8 : 18); i++) {
+          sparks.push({ x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2, vx: (Math.random() - 0.5) * 3.2, vy: -Math.random() * 2.6, life: 1 });
+        }
+      }
+      if (arc) {
+        const mx = (arc.a[0] + arc.b[0]) / 2, my = (arc.a[1] + arc.b[1]) / 2;
+        const flash = ctx.createRadialGradient(mx, my, 0, mx, my, 120);
+        flash.addColorStop(0, 'rgba(200,255,190,.35)'); flash.addColorStop(1, 'rgba(200,255,190,0)');
+        ctx.fillStyle = flash; ctx.beginPath(); ctx.arc(mx, my, 120, 0, 6.283); ctx.fill();
+        const amp = Math.max(3, Math.hypot(arc.b[0] - arc.a[0], arc.b[1] - arc.a[1]) * 0.35);
+        for (let k = 0; k < 2; k++) {
+          const pts = jag(arc.a, arc.b, 7, amp);
+          ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+          ctx.strokeStyle = `rgba(${VOLT},.55)`; ctx.lineWidth = 5; ctx.stroke();
+          ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1.4; ctx.stroke();
+        }
+        if (now > arc.until) { arc = null; nextArc = now + 2000 + Math.random() * 3200; }
+      }
+      sparks = sparks.filter(s => s.life > 0);
+      for (const s of sparks) {
+        s.x += s.vx; s.y += s.vy; s.vy += 0.12; s.life -= 0.025;
+        ctx.fillStyle = `rgba(255,${200 + ((s.life * 55) | 0)},150,${s.life})`;
+        ctx.fillRect(s.x, s.y, 2, 2);
+      }
+      ctx.restore();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    const loop = (now) => { if (running) frame(now); requestAnimationFrame(loop); };
+    build();
+    window.addEventListener('resize', () => { clearTimeout(build._t); build._t = setTimeout(build, 150); });
+    if (reduced) { frame(0); return; }
     const hero = $('#hero');
-    hero.addEventListener('pointermove', (e) => { const r = cvs.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
-    hero.addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
+    hero.addEventListener('pointermove', (e) => {
+      const r = hero.getBoundingClientRect();
+      px.tx = ((e.clientX - r.left) / r.width - 0.5) * -24;
+      px.ty = ((e.clientY - r.top) / r.height - 0.5) * -12;
+    });
+    hero.addEventListener('pointerleave', () => { px.tx = px.ty = 0; });
     new IntersectionObserver(([en]) => { running = en.isIntersecting && !document.hidden; }).observe(cvs);
     document.addEventListener('visibilitychange', () => { running = !document.hidden; });
-    loop();
+    nextArc = performance.now() + 1500;
+    requestAnimationFrame(loop);
   })();
 
   // hero parallax out
@@ -244,25 +450,6 @@ function mainGES() {
   };
   tick();
   setInterval(tick, 1000);
-
-  const wave = $('#liveWave');
-  if (wave) {
-    let ph = 0;
-    const drawWave = () => {
-      let d = '';
-      for (let x = 0; x <= 120; x += 4) {
-        const y = 16 + Math.sin(x * 0.12 + ph) * 6 + Math.sin(x * 0.31 + ph * 1.7) * 2.5;
-        d += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1);
-      }
-      wave.setAttribute('d', d);
-      ph += 0.06;
-    };
-    drawWave();
-    if (!reduced) {
-      let on = false;
-      new IntersectionObserver(([e]) => { if (e.isIntersecting !== on) { on = e.isIntersecting; on ? gsap.ticker.add(drawWave) : gsap.ticker.remove(drawWave); } }).observe(wave);
-    }
-  }
 
   // ------------------------------------------------------------------ live energy counter (Ulug'nor GES)
   // Estimate from the station's real annual output (5.2 GWh) since launch in September 2024.
@@ -398,7 +585,7 @@ function mainGES() {
       const h = $('h3', hsteps[n - 1]);
       if (diaName && h) diaName.textContent = h.textContent;
       gsap.fromTo(diaStep, { y: 8, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5 });
-      gsap.to(fill, { attr: { width: n >= 2 ? 600 : 0 }, duration: reduced ? 0 : (n >= 2 && prev < 2 ? 2.6 : 0.9), ease: 'power2.inOut', overwrite: true });
+      gsap.to(fill, { attr: n >= 2 ? { x: 350, width: 600 } : { x: 950, width: 0 }, duration: reduced ? 0 : (n >= 2 && prev < 2 ? 2.6 : 0.9), ease: 'power2.inOut', overwrite: true });
       showPhoto(n);
     };
     const go = (n) => { setStep(n); camTo(String(n)); };
@@ -413,7 +600,7 @@ function mainGES() {
     });
     ScrollTrigger.create({ trigger: '#howSteps', start: 'top 62%', onLeaveBack: () => camTo('0') });
     gsap.to('#diaBar', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '#howSteps', start: 'top 62%', end: 'bottom 62%', scrub: true } });
-    if (reduced) { for (let i = 1; i <= 5; i++) dia.classList.add('on-' + i); fill.setAttribute('width', 600); }
+    if (reduced) { for (let i = 1; i <= 5; i++) dia.classList.add('on-' + i); fill.setAttribute('x', 350); fill.setAttribute('width', 600); }
   }
 
   // ------------------------------------------------------------------ project ripples
