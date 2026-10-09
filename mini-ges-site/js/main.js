@@ -57,7 +57,7 @@ function mainGES() {
 
   let menuOpen = false;
   if (reduced) root.classList.add('reduced');
-  if (!hasGsap) { $('#loader')?.remove(); return; }
+  if (!hasGsap) { $('#loader')?.remove(); root.classList.add('switch-done'); return; }
 
   gsap.registerPlugin(ScrollTrigger);
   gsap.defaults({ ease: 'expo.out', duration: 1.1 });
@@ -125,7 +125,8 @@ function mainGES() {
   };
 
   const loader = $('#loader');
-  if (reduced || !loader) {
+  const langSwitch = root.classList.contains('lang-switch');   // set by js/boot.js
+  if (reduced || !loader || langSwitch) {
     loader?.remove();
   } else {
     document.body.classList.add('is-loading');
@@ -958,6 +959,40 @@ function mainGES() {
     });
   });
 
+  // ------------------------------------------------------------------ industry news: topic filter + "show more"
+  const news = $('#news'), newsList = $('#newsList');
+  if (news && newsList) {
+    const cards = $$('.ncard', newsList), chips = $$('.nchip', news), moreBtn = $('#newsMore');
+    let expanded = false, topic = 'all';
+    const show = (els) => {
+      if (!reduced && els.length) gsap.fromTo(els, { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.05, overwrite: true });
+      ScrollTrigger.refresh();
+    };
+    // a topic shows every matching item; "all" goes back to the short list unless it was expanded
+    const apply = () => {
+      cards.forEach(c => c.classList.toggle('is-out', topic !== 'all' && c.dataset.tag !== topic));
+      news.classList.toggle('is-all', topic !== 'all' || expanded);
+      if (moreBtn) moreBtn.hidden = topic !== 'all';
+      show(cards.filter(c => c.offsetParent));
+    };
+    chips.forEach(chip => chip.addEventListener('click', () => {
+      topic = chip.dataset.tag;
+      chips.forEach(c => { c.classList.toggle('is-on', c === chip); c.setAttribute('aria-pressed', String(c === chip)); });
+      apply();
+    }));
+    if (moreBtn) {
+      const label = $('span', moreBtn), moreText = label.textContent;
+      moreBtn.addEventListener('click', () => {
+        expanded = !expanded;
+        moreBtn.setAttribute('aria-expanded', String(expanded));
+        label.textContent = expanded ? moreBtn.dataset.less : moreText;
+        news.classList.toggle('is-all', expanded);
+        if (expanded) show($$('.ncard--more', newsList));
+        else { ScrollTrigger.refresh(); if (newsList.getBoundingClientRect().top < 0) scrollToEl(news); }
+      });
+    }
+  }
+
   // ------------------------------------------------------------------ business card
   $$('.vcard').forEach((vcard) => {
     const flip = () => vcard.classList.toggle('is-flipped');
@@ -1115,6 +1150,47 @@ function mainGES() {
 
   // footer wordmark
   if (!reduced) gsap.from('.foot__big', { yPercent: 40, autoAlpha: 0, duration: 1.6, scrollTrigger: { trigger: '.foot', start: 'top 90%', once: true } });
+
+  // ------------------------------------------------------------------ language switch: same place, no loader
+  // Leaving: remember the section in view and fade out. Arriving (js/boot.js saw the note): the loader
+  // is skipped, the page jumps to the same section and fades in. The other page is prefetched on hover.
+  const SWITCH_KEY = 'ges:lang-switch';
+  const fadeOut = () => { document.body.style.transition = 'opacity .2s'; document.body.style.opacity = '0'; };
+  $$('.lang a:not([aria-current])').forEach((a) => {
+    const warm = () => {
+      if (a.dataset.warm) return;
+      a.dataset.warm = '1';
+      const l = document.createElement('link'); l.rel = 'prefetch'; l.href = a.href; document.head.appendChild(l);
+    };
+    ['pointerenter', 'touchstart', 'focus'].forEach(ev => a.addEventListener(ev, warm, { passive: true }));
+    a.addEventListener('click', (e) => {
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;   // new tab: nothing to keep
+      let cur = null;
+      $$('section[id]').forEach((s) => { if (s.getBoundingClientRect().top <= window.innerHeight * 0.3) cur = s; });
+      const r = cur && cur.getBoundingClientRect();
+      try { sessionStorage.setItem(SWITCH_KEY, JSON.stringify({ id: cur ? cur.id : '', f: r ? clamp(-r.top / r.height, 0, 1) : 0, t: Date.now() })); } catch (err) { return; }
+      e.preventDefault();
+      fadeOut();
+      setTimeout(() => { location.href = a.href; }, 200);
+    });
+  });
+  // back button restores this page from the bfcache: undo the fade
+  window.addEventListener('pageshow', (e) => { if (e.persisted) { document.body.style.opacity = ''; } });
+
+  const arrive = () => {
+    let note = null;
+    try { note = JSON.parse(sessionStorage.getItem(SWITCH_KEY) || 'null'); sessionStorage.removeItem(SWITCH_KEY); } catch (err) { /* ignore */ }
+    const sec = note && note.id && document.getElementById(note.id);
+    ScrollTrigger.refresh();
+    if (sec) {
+      const y = sec.getBoundingClientRect().top + window.scrollY + note.f * sec.offsetHeight;
+      if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+      else window.scrollTo(0, y);
+      ScrollTrigger.update();
+    }
+    root.classList.add('switch-done');
+  };
+  if (langSwitch) setTimeout(arrive, 0);   // after the init above has laid the page out
 
   if (document.readyState === 'complete') ScrollTrigger.refresh();
   else window.addEventListener('load', () => ScrollTrigger.refresh());

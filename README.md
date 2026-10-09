@@ -17,6 +17,8 @@ mini gidroelektrostansiyalarini tanishtiruvchi va mini-GES qurish xizmatini sotu
 | Rasmlar WebP, 2 o'lcham (`srcset`), `loading="lazy"` | Birinchi ochilishda rasm yuklanmaydi, telefon kichik nusxani oladi |
 | Hero CSS + JS animatsiyasi, CSS failsafe | Skriptlar yuklanmasa ham sahifa ochiladi (yuklanish ekrani 6 soniyada o'zi yo'qoladi) |
 | `prefers-reduced-motion` | Harakatni kamaytirishni yoqqan foydalanuvchilarga animatsiyasiz versiya |
+| "Soha yangiliklari" build vaqtida HTML'ga yoziladi | Sahifa ochilganda begona saytga so'rov ketmaydi: tez, CSP buzilmaydi, oflaynda ham ko'rinadi |
+| UZ/RU almashtirish yuklanish ekranisiz | `js/boot.js` birinchi kadrdan oldin ishlaydi: o'quvchi turgan bo'limida qoladi |
 
 **Performance budjeti** (telefon, birinchi ochilish): HTML+CSS+JS+shriftlar ≈ 250 KB (gzip bilan ≈ 170 KB), rasm — 0 KB.
 
@@ -34,6 +36,7 @@ mini-ges-site/
 tools/check_site.py     statik sifat tekshiruvi (CI'da ishlaydi)
 tools/i18n.py           tarjima: o'zbekcha manbadan /ru/ sahifasi (lug'at: mini-ges-site/i18n/ru.json)
 tools/gen_iso.py        'Qanday ishlaydi' izometrik maketini yaratadi (SVG)
+tools/fetch_news.py     'Soha yangiliklari': RSS'dan GES xabarlarini yig'adi -> mini-ges-site/data/news.json
 .github/workflows/      CI: tekshiruv -> build -> GitHub Pages
 ```
 
@@ -56,6 +59,17 @@ Push'dan keyin GitHub Actions ketma-ket ishlaydi:
 3. **Deploy:** 1–2 daqiqada jonli saytda.
 
 Tekshiruv o'tmasa, sayt **chiqmaydi**: eski versiya ishlashda davom etadi. Pull request ochilsa, faqat tekshiruv va build ishlaydi.
+
+## Soha yangiliklari
+
+GitHub Actions har kuni soat 06:00 da (Toshkent) `tools/fetch_news.py` ni ishga tushiradi. Skript O'zbekiston
+OAV'larining RSS lentalari va Google News qidiruvidan GES haqidagi xabarlarni yig'adi, saralaydi va
+`mini-ges-site/data/news.json` ga qo'shadi. Keyin sayt qayta yig'ilib chiqariladi. Faqat sarlavha, manba, sana va
+havola saqlanadi, havola asl maqolaga olib boradi.
+
+- Hozir yangilash: repo → **Actions → CI / Deploy → Run workflow**.
+- Manbalar, kalit so'zlar va mavzular (`TAGS`) — `tools/fetch_news.py` boshida.
+- Bitta manba ishlamasa, qolganlari bilan davom etadi; birortasi ham ochilmasa, eski ro'yxat qoladi.
 
 ## Domen ulash (domen sotib olingandan keyin)
 

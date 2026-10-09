@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *"   # every day 06:00 Tashkent: refresh the industry news section
 
 permissions:
   contents: read
@@ -28,7 +30,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: JavaScript syntax
-        run: node --check mini-ges-site/js/main.js
+        run: node --check mini-ges-site/js/main.js && node --check mini-ges-site/js/boot.js
+      - name: News fetcher compiles
+        run: python -m py_compile tools/fetch_news.py
       - name: HTML validation
         run: npx --yes html-validate@8.24.1 mini-ges-site/index.html mini-ges-site/404.html
       - name: Links, assets, ids, alt text, labels
@@ -42,6 +46,8 @@ jobs:
     name: Build
     needs: checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # the daily run commits data/news.json back, so news accumulate
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,6 +56,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Fetch industry news (daily or manual run)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: python tools/fetch_news.py
+      - name: Keep the news history in the repo
+        if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        run: |
+          git diff --quiet -- mini-ges-site/data/news.json && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mini-ges-site/data/news.json
+          git commit -m "Soha yangiliklari yangilandi [skip ci]"
+          git pull --rebase --quiet origin main && git push --quiet origin HEAD:main || echo "push skipped (main moved); the next run retries"
       - name: Build (minify, cache-busting, templated URLs)
         run: python mini-ges-site/build.py
       - uses: actions/configure-pages@v5
