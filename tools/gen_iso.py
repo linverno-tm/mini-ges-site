@@ -305,6 +305,19 @@ for (a32, a46), (b32, b46) in segs:       # bank pieces with slanted ends that f
 lp = P(560, 20, 0)
 W(f'<text class="canal-lbl" x="{f(lp[0])}" y="{f(lp[1])}" transform="rotate(30 {f(lp[0])} {f(lp[1])})">←  ASOSIY SUG\'ORISH KANALI</text>')
 
+# fish jumping upstream (+x) now and then: hidden while they wait, a short leap with a splash in and out.
+# Unequal periods (13/17/19/23/29 s) so the leaps never fall into a noticeable rhythm.
+FISH = [(170, 19, 13, 4), (440, 25, 19, 11), (800, 14, 23, 2), (985, 17, 17, 7), (1170, 22, 29, 17)]   # x, y, period s, phase s
+fish_svg = ('<g transform="scale(1.6)"><ellipse rx="4.6" ry="1.55" fill="#E6EDEE"/><ellipse cx="-.2" cy=".6" rx="4" ry=".85" fill="#3E4F57"/>'
+            '<polygon points="-4,0 -7.4,2 -6.5,0 -7.4,-2" fill="#56666D"/><path d="M-.5 1.35 l1.6 1.1 l.9 -1.15z" fill="#56666D"/>'
+            '<circle cx="3.1" cy=".4" r=".42" fill="#12191D"/></g>')
+for fx, fy, per, ph in FISH:
+    kind = 'a' if per < 20 else 'b'
+    st = f'animation-duration:{per}s;animation-delay:-{ph}s'
+    W(xy(-3) + f'<ellipse class="splash splash--in-{kind}" cx="{fx}" cy="{fy}" rx="4.4" ry="4.4" style="{st}"/>'
+      + f'<ellipse class="splash splash--out-{kind}" cx="{fx + 26}" cy="{fy}" rx="4.4" ry="4.4" style="{st}"/></g>')
+    W(xz(fy) + f'<g transform="translate({fx} -3)"><g class="fish fish--{kind}" style="{st}">{fish_svg}</g></g></g>')
+
 # ---------------------------------------------------------------- intake + 400 m channel: one smooth bow
 # Water leaves the canal in its own direction (no right angle), arcs away from the canal and comes back
 # level into the forebay. Hermite tangents keep the curve smooth at every joint.
