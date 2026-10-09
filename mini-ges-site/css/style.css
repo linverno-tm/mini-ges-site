@@ -211,8 +211,8 @@ main:focus { outline: none; }
     linear-gradient(160deg, #0a3c8a 0%, var(--brand) 18%, #01306f 50%, var(--ink) 100%);
 }
 .hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.18) 28%, rgba(0,0,0,.75) 52%, #000 68%);
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.18) 28%, rgba(0,0,0,.75) 52%, #000 68%); }
+  -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.42) 0%, rgba(0,0,0,.5) 36%, rgba(0,0,0,.9) 60%, #000 72%);
+  mask-image: linear-gradient(90deg, rgba(0,0,0,.42) 0%, rgba(0,0,0,.5) 36%, rgba(0,0,0,.9) 60%, #000 72%); }
 .hero__glow { position: absolute; width: 60vw; height: 60vw; right: -20vw; bottom: -30vw; border-radius: 50%; background: radial-gradient(closest-side, rgba(84, 175, 58, .22), transparent); filter: blur(20px); pointer-events: none; }
 .hero__grid {
   position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 64px; align-items: start;

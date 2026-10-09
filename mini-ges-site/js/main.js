@@ -178,7 +178,8 @@ function mainGES() {
 
     // world (X right, Y up, Z depth) -> screen
     const P = (X, Y, Z) => [VPX + (X * F) / Z, VPY + ((CAMH - Y) * F) / Z];
-    const depthAlpha = Z => Math.max(0.1, Math.min(0.85, 30 / Z));
+    let AL = 30, LW = 1;                 // depth brightness and stroke scale, set per composition in build()
+    const depthAlpha = Z => Math.max(0.1, Math.min(0.85, AL / Z));
     // atmospheric perspective: distant steel turns deep blue, near steel is pale cyan
     const steel = (Z) => { const t = Math.max(0, Math.min(1, (Z - 30) / 220)); return `${Math.round(150 - 90 * t)},${Math.round(215 - 60 * t)},${Math.round(250 - 10 * t)}`; };
     let curZ = 40;
@@ -191,7 +192,7 @@ function mainGES() {
     // lattice pylon; returns the three conductor attach points
     function pylon(c, X, Z) {
       curZ = Z;
-      const al = depthAlpha(Z), lw = Math.max(0.6, 26 / Z);
+      const al = depthAlpha(Z), lw = Math.max(0.6, 26 / Z) * LW;
       const b1 = P(X - 3, 0, Z), b2 = P(X + 3, 0, Z), t1 = P(X - 0.8, 21, Z), t2 = P(X + 0.8, 21, Z);
       line(c, b1, t1, al, lw); line(c, b2, t2, al, lw);
       for (let y = 3; y < 19; y += 4) {                      // cross bracing
@@ -224,14 +225,14 @@ function mainGES() {
       return pts;
     }
     const strokePoly = (c, pts, alpha, width) => {
-      c.strokeStyle = `rgba(${SKY},${alpha})`; c.lineWidth = width;
+      c.strokeStyle = `rgba(${SKY},${alpha})`; c.lineWidth = width * LW;
       c.beginPath(); pts.forEach((p, i) => (i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]))); c.stroke();
     };
 
     // substation in elevation at depth Z, centred on X; returns busbar, entry/exit points and arc sites
     function substation(c, CX, Z) {
       curZ = Z;
-      const al = 0.8, lw = Math.max(0.8, 34 / Z), k = F / Z;
+      const al = 0.8, lw = Math.max(0.8, 34 / Z) * LW, k = F / Z;
       const L = CX - 11, R = CX + 11;
       // fence
       line(c, P(L - 2, 1.8, Z - 4), P(R + 2, 1.8, Z - 4), 0.25, lw * 0.6);
@@ -295,9 +296,11 @@ function mainGES() {
       if (!ready) return;
       [cvs, far, near].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
       [ctx, fctx, nctx].forEach(c => c.setTransform(dpr, 0, 0, dpr, 0, 0));
-      // Composition is measured from the real layout, so nothing overlaps at any width:
-      // desktop: the substation stands on a horizon just above the status card, right of the headline;
-      // phones: it stands on the headline's top edge, top-right, and the outgoing line leaves the screen.
+      // Composition is measured from the real layout:
+      // desktop: a full-width panorama. The line comes from the far left horizon, runs through a large
+      //   substation standing just above the status card, and leaves for the right horizon;
+      //   the CSS mask keeps it faint behind the copy.
+      // phones: the substation stands on the headline's top edge, top-right, and the outgoing line leaves the screen.
       const narrow = W < 700;
       const subZ = 40;
       let subX, visibleTop = H;
@@ -315,18 +318,12 @@ function mainGES() {
         visibleTop = baseY + 4;
       } else {
         const cardTop = cr ? cr.top - hr.top : H * 0.62;
-        // right edge of the headline's actual text (the h1 box itself is wider than its lines)
-        let textRight = tr ? tr.right : 0;
-        if (title) { const rg = document.createRange(); rg.selectNodeContents(title); textRight = rg.getBoundingClientRect().right || textRight; }
-        const left = Math.max(tr ? textRight - hr.left + 24 : W * 0.5, cr ? cr.left - hr.left : W * 0.55);
-        const right = W - 16;
         const nav = $('.nav');
         const top = (nav ? nav.getBoundingClientRect().bottom - hr.top : 80) + 16;
         const baseY = cardTop - 18;
-        // the whole scene (substation + line receding to the right) is ~28 m wide and ~20 m tall
-        // at the substation's scale: fit it inside the free box so nothing is cut at the edge
-        const k = Math.max(4, Math.min(20, (right - left) / 28, (baseY - top) / 20));   // px per metre
-        const cx = left + Math.max(0, (right - left - 28 * k) / 2) + 15 * k;
+        // substation ~40% of the width; nearest pylons (21 m at Z 80) must stay below the nav
+        const k = Math.max(12, Math.min(32, (W * 0.4) / 22, (baseY - top) / 13.5));   // px per metre
+        const cx = Math.min(W * 0.7, W - 19 * k);
         F = k * subZ;
         VPY = baseY - CAMH * k;
         VPX = cx + 4 * k;
@@ -334,6 +331,8 @@ function mainGES() {
         visibleTop = cardTop - 4;
       }
 
+      LW = Math.max(1, Math.min(2.4, F / 520));   // strokes grow with the scene so a large substation is not spindly
+      AL = narrow ? 30 : 64;                       // the desktop incoming line is a main element, keep it readable
       // far layer: perspective ground grid + incoming line
       fctx.clearRect(0, 0, W, H);
       curZ = 200;
@@ -343,17 +342,19 @@ function mainGES() {
       const haze = fctx.createLinearGradient(0, VPY - 70, 0, VPY + 90);
       haze.addColorStop(0, 'rgba(70,198,247,0)'); haze.addColorStop(0.45, 'rgba(70,198,247,.09)'); haze.addColorStop(1, 'rgba(70,198,247,0)');
       fctx.fillStyle = haze; fctx.fillRect(0, VPY - 70, W, 160);
+      // incoming line, far -> near. Desktop: it sweeps in from the left horizon across the whole hero
       const farPylons = [];
-      for (let z = 330; z >= 70; z -= 37) farPylons.push(pylon(fctx, subX - 1, z));
+      if (narrow) for (let z = 330; z >= 70; z -= 37) farPylons.push(pylon(fctx, subX - 1, z));
+      else for (let i = 6; i >= 0; i--) farPylons.push(pylon(fctx, subX - 34 - i * 44, 80 + i * 40));
 
       // near layer: substation + outgoing line
       nctx.clearRect(0, 0, W, H);
       const sub = substation(nctx, subX, subZ);
       // phones: the outgoing line comes towards the viewer and leaves the screen;
-      // desktop: it recedes to the right and stays inside the frame
-      const out1 = narrow ? pylon(nctx, subX + 16, 32) : pylon(nctx, subX + 10, 56);
-      const out2 = narrow ? pylon(nctx, subX + 26, 25) : pylon(nctx, subX + 14, 76);
-      const out3 = narrow ? pylon(nctx, subX + 38, 19) : pylon(nctx, subX + 17, 104);
+      // desktop: it recedes to the right horizon and stays inside the frame
+      const outs = narrow
+        ? [pylon(nctx, subX + 16, 32), pylon(nctx, subX + 26, 25), pylon(nctx, subX + 38, 19)]
+        : [0, 1, 2, 3].map(i => pylon(i ? fctx : nctx, subX + 26 + i * 16, 80 + i * 40));
 
       // conductors and the routes pulses follow (far -> substation -> viewer), one per phase
       routes = [0, 1, 2].map(ph => {
@@ -366,13 +367,14 @@ function mainGES() {
         const inS = span(farPylons[farPylons.length - 1][ph], sub.entry[ph], 14);
         strokePoly(nctx, inS, 0.45, 0.9);
         const [b0, b1] = sub.bus[ph];
-        const o1 = span(sub.exit[ph], out1[ph]), o2 = span(out1[ph], out2[ph]), o3 = span(out2[ph], out3[ph]);
-        const o4 = span(out3[ph], narrow ? [out3[ph][0] + 14, out3[ph][1], 14] : [out3[ph][0] + 3, out3[ph][1], 140]);
-        [o1, o2, o3, o4].forEach(s => strokePoly(nctx, s, 0.5, 1.1));
-        const farPart = pts.slice(), nearPart = [].concat(inS, [b0, b1], o1, o2, o3, o4);
+        const last = outs[outs.length - 1][ph];
+        const chain = [sub.exit[ph], ...outs.map(o => o[ph]), narrow ? [last[0] + 14, last[1], 14] : [last[0] + 18, last[1], last[2] + 60]];
+        const outSpans = chain.slice(1).map((q, i) => span(chain[i], q));
+        outSpans.forEach(s => strokePoly(nctx, s, 0.5, 1.1));
+        const farPart = pts.slice(), nearPart = [].concat(inS, [b0, b1], ...outSpans);
         pts = farPart.concat(nearPart);
         [[fctx, farPart, 0.06, 2], [nctx, nearPart, 0.1, 3.2]].forEach(([c, part, al, lw]) => {   // energised underglow
-          c.strokeStyle = `rgba(${VOLT},${al})`; c.lineWidth = lw;
+          c.strokeStyle = `rgba(${VOLT},${al})`; c.lineWidth = lw * LW;
           c.beginPath(); part.forEach((q, i) => (i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]))); c.stroke();
         });
         const lens = [0];
@@ -380,7 +382,7 @@ function mainGES() {
         return { pts, lens, total: lens[lens.length - 1] };
       });
       // only flash where the scene is clearly visible (the left side fades under the copy)
-      arcs = sub.sites.filter(([a]) => a[1] < visibleTop);
+      arcs = sub.sites.filter(([a]) => a[1] < visibleTop && (narrow || a[0] > W * 0.55));
       if (!arcs.length) arcs = sub.sites;
       // soft bloom of the near layer, computed once
       glow.width = near.width; glow.height = near.height;
