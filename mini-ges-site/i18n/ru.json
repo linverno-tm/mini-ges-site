@@ -1,6 +1,7 @@
 {
   "html": {
-    "hero.title": "Производите <em>электричество</em> из воды на своей земле"
+    "hero.title": "«Производите <em>электричество</em> из воды на своей земле»",
+    "hero.quote": "<p>Наши предприниматели, эффективно используя водные ресурсы, в этом году также построили малые и микроГЭС на 40 мегаватт. В результате выработано 120 миллионов киловатт-часов электроэнергии, что обеспечило им дополнительный источник дохода.</p><footer><b>Шавкат Мирзиёев</b>, Президент Республики Узбекистан · выступление на конференции «Устойчивая энергетика», 5 декабря 2025 · <a href=\"https://president.uz/ru/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></footer>"
   },
   "text": {
     "MINI GES — mini gidroelektrostansiyalar": "MINI GES — мини-гидроэлектростанции",
@@ -366,6 +367,7 @@
     "Yangiliklar": "Новости",
     "SUV QABUL QILGICH · FILTR · ZATVOR": "ВОДОЗАБОР · СОРОУДЕРЖИВАЮЩАЯ РЕШЁТКА · ЗАТВОР",
     "Chiqindi tutuvchi panjara (filtr) montaji": "Монтаж сороудерживающей решётки (фильтра)",
-    "Kattalashtirish: Chiqindi tutuvchi panjara (filtr) montaji": "Увеличить: Монтаж сороудерживающей решётки (фильтра)"
+    "Kattalashtirish: Chiqindi tutuvchi panjara (filtr) montaji": "Увеличить: Монтаж сороудерживающей решётки (фильтра)",
+    "president.uz": "president.uz"
   }
 }
