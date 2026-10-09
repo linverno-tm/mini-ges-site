@@ -1,0 +1,8 @@
+# build output (CI rebuilds it on every push)
+mini-ges-site/dist/
+# local tooling
+.claude/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
