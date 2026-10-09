@@ -384,9 +384,9 @@ dim = [q for q in offset(deriv_line, -26)]
 d1, d2 = P(*dim[0]), P(*dim[-1])
 apex = max(range(len(dim)), key=lambda i: dim[i][1])
 am = P(*dim[apex])
-W(f'<g class="dim"><path d="M' + 'L'.join(f'{f(P(x, y)[0])} {f(P(x, y)[1])}' for x, y in dim) + '" fill="none" stroke="#46C6F7" stroke-width="1.2" stroke-dasharray="4 3"/>'
+DIM_SVG = (f'<g class="dim"><path d="M' + 'L'.join(f'{f(P(x, y)[0])} {f(P(x, y)[1])}' for x, y in dim) + '" fill="none" stroke="#46C6F7" stroke-width="1.2" stroke-dasharray="4 3"/>'
   + ''.join(f'<path d="{"M%s %sL%s %s" % (f(q[0]), f(q[1] - 6), f(q[0]), f(q[1] + 6))}" stroke="#46C6F7" stroke-width="1.2"/>' for q in (d1, d2))
-  + f'<g transform="translate({f(am[0])} {f(am[1] + 4)})"><rect x="-30" y="-11" width="60" height="22" rx="6" fill="#0B1B33" stroke="#46C6F7" stroke-width="1.2"/><text x="0" y="4.5" text-anchor="middle">400 m</text></g></g>')
+  + f'<g transform="translate({f(am[0])} {f(am[1] + 4)})"><rect x="-30" y="-11" width="60" height="22" rx="6" fill="#0B1B33" stroke="#46C6F7" stroke-width="1.2"/><text x="0" y="4.5" text-anchor="middle">400 m</text></g></g>')   # drawn last, see labels
 for x in range(452, 1192, 46):                                              # near poplar row, beyond the arch
     W(tree(x, 232 + (x * 3 % 7), 30 + (x * 5 % 9)))
 
@@ -403,6 +403,18 @@ for i in range(5):
     a_ = P(266, 58 + DY + i * 12, -3)
     W(f'<circle class="drop" cx="{f(a_[0])}" cy="{f(a_[1])}" r="1.3" fill="#E6F8FF" style="animation-delay:-{i * .27}s"/>')
 TMID = tail[len(tail) // 2]
+out = []
+# discharge: the turbulent stretch runs along the first ~45 % of the tailrace (the part next to the wall is hidden by it)
+nseg = int(len(tail) * .45)
+for i in range(1, nseg):
+    q, k = tail[i], 1 - i / nseg                                  # k: 1 at the outlet, fading downstream
+    for side in (-.45, .1, .5):
+        cx, cy = offset([tail[i - 1], q, tail[i + 1]], [th[i] * side] * 3)[1]
+        out.append(f'<ellipse class="foam" cx="{f(cx)}" cy="{f(cy)}" rx="{f(2.5 + 4 * k)}" ry="{f(1.8 + 2.6 * k)}" '
+                   f'style="animation-delay:-{(i * .29 + side) % 1.2:.2f}s;opacity:{.2 + .5 * k:.2f}"/>')
+out += [f'<path class="flow flow--out" d="{path_xy(offset(tail[:nseg + 3], [th[j] * d for j in range(nseg + 3)]))}" style="animation-delay:-{n * .12:.2f}s"/>'
+        for n, d in enumerate((-.55, -.25, .05, .35, .6))]
+W('<g class="w-out">' + xy(-3.8) + ''.join(out) + '</g></g>')
 
 # ---------------------------------------------------------------- powerhouse (cutaway); water enters at x=380, leaves at x=270
 PX0, PX1, PY0, PY1, PZ0, PZ1 = 270, 380, 46 + DY, 116 + DY, -6, 34
@@ -412,6 +424,8 @@ W(xy(PZ0 + .2) + f'<circle class="ph-glow" cx="325" cy="{81 + DY}" r="58" fill="
 W(xz(PY0) + rect(PX0, PZ0, PX1 - PX0, PZ1 - PZ0, PLASTER[1]) + ''.join(
     rect(PX0 + 12 + i * 26, 14, 14, 12, '#5D6B74') + rect(PX0 + 12 + i * 26, 14, 14, 3, '#7F8E97') for i in range(4)) + '</g>')
 W(yz(PX0) + rect(PY0, PZ0, PY1 - PY0, PZ1 - PZ0, PLASTER[2]) + rect(58 + DY, -4, 16, 18, '#3A3B37') + rect(88 + DY, -4, 16, 18, '#3A3B37') + '</g>')
+W('<g class="w-out">' + yz(PX0) + ''.join(rect(y0, -4, 16, 9, 'url(#gWdeep)') + f'<rect class="foam foam--lip" x="{y0}" y="3.2" width="16" height="2.2" fill="#F4FBFA"/>'
+                                          for y0 in (58 + DY, 88 + DY)) + '</g></g>')     # water rushing out through the outlets
 
 def unit(yc, k):
     zc = 6
@@ -531,6 +545,8 @@ for i, yc in enumerate((66 + DY, 96 + DY)):
               '<circle r="11" class="gen-zap__halo"/>'
               '<path d="M1.5 -9 L-5 1.5 H-0.5 L-2.5 9 L5 -2 H0.5 L3 -9Z"/></g>')
 W('<g class="genfx" filter="url(#fArc)">' + ''.join(fx) + '</g>')
+
+W(DIM_SVG)                                                     # on top of trees and buildings
 
 # ---------------------------------------------------------------- labels (scale-compensated by JS)
 def label(cls, world, dx, dy, text, anchor='start'):
