@@ -7,3 +7,8 @@ __pycache__/
 .DS_Store
 Thumbs.db
 linkedin/
+
+# AI video media (large)
+video-ai/clips/
+video-ai/*.zip
+video-ai/references/

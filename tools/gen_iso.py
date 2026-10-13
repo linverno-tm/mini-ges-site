@@ -248,23 +248,24 @@ W(xy(0) + rect(-900, -800, 2900, 2000, 'url(#gGround)') + rect(-900, -800, 2900,
 M = lambda x: 1092 - x
 DY = 50                 # powerhouse, tailrace, grid and village sit this much further from the canal than in v2
 FY = 110                # near-side fields move back so the arched channel has open ground around it
+KW = 46                 # the Great Fergana Canal is wide: its far bank, road and poplars sit this much further away
 
 fields = [(-120, 130, 230, 150, 'pRows'), (150, 140, 200, 140, 'pRows2'), (380, 140, 230, 150, 'pRows'),
           (-140, -130, 330, 90, 'pRows2'), (240, -130, 330, 95, 'pRows'), (620, -130, 360, 100, 'pRows2'),
           (640, 200, 150, 110, 'pRows'), (-130, 300, 260, 110, 'pRows2'), (180, 300, 300, 100, 'pRows')]
-fields = [(M(x + w), y + (FY if y > 0 else 0), w, h, p) for x, y, w, h, p in fields]
+fields = [(M(x + w), y + (FY if y > 0 else -KW), w, h, p) for x, y, w, h, p in fields]
 W(xy(0) + ''.join(rect(x, y, w, h, f'url(#{p})', ' rx="3" stroke="#5E5435" stroke-opacity=".45" stroke-width="1.2"') for x, y, w, h, p in fields) + '</g>')
-W(xy(0) + rect(-260, -34, 1560, 12, '#A08C67') + rect(-260, -34, 1560, 12, 'url(#pGridW)') + '</g>')   # dirt road, far side
+W(xy(0) + rect(-260, -34 - KW, 1560, 12, '#A08C67') + rect(-260, -34 - KW, 1560, 12, 'url(#pGridW)') + '</g>')   # dirt road, far side
 for x in range(-180, 1240, 34):                                             # far poplar row
-    W(tree(x, -42, 46 + (x * 7 % 13)))
+    W(tree(x, -42 - KW, 46 + (x * 7 % 13)))
 
 # ---------------------------------------------------------------- main canal (flows toward -x)
 X0, X1 = -260, 1300
-W(xy(0) + rect(X0, -12, X1 - X0, 16, CONC[0]) + '</g>')
-W(f'<polygon points="{pts((X0, 4, 0), (X1, 4, 0), (X1, 11, -11), (X0, 11, -11))}" fill="{CONC[1]}"/>')
-W(xy(-3) + f'<rect x="{X0}" y="6" width="{X1 - X0}" height="25" fill="url(#gW)"/>'
-  + f'<rect class="glint" x="{X0}" y="9" width="220" height="16" fill="url(#gGlint)" opacity=".35"/>'
-  + ''.join(f'<path class="flow flow--canal" d="M{X1} {yy}H{X0}" style="animation-delay:-{d}s"/>' for yy, d in ((11, 0), (17, .7), (23, .3), (28, 1.1)))
+W(xy(0) + rect(X0, -12 - KW, X1 - X0, 16, CONC[0]) + '</g>')
+W(f'<polygon points="{pts((X0, 4 - KW, 0), (X1, 4 - KW, 0), (X1, 11 - KW, -11), (X0, 11 - KW, -11))}" fill="{CONC[1]}"/>')
+W(xy(-3) + f'<rect x="{X0}" y="{6 - KW}" width="{X1 - X0}" height="{25 + KW}" fill="url(#gW)"/>'
+  + f'<rect class="glint" x="{X0}" y="{9 - KW}" width="220" height="{16 + KW}" fill="url(#gGlint)" opacity=".35"/>'
+  + ''.join(f'<path class="flow flow--canal" d="M{X1} {yy}H{X0}" style="animation-delay:-{d}s"/>' for yy, d in ((-34, .5), (-25, 1.3), (-16, .2), (-7, .9), (2, .4), (11, 0), (17, .7), (23, .3), (28, 1.1)))
   + '</g>')
 # water routes (drawn further down) are laid out first: the near bank gets real openings where they cross it
 K0, K1, K2 = (1060, 16), (700, 178), (422, 81 + DY)
@@ -304,14 +305,14 @@ segs.append((start, (X1, X1)))
 for (a32, a46), (b32, b46) in segs:       # bank pieces with slanted ends that follow the channel walls
     W(xy(0) + f'<polygon points="{f(a32)},32 {f(b32)},32 {f(b46)},46 {f(a46)},46" fill="{CONC[0]}"/></g>')
     W(xz(46) + rect(a46, -3, b46 - a46, 3, CONC[2]) + '</g>')
-lp = P(560, 20, 0)
-W(f'<text class="canal-lbl" x="{f(lp[0])}" y="{f(lp[1])}" transform="rotate(30 {f(lp[0])} {f(lp[1])})">←  ASOSIY SUG\'ORISH KANALI</text>')
+lp = P(560, 4, 0)
+W(f'<text class="canal-lbl" x="{f(lp[0])}" y="{f(lp[1])}" transform="rotate(30 {f(lp[0])} {f(lp[1])})">←  KATTA FARG\'ONA KANALI</text>')
 
 # fish jumping upstream (+x) often: hidden while they wait, a short leap with a splash in and out.
 # Seven fish along the canal (every camera view has one), unequal periods of 5-10 s so that somewhere
 # a fish leaps every second or two, never in a noticeable rhythm.
-FISH = [(130, 19, 6.3, 1.1), (300, 24, 8.9, 5.2), (470, 15, 5.7, 3.4), (640, 22, 9.6, 7.9),
-        (810, 17, 7.1, .6), (975, 21, 5.3, 2.8), (1160, 16, 8.3, 4.4)]          # x, y, period s, phase s
+FISH = [(130, 19, 6.3, 1.1), (300, -14, 8.9, 5.2), (470, 15, 5.7, 3.4), (640, -22, 9.6, 7.9),
+        (810, 17, 7.1, .6), (975, -8, 5.3, 2.8), (1160, 16, 8.3, 4.4)]          # x, y, period s, phase s
 fish_svg = ('<g transform="scale(1.6)"><ellipse rx="4.6" ry="1.55" fill="#E6EDEE"/><ellipse cx="-.2" cy=".6" rx="4" ry=".85" fill="#3E4F57"/>'
             '<polygon points="-4,0 -7.4,2 -6.5,0 -7.4,-2" fill="#56666D"/><path d="M-.5 1.35 l1.6 1.1 l.9 -1.15z" fill="#56666D"/>'
             '<circle cx="3.1" cy=".4" r=".42" fill="#12191D"/></g>')
@@ -617,7 +618,7 @@ def cam(x0, x1, y0, y1, z0=-12, z1=40, m=.06, sx=0.0):
     cx, cy = (max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2
     return f'{f(cx - w / 2 - sx * w)} {f(cy - h / 2)} {f(w)} {f(h)}'
 cams = {
-    '0': cam(-48, 1132, 20, 330 + DY, 0, 30, .0),
+    '0': cam(-48, 1132, 20 - KW // 2, 330 + DY, 0, 30, .0),
     '1': cam(G[0] - 60, G[0] + 75, 8, G[1] + 30, -12, 40, .1, .04),
     '2': cam(372, 1060, 10, 205, -12, 20, .04, .14),   # shifted so the photo inset (bottom-left) leaves the arch visible
     '3': cam(252, 392, 40 + DY, 125 + DY, -6, 36, .16, .1),
@@ -626,7 +627,7 @@ cams = {
 }
 
 svg = (f'<svg class="dia" id="dia" viewBox="{cams["0"]}" data-cams=\'{json.dumps(cams)}\' role="img" '
-       'aria-label="Mini-GES maketi: sug\'orish kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, '
+       'aria-label="Mini-GES maketi: Katta Farg\'ona kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, '
        'ikki gorizontal turbinali stansiya, qaytish o\'zani, transformator va qishloqqa boruvchi elektr tarmog\'i">'
        + ''.join(o) + '</svg>')
 open(sys.argv[1], 'w', encoding='utf-8').write(svg)
