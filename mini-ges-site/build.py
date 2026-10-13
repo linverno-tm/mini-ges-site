@@ -53,6 +53,12 @@ NEWS_L = {
            'tags': {'tariff': 'Тарифы', 'law': 'Законодательство', 'invest': 'Инвестиции', 'project': 'Проекты', 'news': 'Отрасль'},
            'months': 'января февраля марта апреля мая июня июля августа сентября октября ноября декабря'.split(),
            'date': '{d} {m} {y}'},
+    'en': {'filters': 'Filter by topic',
+           'all': 'All', 'more': 'Show more', 'less': 'Show less', 'newtab': 'opens in a new window',
+           'empty': 'No news yet.',
+           'tags': {'tariff': 'Tariffs', 'law': 'Regulation', 'invest': 'Investment', 'project': 'Projects', 'news': 'Industry'},
+           'months': 'January February March April May June July August September October November December'.split(),
+           'date': '{d} {m} {y}'},
 }
 
 
@@ -147,29 +153,30 @@ def main():
 
     write('index.html', finish(template(source)).replace('<!--NEWS-->', render_news('uz')))
 
-    # Russian page: same source, translated at build time, one folder deeper
-    ru, missing = i18n.translate(source, 'ru')
-    assert not missing, f'untranslated for ru: {missing[:5]}'
-    ru = ru.replace('<html lang="uz"', '<html lang="ru"', 1)
-    ru = ru.replace('content="uz_UZ"', 'content="ru_RU"')
-    ru = ru.replace('<link rel="canonical" href="%SITE_URL%">', '<link rel="canonical" href="%SITE_URL%ru/">')
-    ru = ru.replace('<meta property="og:url" content="%SITE_URL%">', '<meta property="og:url" content="%SITE_URL%ru/">')
-    ru = ru.replace('href="./" hreflang="uz" lang="uz" aria-current="page"', 'href="./" hreflang="uz" lang="uz"')
-    ru = ru.replace('href="ru/" hreflang="ru" lang="ru"', 'href="ru/" hreflang="ru" lang="ru" aria-current="page"')
-    ru = re.sub(r'(\s(?:src|href|data-src)=")(?!https?:|//|#|data:|tel:|mailto:|%SITE_URL%|/|\.\./)', r'\1../', ru)
-    ru = re.sub(r'(\ssrcset=")([^"]+)"', lambda m: m.group(1) + ', '.join(
-        p.strip() if p.strip().startswith(('http', '/', 'data:')) else '../' + p.strip()
-        for p in m.group(2).split(',')) + '"', ru)
-    ru = ru.replace('href="../ru/"', 'href="./"').replace('href=".././"', 'href="../"')
-    os.makedirs(os.path.join(DIST, 'ru'), exist_ok=True)
-    write('ru/index.html', finish(template(ru)).replace('<!--NEWS-->', render_news('ru')))
+    # Russian and English pages: same source, translated at build time, one folder deeper
+    for code, locale in (('ru', 'ru_RU'), ('en', 'en_US')):
+        page, missing = i18n.translate(source, code)
+        assert not missing, f'untranslated for {code}: {missing[:5]}'
+        page = page.replace('<html lang="uz"', f'<html lang="{code}"', 1)
+        page = page.replace('content="uz_UZ"', f'content="{locale}"')
+        page = page.replace('<link rel="canonical" href="%SITE_URL%">', f'<link rel="canonical" href="%SITE_URL%{code}/">')
+        page = page.replace('<meta property="og:url" content="%SITE_URL%">', f'<meta property="og:url" content="%SITE_URL%{code}/">')
+        page = page.replace('href="./" hreflang="uz" lang="uz" aria-current="page"', 'href="./" hreflang="uz" lang="uz"')
+        page = page.replace(f'href="{code}/" hreflang="{code}" lang="{code}"', f'href="{code}/" hreflang="{code}" lang="{code}" aria-current="page"')
+        page = re.sub(r'(\s(?:src|href|data-src)=")(?!https?:|//|#|data:|tel:|mailto:|%SITE_URL%|/|\.\./)', r'\1../', page)
+        page = re.sub(r'(\ssrcset=")([^"]+)"', lambda m: m.group(1) + ', '.join(
+            p.strip() if p.strip().startswith(('http', '/', 'data:')) else '../' + p.strip()
+            for p in m.group(2).split(',')) + '"', page)
+        page = page.replace(f'href="../{code}/"', 'href="./"').replace('href=".././"', 'href="../"')
+        os.makedirs(os.path.join(DIST, code), exist_ok=True)
+        write(f'{code}/index.html', finish(template(page)).replace('<!--NEWS-->', render_news(code)))
 
     for name in ('404.html', 'robots.txt', 'sitemap.xml', 'manifest.webmanifest'):
         write(name, template(open(os.path.join(ROOT, name), encoding='utf-8').read()))
 
     # service worker: version = content hash of the pages, precache the shell (not the photos)
     build_id = hashlib.md5((css_v + js_v + open(os.path.join(DIST, 'index.html'), 'rb').read().hex()[:4000]).encode()).hexdigest()[:10]
-    precache = ['./', 'ru/', f'css/style.css?v={css_v}', f'js/main.js?v={js_v}', f'js/boot.js?v={boot_v}',
+    precache = ['./', 'ru/', 'en/', f'css/style.css?v={css_v}', f'js/main.js?v={js_v}', f'js/boot.js?v={boot_v}',
                 'js/vendor/gsap.min.js?v=1', 'js/vendor/ScrollTrigger.min.js?v=1', 'js/vendor/lenis.min.js?v=1',
                 'assets/logo-ulugnor.webp', 'assets/logo-baliqchi.webp', 'assets/favicon.png', 'manifest.webmanifest']
     sw = open(os.path.join(ROOT, 'sw.js'), encoding='utf-8').read()
@@ -183,7 +190,7 @@ def main():
     copy_tree('js/vendor', lambda f: f.endswith('.js'))
     shutil.copy2(os.path.join(ROOT, '.htaccess'), os.path.join(DIST, '.htaccess'))
 
-    leftovers = [p for p in ('index.html', 'ru/index.html', '404.html', 'robots.txt', 'sitemap.xml')
+    leftovers = [p for p in ('index.html', 'ru/index.html', 'en/index.html', '404.html', 'robots.txt', 'sitemap.xml')
                  if '%SITE_URL%' in open(os.path.join(DIST, p), encoding='utf-8').read()]
     assert not leftovers, f'untemplated placeholders in {leftovers}'
 

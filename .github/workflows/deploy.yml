@@ -38,7 +38,7 @@ jobs:
       - name: Links, assets, ids, alt text, labels
         run: python tools/check_site.py
       - name: Translations complete (ru)
-        run: python tools/i18n.py extract ru
+        run: python tools/i18n.py extract ru && python tools/i18n.py extract en
       - name: Service worker syntax
         run: node --check mini-ges-site/sw.js
 

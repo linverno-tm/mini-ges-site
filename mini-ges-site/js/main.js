@@ -14,7 +14,7 @@ const SITE_BASE = (() => {
 })();
 
 // UI strings created by script (static text is localised at build time, see tools/i18n.py)
-const LANG = document.documentElement.lang === 'ru' ? 'ru' : 'uz';
+const LANG = ['ru', 'en'].includes(document.documentElement.lang) ? document.documentElement.lang : 'uz';
 const L = {
   uz: {
     tashkent: 'Toshkent', launched: 'Ishga tushirildi', running: 'Ishlab turibdi',
@@ -38,6 +38,17 @@ const L = {
     aiViz: 'AI-визуализация',
     photos: ['Стальной колёсный затвор', 'Бетонный канал длиной 400 м', 'Монтаж двух горизонтальных турбин', 'Здание станции и мостовой кран', 'Станция и линия электропередачи'],
   },
+  en: {
+    tashkent: 'Tashkent', launched: 'Launched', running: 'Running',
+    offline: 'No internet — showing the saved version', online: 'Back online',
+    calcAdded: 'Estimate added to your enquiry', leadCopied: 'Enquiry text copied — paste it into a messenger', copied: 'Copied: ', copyFail: 'Could not copy — please select the text',
+    errWrap: list => `Please enter ${list}.`, errName: 'your name', errPhone: 'your phone number (at least 9 digits)', errRegion: 'your region',
+    leadHello: 'Hello! An enquiry about a small hydropower project.', fName: 'Name', fPhone: 'Phone', fRegion: 'Region', fSource: 'Type', fMsg: 'Comment',
+    calcMsg: (q, h, p, e) => `Calculator: Q = ${q} m³/s, H = ${h} m → about ${p} kW, ${e} kWh/year.`,
+    uQ: ' m³/s', uH: ' m', usdM: ' mln $', usdK: 'k $', yr: ' yrs',
+    aiViz: 'AI visualisation',
+    photos: ['Steel wheeled gate', 'The 400-metre concrete channel', 'Installing two horizontal turbines', 'Powerhouse and overhead crane', 'Plant and power line'],
+  },
 }[LANG];
 
 function mainGES() {
@@ -59,7 +70,7 @@ function mainGES() {
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const fmt = (n, d = 0) => Number(n).toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/ /g, ' ');
+  const fmt = (n, d = 0) => Number(n).toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/ /g, ' ');
 
   let menuOpen = false;
   if (reduced) root.classList.add('reduced');
@@ -568,7 +579,7 @@ function mainGES() {
 
   // ------------------------------------------------------------------ clock, live wave, countdown
   const clock = $('#clock');
-  const tashkent = new Intl.DateTimeFormat('ru-RU', { timeZone: 'Asia/Tashkent', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const tashkent = new Intl.DateTimeFormat(LANG === 'en' ? 'en-GB' : 'ru-RU', { timeZone: 'Asia/Tashkent', hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const pad = n => String(n).padStart(2, '0');
   const countdowns = $$('[data-countdown]');
   const tick = () => {
@@ -596,7 +607,7 @@ function mainGES() {
     if (document.hidden && force !== true) return;   // no work in background tabs
     const kwh = (Date.now() - LIVE.start) / 1000 * LIVE.perSec;
     const whole = fmt(Math.floor(kwh)), frac = Math.floor((kwh % 1) * 10);
-    liveKwh.forEach(el => { el.innerHTML = `${whole}<small>,${frac}</small>`; });
+    liveKwh.forEach(el => { el.innerHTML = `${whole}<small>${LANG === 'en' ? '.' : ','}${frac}</small>`; });
     liveCo2.forEach(el => { el.textContent = fmt(kwh * LIVE.co2); });
     liveCoal.forEach(el => { el.textContent = fmt(kwh * LIVE.coal); });
   };
