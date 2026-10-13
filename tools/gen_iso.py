@@ -305,8 +305,6 @@ segs.append((start, (X1, X1)))
 for (a32, a46), (b32, b46) in segs:       # bank pieces with slanted ends that follow the channel walls
     W(xy(0) + f'<polygon points="{f(a32)},32 {f(b32)},32 {f(b46)},46 {f(a46)},46" fill="{CONC[0]}"/></g>')
     W(xz(46) + rect(a46, -3, b46 - a46, 3, CONC[2]) + '</g>')
-lp = P(560, 4, 0)
-W(f'<text class="canal-lbl" x="{f(lp[0])}" y="{f(lp[1])}" transform="rotate(30 {f(lp[0])} {f(lp[1])})">←  KATTA FARG\'ONA KANALI</text>')
 
 # fish jumping upstream (+x) often: hidden while they wait, a short leap with a splash in and out.
 # Seven fish along the canal (every camera view has one), unequal periods of 5-10 s so that somewhere

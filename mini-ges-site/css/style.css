@@ -330,7 +330,6 @@ main:focus { outline: none; }
 /* isometric model: states per step (on-1 … on-5 are cumulative) */
 .dia-wrap { position: relative; }
 .dia { --k: 1; }
-.dia .canal-lbl { font: 600 12px var(--f-mono); letter-spacing: .16em; fill: #F4FBFA; opacity: .8; }
 .dia .flow { fill: none; stroke: #EAF6F4; stroke-opacity: .55; stroke-width: 1.1; stroke-linecap: round; stroke-dasharray: 6 20; animation: dash 1.4s linear infinite; }
 .dia .flow--canal { animation-duration: 1.9s; }
 .dia .glint { animation: glint 8s linear infinite reverse; }
