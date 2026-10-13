@@ -21,6 +21,7 @@ const L = {
     leadHello: "Assalomu alaykum! Mini-GES loyihasi bo'yicha ariza.", fName: 'Ism', fPhone: 'Telefon', fRegion: 'Hudud', fSource: "Yo'nalish", fMsg: 'Izoh',
     calcMsg: (q, h, p, e) => `Kalkulyator: Q = ${q} m³/s, H = ${h} m → taxminan ${p} kVt, ${e} kVt·soat/yil.`,
     uQ: ' m³/s', uH: ' m',
+    aiViz: 'AI vizualizatsiya',
     photos: ["G'ildirakli po'lat zatvor", '400 metrlik beton kanal', 'Ikki gorizontal turbina montaji', "Stansiya binosi va ko'prik krani", 'Stansiya va elektr uzatish liniyasi'],
   },
   ru: {
@@ -31,6 +32,7 @@ const L = {
     leadHello: 'Здравствуйте! Заявка по проекту мини-ГЭС.', fName: 'Имя', fPhone: 'Телефон', fRegion: 'Регион', fSource: 'Направление', fMsg: 'Комментарий',
     calcMsg: (q, h, p, e) => `Калькулятор: Q = ${q} м³/с, H = ${h} м → примерно ${p} кВт, ${e} кВт·ч/год.`,
     uQ: ' м³/с', uH: ' м',
+    aiViz: 'AI-визуализация',
     photos: ['Стальной колёсный затвор', 'Бетонный канал длиной 400 м', 'Монтаж двух горизонтальных турбин', 'Здание станции и мостовой кран', 'Станция и линия электропередачи'],
   },
 }[LANG];
@@ -662,6 +664,66 @@ function mainGES() {
   const hsteps = $$('.hstep');
   const PHOTOS = ['assets/gallery/ges-05-sm.webp', 'assets/timeline/tl-10-sm.webp', 'assets/gallery/ges-07-sm.webp',
     'assets/gallery/ges-10-sm.webp', 'assets/how/how-5.webp'].map((src, i) => [SITE_BASE + src, L.photos[i]]);
+  // Realistic view: an AI visualisation of the same scene for every camera, over the model.
+  // Clips load only when the stage is near the screen (small files on phones and slow links),
+  // play while it is visible and pause when it is not; steps without a clip show a still that drifts.
+  const REAL = { 0: 0, 1: 1, 2: 1, 3: 0, 4: 0, 5: 1 };          // camera key -> has a clip
+  const diaWrap = $('.dia-wrap'), diaReal = $('#diaReal');
+  const real = { key: null, front: 0, near: false, seen: false };
+  const realLayers = diaReal ? $$('.dia-real__layer', diaReal) : [];
+  const realBig = () => {
+    const c = navigator.connection || {};
+    return !(c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '')) && diaReal.clientWidth * (window.devicePixelRatio || 1) > 1000;
+  };
+  const realOn = () => diaWrap && diaWrap.classList.contains('is-real');
+  const realPlay = () => {
+    const v = $('video', realLayers[real.front]);
+    if (v.getAttribute('src') && realOn() && real.seen && !reduced) { const p = v.play(); if (p) p.catch(() => {}); }
+  };
+  const showReal = (key) => {
+    if (!diaReal) return;
+    real.key = key;
+    if (!real.near) return;
+    const layer = realLayers[real.front];
+    if (layer.dataset.key === key) { realPlay(); return; }
+    const back = realLayers[1 - real.front], img = $('img', back), v = $('video', back);
+    const base = SITE_BASE + 'assets/real/' + 'real-' + key, sfx = realBig() ? '' : '-sm';
+    back.dataset.key = key;
+    back.classList.toggle('is-still', !REAL[key] || reduced);
+    back.classList.toggle('has-video', !!REAL[key] && !reduced);
+    v.classList.remove('is-ready');
+    const swap = () => {
+      if (back.dataset.key !== real.key) return;
+      back.classList.remove('is-out'); layer.classList.add('is-out');
+      real.front = 1 - real.front;
+      setTimeout(() => { const old = $('video', layer); if (layer.classList.contains('is-out')) old.pause(); }, 1100);
+      realPlay();
+    };
+    const url = base + sfx + '.webp';
+    img.alt = ($('#diaName') ? $('#diaName').textContent + ', ' : '') + L.aiViz;
+    if (img.src === url && img.complete) swap(); else { img.onload = swap; img.src = url; }
+    if (REAL[key] && !reduced) {
+      v.oncanplay = () => { v.classList.add('is-ready'); if (back === realLayers[real.front]) realPlay(); };
+      v.src = base + sfx + '.mp4'; v.load();
+    } else { v.removeAttribute('src'); v.load(); }
+  };
+  if (diaReal && 'IntersectionObserver' in window) {
+    new IntersectionObserver((es) => es.forEach((e) => {
+      real.near = real.near || e.isIntersecting;
+      if (e.isIntersecting && real.key !== null) showReal(real.key);
+    }), { rootMargin: '500px 0px' }).observe(diaReal);
+    new IntersectionObserver((es) => es.forEach((e) => {
+      real.seen = e.isIntersecting;
+      if (real.seen) realPlay(); else realLayers.forEach(l => $('video', l).pause());
+    }), { threshold: 0.2 }).observe(diaReal);
+    $$('.dia-mode button').forEach((b) => b.addEventListener('click', () => {
+      const on = b.dataset.mode === 'real';
+      diaWrap.classList.toggle('is-real', on);
+      $$('.dia-mode button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      if (on) realPlay(); else realLayers.forEach(l => $('video', l).pause());
+    }));
+  }
+
   let currentStep = 0, camKey = '0';
   if (dia) {
     const cams = JSON.parse(dia.dataset.cams);
@@ -685,6 +747,7 @@ function mainGES() {
       gsap.to(dia, { attr: { viewBox: vb }, '--k': kFor(vb), duration: d, ease: 'power3.inOut', overwrite: 'auto' });
     };
     applyCam('0', 0);
+    showReal('0');
     let rz;
     window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => applyCam(camKey, 0), 150); });
 
@@ -692,6 +755,7 @@ function mainGES() {
       if (key === camKey || !cams[key]) return;
       camKey = key;
       applyCam(key, reduced ? 0 : 1.7);
+      showReal(key);
     };
     const diaName = $('#diaName');
     const showPhoto = (n) => {
@@ -731,46 +795,6 @@ function mainGES() {
     ScrollTrigger.create({ trigger: '#howSteps', start: 'top 62%', onLeaveBack: () => camTo('0') });
     gsap.to('#diaBar', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '#howSteps', start: 'top 62%', end: 'bottom 62%', scrub: true } });
     if (reduced) { for (let i = 1; i <= 5; i++) dia.classList.add('on-' + i); fill.setAttribute('x', 350); fill.setAttribute('width', 730); }
-  }
-
-  // ------------------------------------------------------------------ film: AI clips of the water route
-  // Nothing loads with the page: each clip gets its source only when it comes near the screen
-  // (the small file on phones, slow links and Save-Data), plays while visible and pauses when not.
-  const clips = $$('.fclip');
-  if (clips.length && 'IntersectionObserver' in window) {
-    const conn = navigator.connection || {};
-    const slow = conn.saveData || /(^|-)2g|3g/.test(conn.effectiveType || '');
-    const userPaused = new WeakSet();
-    const load = (v) => {
-      if (v.dataset.loaded) return;
-      v.dataset.loaded = '1';
-      const small = slow || v.clientWidth * (window.devicePixelRatio || 1) <= 560;
-      if (!small) v.poster = v.dataset.poster;
-      v.src = small ? v.dataset.srcSm : v.dataset.src;
-      v.preload = 'auto';
-    };
-    const setPaused = (fig, paused) => fig.classList.toggle('is-paused', paused);
-    const play = (fig) => { const v = $('video', fig); load(v); const p = v.play(); if (p) p.then(() => setPaused(fig, false), () => setPaused(fig, true)); };
-    const near = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { load($('video', e.target)); near.unobserve(e.target); } }), { rootMargin: '400px 0px' });
-    const seen = new IntersectionObserver((es) => es.forEach((e) => {
-      const v = $('video', e.target);
-      if (e.isIntersecting && !reduced && !userPaused.has(e.target)) play(e.target);
-      else if (!e.isIntersecting && !v.paused) v.pause();
-    }), { threshold: 0.35 });
-    clips.forEach((fig) => {
-      const v = $('video', fig), bar = $('.fclip__bar b', fig);
-      setPaused(fig, true);
-      near.observe(fig); seen.observe(fig);
-      const tick = () => {                      // smooth progress line while playing (timeupdate is only ~4 Hz)
-        if (v.duration) bar.style.transform = `scaleX(${v.currentTime / v.duration})`;
-        if (!v.paused) requestAnimationFrame(tick);
-      };
-      v.addEventListener('pause', () => setPaused(fig, true));
-      v.addEventListener('playing', () => { setPaused(fig, false); requestAnimationFrame(tick); });
-      $('.fclip__btn', fig).addEventListener('click', () => {
-        if (v.paused) { userPaused.delete(fig); play(fig); } else { userPaused.add(fig); v.pause(); }
-      });
-    });
   }
 
   // ------------------------------------------------------------------ project ripples

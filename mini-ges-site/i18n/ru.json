@@ -369,16 +369,11 @@
     "Kattalashtirish: Chiqindi tutuvchi panjara (filtr) montaji": "Увеличить: Монтаж сороудерживающей решётки (фильтра)",
     "Президент Шавкат Мирзиёев выступает на конференции «Устойчивая энергетика», 5 декабря 2025": "Президент Шавкат Мирзиёев выступает на конференции «Устойчивая энергетика», 5 декабря 2025",
     "president.uz": "president.uz",
-    "400 metrlik beton o'zan suvni stansiya binosiga olib boradi.": "400-метровое бетонное русло подводит воду к зданию станции.",
     "AI vizualizatsiya": "AI-визуализация",
-    "Filtr va zatvor": "Решётка и затвор",
-    "Kanal oqimining bir qismi zatvorlar orqali yangi o'zanga buriladi.": "Часть потока канала через затворы поворачивает в новое русло.",
-    "Kanaldan stansiyagacha: suv qanday yo'l bosadi": "От канала до станции: путь воды",
-    "Obyekt rasmlari asosida sun'iy intellekt yordamida tayyorlangan vizualizatsiya. Suv katta kanaldan olinib, filtr va zatvordan o'tib, 400 metrlik o'zan bo'ylab turbinaga yetib boradi.": "Визуализация, созданная с помощью искусственного интеллекта по фотографиям объекта. Вода забирается из большого канала, проходит решётку и затвор и по 400-метровому руслу доходит до турбины.",
-    "Panjara chiqindini ushlab qoladi, g'ildirakli zatvor oqimni boshqaradi.": "Решётка задерживает мусор, колёсный затвор регулирует поток.",
-    "Pauza": "Пауза",
     "Suv qabul qilgich": "Водозабор",
-    "Suv yo'li": "Путь воды",
-    "Videoni to'xtatish yoki davom ettirish": "Остановить или продолжить видео"
+    "Maket": "Макет",
+    "Ko'rinish": "Вид",
+    "Katta Farg'ona kanali bo'yidagi mini-GES, AI vizualizatsiya": "Мини-ГЭС у Большого Ферганского канала, AI-визуализация",
+    "Real": "Реально"
   }
 }

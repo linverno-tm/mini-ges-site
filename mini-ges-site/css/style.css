@@ -411,6 +411,25 @@ main:focus { outline: none; }
 .dia.on-5 .village-glow { opacity: 1; }
 
 
+/* realistic view (AI visualisation of the same scene) over the model; the model stays one tap away */
+.dia-view { position: relative; }
+.dia-real { position: absolute; inset: 0; z-index: 1; overflow: hidden; border-radius: 12px; background: #0B1B33; opacity: 0; visibility: hidden; transition: opacity .7s var(--ease), visibility .7s; }
+.dia-wrap.is-real .dia-real { opacity: 1; visibility: visible; }
+.dia-real__layer { position: absolute; inset: 0; transition: opacity 1s var(--ease); }
+.dia-real__layer.is-out { opacity: 0; }
+.dia-real__layer img, .dia-real__layer video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.dia-real__layer video { opacity: 0; transition: opacity .6s; }
+.dia-real__layer.has-video video.is-ready { opacity: 1; }
+.dia-real__layer.is-still img { animation: diaDrift 14s ease-in-out infinite alternate; }
+@keyframes diaDrift { from { transform: scale(1.02); } to { transform: scale(1.1) translate(-1.5%, -1%); } }
+.dia-real__tag { position: absolute; z-index: 2; top: 10px; right: 10px; padding: 5px 9px; border-radius: 999px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--white); background: rgba(6, 18, 38, .6); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(6px); }
+.dia-real__tag::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--volt); box-shadow: 0 0 8px var(--volt); vertical-align: 1px; }
+.dia-mode { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12); margin: -6px auto -6px 14px; }
+.dia-mode button { font: 600 10.5px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-d); background: none; border: 0; border-radius: 999px; padding: 7px 11px; cursor: pointer; transition: background .3s, color .3s; }
+.dia-mode button[aria-pressed="true"] { background: var(--white); color: var(--ink); }
+.dia-mode button:focus-visible { outline: 2px solid var(--sky); outline-offset: 2px; }
+.dia-photo { z-index: 2; }
 .dia-photo { position: absolute; left: 30px; bottom: 36px; width: min(30%, 250px); aspect-ratio: 4 / 3; margin: 0; border-radius: 14px; overflow: hidden; background: #0B1B33; border: 1px solid rgba(255,255,255,.16); box-shadow: 0 18px 40px -12px rgba(0,0,0,.7); }
 .dia-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .7s var(--ease), transform 1.6s var(--ease); }
 .dia-photo img.is-out { opacity: 0; transform: scale(1.08); }
@@ -517,36 +536,6 @@ main:focus { outline: none; }
 .ci__body time { font-size: 12px; color: var(--azure); letter-spacing: .08em; text-transform: uppercase; }
 .ci__body h3 { font-size: clamp(19px, 1.8vw, 24px); font-weight: 700; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .ci__body p { color: var(--muted); font-size: 15px; max-width: 44ch; }
-
-/* ---------------- film: the water route (AI visualisation) ---------------- */
-.film { background: radial-gradient(70% 50% at 50% 0%, rgba(0, 160, 227, .16), transparent 70%), linear-gradient(180deg, var(--ink), var(--deep)); overflow: hidden; }
-.film__row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 36px); align-items: start; counter-reset: fclip; }
-.fclip { margin: 0; display: grid; gap: 16px; }
-.fclip:nth-child(2) { margin-top: clamp(0px, 6vw, 88px); }
-.fclip:nth-child(3) { margin-top: clamp(0px, 3vw, 44px); }
-.fclip__media { position: relative; aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: #0B1B33; isolation: isolate;
-  border: 1px solid rgba(255, 255, 255, .12); box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .8), 0 0 0 1px rgba(70, 198, 247, .06);
-  transition: transform .8s var(--ease), box-shadow .8s var(--ease); }
-.fclip__media::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(6, 18, 38, .35), transparent 22%, transparent 70%, rgba(6, 18, 38, .55)); }
-.fclip__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.04); transition: transform 1.2s var(--ease); }
-.fclip:hover .fclip__media { transform: translateY(-6px); box-shadow: 0 50px 90px -40px rgba(0, 0, 0, .9), 0 0 0 1px rgba(74, 247, 69, .35); }
-.fclip:hover .fclip__media video { transform: scale(1.08); }
-.fclip__ai { position: absolute; z-index: 2; top: 14px; left: 14px; padding: 6px 10px; border-radius: 999px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--white); background: rgba(6, 18, 38, .55); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(6px); }
-.fclip__ai::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--volt); box-shadow: 0 0 8px var(--volt); vertical-align: 1px; animation: fclipDot 1.6s ease-in-out infinite; }
-@keyframes fclipDot { 50% { opacity: .35; } }
-.fclip__btn { position: absolute; inset: 0; z-index: 2; width: 100%; border: 0; background: transparent; cursor: pointer; }
-.fclip__btn::after { content: ""; position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
-  background: rgba(6, 18, 38, .55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z' fill='%23fff'/%3E%3C/svg%3E") 54% 50% / 26px no-repeat;
-  border: 1px solid rgba(255, 255, 255, .25); backdrop-filter: blur(6px); opacity: 0; transform: scale(.8); transition: opacity .4s, transform .4s var(--ease); }
-.fclip.is-paused .fclip__btn::after { opacity: 1; transform: scale(1); }
-.fclip__btn:focus-visible { outline: 2px solid var(--sky); outline-offset: -4px; border-radius: 22px; }
-.fclip__bar { position: absolute; z-index: 2; left: 14px; right: 14px; bottom: 14px; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, .2); overflow: hidden; }
-.fclip__bar b { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, var(--sky), var(--volt)); }
-.fclip figcaption { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 14px; align-items: baseline; }
-.fclip figcaption .mono { grid-row: span 2; font-size: 13px; color: var(--volt); }
-.fclip figcaption strong { font: 700 clamp(18px, 1.6vw, 22px)/1.2 var(--f-display); color: var(--white); }
-.fclip figcaption small { font-size: 14px; line-height: 1.5; color: var(--muted-d); max-width: 36ch; }
 
 /* ---------------- gallery ---------------- */
 .gallery { background: linear-gradient(180deg, var(--ink), var(--deep)); color: var(--white); overflow: hidden; }
@@ -842,15 +831,13 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   .nav__phone { display: none; }
   .sec-head--split, .how__grid, .process__grid, .calc__grid, .faq__grid, .contact__grid { grid-template-columns: minmax(0, 1fr); }
   .how__grid { gap: 0; }
-  .film__row { grid-template-columns: repeat(3, minmax(250px, 72vw)); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-    margin-inline: calc(var(--gutter) * -1); padding: 4px var(--gutter) 8px; scroll-padding-inline: var(--gutter); }
-  .film__row::-webkit-scrollbar { display: none; }
-  .fclip { scroll-snap-align: start; }
-  .fclip:nth-child(n) { margin-top: 0; }
   .how__stage { order: -1; top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 2; margin-inline: calc(var(--gutter) * -1); padding: 8px var(--gutter) 12px; background: linear-gradient(var(--ink) 85%, transparent); }
   .dia-wrap { padding: 10px; border-radius: 18px; }
   .dia { aspect-ratio: 1.12; height: auto; }
   .dia-top__name { display: none; }
+  .dia-mode { margin: -4px auto -4px 0; }
+  .dia-mode button { font-size: 9.5px; padding: 6px 9px; }
+  #diaStep { white-space: nowrap; }
   .dia-top__step { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .dia-photo { left: 16px; bottom: 22px; width: 34%; border-radius: 10px; }
   .hstep { min-height: 46vh; }
