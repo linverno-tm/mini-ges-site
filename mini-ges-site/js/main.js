@@ -733,6 +733,46 @@ function mainGES() {
     if (reduced) { for (let i = 1; i <= 5; i++) dia.classList.add('on-' + i); fill.setAttribute('x', 350); fill.setAttribute('width', 730); }
   }
 
+  // ------------------------------------------------------------------ film: AI clips of the water route
+  // Nothing loads with the page: each clip gets its source only when it comes near the screen
+  // (the small file on phones, slow links and Save-Data), plays while visible and pauses when not.
+  const clips = $$('.fclip');
+  if (clips.length && 'IntersectionObserver' in window) {
+    const conn = navigator.connection || {};
+    const slow = conn.saveData || /(^|-)2g|3g/.test(conn.effectiveType || '');
+    const userPaused = new WeakSet();
+    const load = (v) => {
+      if (v.dataset.loaded) return;
+      v.dataset.loaded = '1';
+      const small = slow || v.clientWidth * (window.devicePixelRatio || 1) <= 560;
+      if (!small) v.poster = v.dataset.poster;
+      v.src = small ? v.dataset.srcSm : v.dataset.src;
+      v.preload = 'auto';
+    };
+    const setPaused = (fig, paused) => fig.classList.toggle('is-paused', paused);
+    const play = (fig) => { const v = $('video', fig); load(v); const p = v.play(); if (p) p.then(() => setPaused(fig, false), () => setPaused(fig, true)); };
+    const near = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { load($('video', e.target)); near.unobserve(e.target); } }), { rootMargin: '400px 0px' });
+    const seen = new IntersectionObserver((es) => es.forEach((e) => {
+      const v = $('video', e.target);
+      if (e.isIntersecting && !reduced && !userPaused.has(e.target)) play(e.target);
+      else if (!e.isIntersecting && !v.paused) v.pause();
+    }), { threshold: 0.35 });
+    clips.forEach((fig) => {
+      const v = $('video', fig), bar = $('.fclip__bar b', fig);
+      setPaused(fig, true);
+      near.observe(fig); seen.observe(fig);
+      const tick = () => {                      // smooth progress line while playing (timeupdate is only ~4 Hz)
+        if (v.duration) bar.style.transform = `scaleX(${v.currentTime / v.duration})`;
+        if (!v.paused) requestAnimationFrame(tick);
+      };
+      v.addEventListener('pause', () => setPaused(fig, true));
+      v.addEventListener('playing', () => { setPaused(fig, false); requestAnimationFrame(tick); });
+      $('.fclip__btn', fig).addEventListener('click', () => {
+        if (v.paused) { userPaused.delete(fig); play(fig); } else { userPaused.add(fig); v.pause(); }
+      });
+    });
+  }
+
   // ------------------------------------------------------------------ project ripples
   $$('canvas.ripple').forEach((cvs) => {
     const ctx = cvs.getContext('2d');

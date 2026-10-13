@@ -178,7 +178,7 @@ def main():
     write('sw.js', sw)
 
     # only what pages reference: web images + icons (source PNG logos stay out)
-    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg')) or f in (
+    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg', '.mp4')) or f in (
         'favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'))
     copy_tree('js/vendor', lambda f: f.endswith('.js'))
     shutil.copy2(os.path.join(ROOT, '.htaccess'), os.path.join(DIST, '.htaccess'))
