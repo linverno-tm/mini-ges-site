@@ -1,8 +1,11 @@
 /* MINI GES — interaction & motion layer.
    GSAP + ScrollTrigger for scroll choreography, Lenis for smooth scroll,
    two hand-rolled canvases (hero power-grid scene, project ripples). */
-// JS is running: the CSS failsafe that hides the loader is no longer needed
+// JS is running. If it arrived quickly it takes over the loader; on a slow connection the CSS failsafe has
+// already faded the loader (at ~1.4 s) and the page stays as it is, without hiding the hero again.
+const LATE_JS = performance.now() > 1250;
 document.documentElement.classList.add('js-on');
+if (LATE_JS) document.documentElement.classList.add('js-late');
 
 // Site root, derived from this script's URL: works for /, /ru/ and sub-path hosting.
 const SITE_BASE = (() => {
@@ -16,22 +19,22 @@ const L = {
   uz: {
     tashkent: 'Toshkent', launched: 'Ishga tushirildi', running: 'Ishlab turibdi',
     offline: "Internet yo'q — saqlangan versiya ko'rsatilmoqda", online: 'Internet tiklandi',
-    calcAdded: "Hisob-kitob arizaga qo'shildi", copied: 'Nusxalandi: ', copyFail: "Nusxalab bo'lmadi — matnni belgilab oling",
+    calcAdded: "Hisob-kitob arizaga qo'shildi", leadCopied: "Ariza matni nusxalandi: messenjerga qo'ying", copied: 'Nusxalandi: ', copyFail: "Nusxalab bo'lmadi — matnni belgilab oling",
     errWrap: list => `Iltimos, ${list} kiriting.`, errName: 'ismingizni', errPhone: 'telefon raqamingizni (kamida 9 raqam)', errRegion: 'hududni',
     leadHello: "Assalomu alaykum! Mini-GES loyihasi bo'yicha ariza.", fName: 'Ism', fPhone: 'Telefon', fRegion: 'Hudud', fSource: "Yo'nalish", fMsg: 'Izoh',
     calcMsg: (q, h, p, e) => `Kalkulyator: Q = ${q} m³/s, H = ${h} m → taxminan ${p} kVt, ${e} kVt·soat/yil.`,
-    uQ: ' m³/s', uH: ' m',
+    uQ: ' m³/s', uH: ' m', usdM: ' mln $', usdK: ' ming $', yr: ' yil',
     aiViz: 'AI vizualizatsiya',
     photos: ["G'ildirakli po'lat zatvor", '400 metrlik beton kanal', 'Ikki gorizontal turbina montaji', "Stansiya binosi va ko'prik krani", 'Stansiya va elektr uzatish liniyasi'],
   },
   ru: {
     tashkent: 'Ташкент', launched: 'Запущена', running: 'Работает',
     offline: 'Нет интернета — показана сохранённая версия', online: 'Интернет восстановлен',
-    calcAdded: 'Расчёт добавлен в заявку', copied: 'Скопировано: ', copyFail: 'Не удалось скопировать — выделите текст вручную',
+    calcAdded: 'Расчёт добавлен в заявку', leadCopied: 'Текст заявки скопирован — вставьте в мессенджер', copied: 'Скопировано: ', copyFail: 'Не удалось скопировать — выделите текст вручную',
     errWrap: list => `Пожалуйста, укажите ${list}.`, errName: 'имя', errPhone: 'номер телефона (не меньше 9 цифр)', errRegion: 'регион',
     leadHello: 'Здравствуйте! Заявка по проекту мини-ГЭС.', fName: 'Имя', fPhone: 'Телефон', fRegion: 'Регион', fSource: 'Направление', fMsg: 'Комментарий',
     calcMsg: (q, h, p, e) => `Калькулятор: Q = ${q} м³/с, H = ${h} м → примерно ${p} кВт, ${e} кВт·ч/год.`,
-    uQ: ' м³/с', uH: ' м',
+    uQ: ' м³/с', uH: ' м', usdM: ' млн $', usdK: ' тыс. $', yr: ' г.',
     aiViz: 'AI-визуализация',
     photos: ['Стальной колёсный затвор', 'Бетонный канал длиной 400 м', 'Монтаж двух горизонтальных турбин', 'Здание станции и мостовой кран', 'Станция и линия электропередачи'],
   },
@@ -43,7 +46,7 @@ function mainGES() {
   // ------------------------------------------------------------------ config
   // Baliqchi GES ishga tushish sanasi (oy oxiri, Toshkent vaqti)
   const LAUNCH = new Date('2026-10-31T23:59:59+05:00');
-  const CALC = { eff: 0.8, load: 0.9, household: 2200, co2: 0.77 };
+  const CALC = { eff: 0.8, load: 0.9, household: 2200, co2: 0.77, coal: 0.4, capex: [1700, 2500], usd: 12700 };   // capex: $ per kW on our own plants   // kg per kWh: the same factors as every figure on the page
 
   const root = document.documentElement;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -51,6 +54,7 @@ function mainGES() {
   // slow network / data saver / weak device → keep decorative motion minimal
   const conn = navigator.connection || {};
   const lite = !!conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '') || (navigator.deviceMemory || 8) <= 2 || (navigator.hardwareConcurrency || 8) <= 2;
+  const midTier = !finePointer || (navigator.deviceMemory || 8) <= 4 || (navigator.hardwareConcurrency || 8) <= 4;
   const hasGsap = typeof window.gsap !== 'undefined';
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
@@ -128,7 +132,7 @@ function mainGES() {
 
   const loader = $('#loader');
   const langSwitch = root.classList.contains('lang-switch');   // set by js/boot.js
-  if (reduced || !loader || langSwitch) {
+  if (reduced || !loader || langSwitch || LATE_JS) {
     loader?.remove();
   } else {
     document.body.classList.add('is-loading');
@@ -295,7 +299,7 @@ function mainGES() {
     }
 
     function build() {
-      dpr = lite ? 1 : Math.min(window.devicePixelRatio || 1, 1.6);
+      dpr = lite || midTier ? 1 : Math.min(window.devicePixelRatio || 1, 1.6);   // phones and mid-range PCs: 1x canvas
       W = cvs.clientWidth; H = cvs.clientHeight;
       ready = W > 0 && H > 0;            // layout not ready yet (hidden, first paint): retry on resize
       if (!ready) return;
@@ -571,6 +575,7 @@ function mainGES() {
     if (clock) clock.textContent = L.tashkent + ' ' + tashkent.format(new Date());
     const diff = LAUNCH - Date.now();
     if (diff <= 0) {
+      root.classList.add('launched');
       countdowns.forEach(c => { c.innerHTML = `<span class="mono">${L.launched}</span>`; });
       $$('.pill--build').forEach(p => { p.className = p.className.replace('pill--build', 'pill--live'); p.lastChild.textContent = L.running; });
       return false;
@@ -585,7 +590,7 @@ function mainGES() {
 
   // ------------------------------------------------------------------ live energy counter (Ulug'nor GES)
   // Estimate from the station's real annual output (5.2 GWh) since launch in September 2024.
-  const LIVE = { start: Date.parse('2024-09-01T00:00:00+05:00'), perSec: 5.2e6 / (365.25 * 86400), co2: 4700 / 5.2e6, coal: 2000 / 5.2e6 };
+  const LIVE = { start: Date.parse('2024-09-01T00:00:00+05:00'), perSec: 5.2e6 / (365.25 * 86400), co2: CALC.co2 / 1000, coal: CALC.coal / 1000 };   // t per kWh
   const liveKwh = $$('[data-live-kwh]'), liveCo2 = $$('[data-live-co2]'), liveCoal = $$('[data-live-coal]');
   const tickLive = (force) => {
     if (document.hidden && force !== true) return;   // no work in background tabs
@@ -634,7 +639,7 @@ function mainGES() {
     const words = splitWords(manifesto);
     words.forEach(w => w.classList.add('mw'));
     if (!reduced) {
-      gsap.fromTo(words, { color: '#C2CEDF' }, {
+      gsap.fromTo(words, { color: '#7D8CA3' }, {
         color: '#0B1B33', ease: 'none', stagger: 0.12,
         scrollTrigger: { trigger: manifesto, start: 'top 78%', end: 'bottom 45%', scrub: 0.6 },
       });
@@ -1029,7 +1034,7 @@ function mainGES() {
 
   // ------------------------------------------------------------------ calculator
   const inQ = $('#inQ'), inH = $('#inH'), inT = $('#inT');
-  const out = { P: $('#rP'), E: $('#rE'), R: $('#rR'), Hh: $('#rHh'), C: $('#rC') };
+  const out = { P: $('#rP'), E: $('#rE'), R: $('#rR'), Hh: $('#rHh'), C: $('#rC'), Cap: $('#rCap'), Pay: $('#rPay') };
   const arc = $('#gaugeArc');
   const PMAX = 9.81 * 10 * 30 * CALC.eff;
   const shown = { P: 0, E: 0, R: 0, Hh: 0, C: 0 };
@@ -1068,6 +1073,11 @@ function mainGES() {
     out.R.textContent = fmt(shown.R, shown.R < 100 ? 1 : 0);
     out.Hh.textContent = fmt(shown.Hh);
     out.C.textContent = fmt(shown.C, shown.C < 100 ? 1 : 0);
+    // project cost and payback from our own plants' price per kW (a range, not a quote)
+    const [lo, hi] = CALC.capex.map(c => shown.P * c);
+    const usd = hi >= 1e6 ? fmt(lo / 1e6, 1) + '–' + fmt(hi / 1e6, 1) + L.usdM : fmt(lo / 1000) + '–' + fmt(hi / 1000) + L.usdK;
+    if (out.Cap) out.Cap.textContent = shown.P > 0 ? usd : '—';
+    if (out.Pay) out.Pay.textContent = shown.R > 0 ? fmt(lo * CALC.usd / (shown.R * 1e6), 1) + '–' + fmt(hi * CALC.usd / (shown.R * 1e6), 1) + L.yr : '—';
   }
   if (inQ) {
     [inQ, inH, inT].forEach(el => el.addEventListener('input', () => calc()));
@@ -1089,6 +1099,7 @@ function mainGES() {
       scrollToEl($('#contact'));
       setTimeout(() => $('#fName').focus({ preventScroll: true }), 1200);
       toast(L.calcAdded);
+      track('calc');
     });
   }
 
@@ -1165,6 +1176,23 @@ function mainGES() {
   window.addEventListener('offline', () => toast(L.offline));
   window.addEventListener('online', () => toast(L.online));
 
+  // ------------------------------------------------------------------ analytics (Yandex Metrika)
+  // Off until YM_ID is set: then the counter loads after the page and the key actions are counted as goals
+  // (lead sent, call, Telegram, calculator). No inline script, so the CSP stays strict.
+  const YM_ID = 0;
+  function track(goal) { if (YM_ID && window.ym) window.ym(YM_ID, 'reachGoal', goal); }
+  if (YM_ID) {
+    window.ym = window.ym || function () { (window.ym.a = window.ym.a || []).push(arguments); };
+    window.ym.l = Date.now();
+    window.ym(YM_ID, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true });
+    const tag = document.createElement('script'); tag.async = true; tag.src = 'https://mc.yandex.ru/metrika/tag.js';
+    window.addEventListener('load', () => document.head.appendChild(tag), { once: true });
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]'); if (!a) return;
+      if (a.href.startsWith('tel:')) track('call'); else if (a.hostname === 't.me') track('telegram');
+    });
+  }
+
   // ------------------------------------------------------------------ copy + toast
   const toastEl = $('#toast');
   function toast(msg) {
@@ -1218,10 +1246,12 @@ function mainGES() {
       const tg = 'https://t.me/ozodbekov?text=' + encodeURIComponent(text);
       $('#leadTg').href = tg;
       window.open(tg, '_blank', 'noopener');
+      track('lead');
       ok.hidden = false;
       gsap.fromTo(ok, { clipPath: 'circle(0% at 50% 100%)' }, { clipPath: 'circle(150% at 50% 100%)', duration: 1, ease: 'power3.inOut' });
       gsap.from($$('h3, p, pre, .lead__ok-ctas', ok), { y: 20, autoAlpha: 0, stagger: 0.08, delay: 0.4, duration: 0.8 });
     });
+    $('#leadCopy').addEventListener('click', () => copyText(txt.textContent).then(ok => toast(ok ? L.leadCopied : L.copyFail)));
     $('#leadBack').addEventListener('click', () => {
       gsap.to(ok, { clipPath: 'circle(0% at 50% 100%)', duration: 0.7, ease: 'power3.inOut', onComplete: () => { ok.hidden = true; } });
     });

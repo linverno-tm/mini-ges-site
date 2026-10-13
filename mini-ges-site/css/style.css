@@ -128,8 +128,9 @@ main:focus { outline: none; }
 @keyframes ping { 0% { transform: scale(.6); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
 
 /* ---------------- loader ---------------- */
-.loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; pointer-events: none; animation: loader-failsafe .6s ease 6s forwards; }
+.loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; pointer-events: none; animation: loader-failsafe .5s ease 1.4s forwards; }   /* slow network: content shows by 1.9 s even before the scripts */
 .js-on .loader { animation: none; }
+.js-late .loader { display: none; }
 /* UZ/RU switch (js/boot.js): no loader, the page fades in at the reader's place; failsafe after 3 s */
 .lang-switch .loader { display: none; }
 .lang-switch body { opacity: 0; animation: switch-failsafe .3s ease 3s forwards; }
@@ -146,6 +147,10 @@ main:focus { outline: none; }
 .loader__meta { display: flex; gap: 28px; font: 700 13px/1 var(--f-display); letter-spacing: .18em; color: var(--white); }
 .loader__count { font-family: var(--f-mono); font-weight: 500; letter-spacing: 0; color: var(--sky); min-width: 4ch; }
 .no-js .loader, .reduced .loader { display: none; }
+/* dated copy: the "after launch" wording takes over by itself once Baliqchi GES starts (LAUNCH in main.js) */
+.when-post { display: none; }
+.launched .when-pre { display: none; }
+.launched .when-post { display: inline; }
 
 /* ---------------- cursor ---------------- */
 .cursor { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; display: none; mix-blend-mode: normal; }

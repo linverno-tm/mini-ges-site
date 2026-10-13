@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://mc.yandex.ru; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://mc.yandex.ru; connect-src 'self' https://mc.yandex.ru; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>MINI GES — mini gidroelektrostansiyalar</title>
 <meta name="description" content="MINI GES — sug'orish kanallari bo'yida mini gidroelektrostansiyalarni loyihalash, qurish va sotish. Ulug'nor GES (600 kVt) va Baliqchi GES (1 000 kVt).">
@@ -20,7 +20,7 @@
 <meta property="og:locale" content="uz_UZ">
 <meta property="og:url" content="%SITE_URL%">
 <meta property="og:title" content="MINI GES — o'z yeringizdagi suvdan elektr">
-<meta property="og:description" content="Mini-GES loyihalash, qurish va sotish. Ulug'nor GES (600 kVt) ishlab turibdi, Baliqchi GES (1 000 kVt) oktyabr oxirida ishga tushadi.">
+<meta property="og:description" content="Mini-GES loyihalash, qurish va sotish. Ulug'nor GES (600 kVt) 2024-yildan ishlab turibdi, Baliqchi GES (1 000 kVt) 2026-yil oktyabrda ishga tushadi.">
 <meta property="og:image" content="%SITE_URL%assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -69,8 +69,8 @@
 <div class="loader" id="loader" aria-hidden="true">
   <div class="loader__inner">
     <div class="loader__drop">
-      <img class="loader__ghost" src="assets/logo-ulugnor.webp" alt="">
-      <div class="loader__fill" id="loaderFill"><img src="assets/logo-ulugnor.webp" alt=""></div>
+      <img class="loader__ghost" src="assets/logo-ulugnor.webp" alt="" width="160" height="223">
+      <div class="loader__fill" id="loaderFill"><img src="assets/logo-ulugnor.webp" alt="" width="160" height="223"></div>
     </div>
     <div class="loader__meta">
       <span>MINI GES</span>
@@ -138,7 +138,7 @@
       <p class="eyebrow eyebrow--light hero__eyebrow" data-hero-fade>Mini gidroelektrostansiyalar · Andijon</p>
       <figure class="pres" data-hero-fade data-i18n="hero.quote"><img class="pres__photo" src="assets/president/mirziyoyev-2025-12-05-sm.webp" srcset="assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w" sizes="(max-width: 620px) 84px, 160px" width="600" height="750" alt="Prezident Shavkat Mirziyoyev «Barqaror energetika» anjumanida nutq so'zlamoqda, 5-dekabr 2025" decoding="async"><blockquote class="pres__q"><p>Tadbirkorlarimiz qancha boy bo‘lsa, xalqimiz shuncha farovon yashaydi, davlatimiz shuncha qudratli bo‘ladi. <strong>Tadbirkorning yutug‘i – bu butun xalqimizning yutug‘i.</strong></p></blockquote><figcaption class="pres__by"><b>Shavkat Mirziyoyev</b><span>O'zbekiston Respublikasi Prezidenti</span><small>Tadbirkorlar bilan uchrashuv, 20-dekabr 2024 · <a href="https://president.uz/oz/lists/view/7778" target="_blank" rel="noopener">president.uz</a><br>Foto: «Barqaror energetika» anjumani, 5-dekabr 2025 · <a href="https://president.uz/oz/lists/view/8751" target="_blank" rel="noopener">president.uz</a></small></figcaption></figure>
       <h1 class="hero__title" data-split data-i18n="hero.title">«O'z yeringizdagi suvdan <em>elektr</em> ishlab chiqaring»</h1>
-      <p class="hero__lead" data-hero-fade>Sug'orish kanallari bo'yida mini-GES loyihalaymiz, quramiz va kalitini topshiramiz. Suv kanaldan olinadi, turbinadan o'tib yana kanalga qaytadi. Birinchi stansiyamiz tarmoqqa tok berib turibdi, ikkinchisi shu oy oxirida ishga tushadi.</p>
+      <p class="hero__lead" data-hero-fade>Sug'orish kanallari bo'yida mini-GES loyihalaymiz, quramiz va kalitini topshiramiz. Suv kanaldan olinadi, turbinadan o'tib yana kanalga qaytadi. <span class="when-pre">Birinchi stansiyamiz tarmoqqa tok berib turibdi, ikkinchisi 2026-yil oktyabr oxirida ishga tushadi.</span><span class="when-post">Ikkala stansiyamiz ham tarmoqqa tok berib turibdi.</span></p>
       <div class="hero__ctas" data-hero-fade>
         <a class="btn btn--green magnetic" href="#contact" data-cursor="Ariza"><span>Loyihani hisoblatish</span><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <a class="btn btn--ghost magnetic" href="#projects"><span>Loyihalarni ko'rish</span></a>
@@ -166,7 +166,7 @@
         </div>
         <div class="status__count mono" data-countdown><b data-cd="d">--</b>k <b data-cd="h">--</b>:<b data-cd="m">--</b>:<b data-cd="s">--</b></div>
       </div>
-      <p class="status__note mono">Baliqchi GES ishga tushishiga qolgan vaqt</p>
+      <p class="status__note mono"><span class="when-pre">Baliqchi GES ishga tushishiga qolgan vaqt</span><span class="when-post">Baliqchi GES ishga tushirildi</span></p>
       <div class="status__live">
         <span class="mono">Ulug'nor GES ishga tushganidan beri</span>
         <span class="status__kwh"><b class="mono" data-live-kwh>10 934 000</b> <span>kVt·soat</span></span>
@@ -206,11 +206,11 @@
     <div class="facts">
       <div class="fact" data-reveal>
         <span class="fact__num"><b data-count="2">2</b></span>
-        <span class="fact__label">obyekt: biri 2024-yildan ishlab turibdi, biri yakunlanmoqda</span>
+        <span class="fact__label">obyekt: <span class="when-pre">biri 2024-yildan ishlab turibdi, biri yakunlanmoqda</span><span class="when-post">ikkalasi ham ishlab turibdi</span></span>
       </div>
       <div class="fact" data-reveal>
-        <span class="fact__num"><b data-count="1">1</b><sup>-chi</sup></span>
-        <span class="fact__label">O'zbekistondagi birinchi xususiy mini-GES — Ulug'nor GES</span>
+        <span class="fact__num"><b>2024</b></span>
+        <span class="fact__label">yildan beri Ulug'nor GES tarmoqqa tok beradi: O'zbekistondagi birinchi xususiy mini-GESlardan biri</span>
       </div>
       <div class="fact" data-reveal>
         <span class="fact__num"><b data-count="13.9" data-dec="1">13,9</b><sup>mln</sup></span>
@@ -218,7 +218,7 @@
       </div>
       <div class="fact" data-reveal>
         <span class="fact__num"><b data-count="6000">6 000</b><sup>+</sup></span>
-        <span class="fact__label">xonadon uzluksiz elektr bilan ta'minlanadi (ijtimoiy norma bo'yicha)</span>
+        <span class="fact__label">xonadonning yillik ehtiyojiga teng elektr (yiliga 2 200 kVt·soat hisobida)</span>
       </div>
     </div>
   </div>
@@ -316,18 +316,18 @@
       <article class="pcard pcard--live" data-pcard>
         <div class="pcard__media" aria-hidden="true">
           <canvas class="ripple" data-ripple="#46C6F7,#4AF745"></canvas>
-          <img class="pcard__logo" src="assets/logo-ulugnor.webp" alt="">
+          <img class="pcard__logo" src="assets/logo-ulugnor.webp" alt="" width="160" height="223" loading="lazy" decoding="async">
         </div>
         <div class="pcard__body">
           <span class="pill pill--live pill--dark"><i></i>Ishlab turibdi</span>
           <h3>Ulug'nor GES</h3>
-          <p class="pcard__lead">O'zbekistondagi birinchi xususiy mini-GES. 2024-yil sentabrdan beri tarmoqqa uzluksiz elektr berib, ish sifatimizni har kuni isbotlab turibdi.</p>
+          <p class="pcard__lead">O'zbekistondagi birinchi xususiy mini-GESlardan biri. 2024-yil sentabrdan beri tarmoqqa muntazam elektr berib, ish sifatimizni har kuni isbotlab turibdi.</p>
           <div class="live" role="group" aria-label="Ulug'nor GES ishga tushganidan beri ishlab chiqargan energiya (taxminiy)">
             <span class="live__label mono"><i aria-hidden="true"></i>Ishga tushganidan beri ishlab chiqarildi</span>
             <span class="live__num"><b class="mono" data-live-kwh>10 934 000</b> <span>kVt·soat</span></span>
             <span class="live__row mono">
-              <span><b data-live-co2>10 000</b> t CO₂ chiqmadi</span>
-              <span><b data-live-coal>4 200</b> t ko'mir tejaldi</span>
+              <span><b data-live-co2>8 400</b> t CO₂ chiqmadi</span>
+              <span><b data-live-coal>4 400</b> t ko'mir tejaldi</span>
             </span>
           </div>
           <dl class="specs specs--3">
@@ -336,9 +336,9 @@
             <div><dt>Ishga tushgan</dt><dd>2024-yil sentabr</dd></div>
             <div><dt>Loyiha qiymati</dt><dd>1 mln $</dd></div>
             <div><dt>Yillik aylanma</dt><dd>5,2 mlrd so'm</dd></div>
-            <div><dt>Xonadonlar</dt><dd>2 000–2 500</dd></div>
+            <div><dt>Xonadonlar</dt><dd>~2 400</dd></div>
           </dl>
-          <p class="pcard__eco"><svg class="i" viewBox="0 0 24 24"><path d="M5 19c9 0 14-5 14-14-9 0-14 5-14 14Zm0 0 7-7"/></svg>Har yili 2 000 t ko'mir yoqilmaydi, 4 700 t CO₂ chiqmaydi</p>
+          <p class="pcard__eco"><svg class="i" viewBox="0 0 24 24"><path d="M5 19c9 0 14-5 14-14-9 0-14 5-14 14Zm0 0 7-7"/></svg>Har yili 2 100 t ko'mir yoqilmaydi, 4 000 t CO₂ chiqmaydi</p>
           <a class="link-arrow" href="#contact" data-cursor="Ko'rish">Obyektni ko'rishga yozilish <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
       </article>
@@ -346,12 +346,12 @@
       <article class="pcard pcard--build" data-pcard>
         <div class="pcard__media" aria-hidden="true">
           <canvas class="ripple" data-ripple="#00A0E3,#54AF3A"></canvas>
-          <img class="pcard__logo" src="assets/logo-baliqchi.webp" alt="">
+          <img class="pcard__logo" src="assets/logo-baliqchi.webp" alt="" width="160" height="224" loading="lazy" decoding="async">
         </div>
         <div class="pcard__body">
           <span class="pill pill--build pill--dark"><i></i>Oktyabr oxirida ishga tushadi</span>
           <h3>Baliqchi GES</h3>
-          <p class="pcard__lead">Xitoylik hamkorlar bilan qurilgan ikkinchi obyekt. Qurilish yakuniy bosqichda, ishga tushirishga sanoqli kunlar qoldi.</p>
+          <p class="pcard__lead">Xitoylik hamkorlar bilan qurilgan ikkinchi obyekt. <span class="when-pre">Qurilish yakuniy bosqichda, ishga tushirishga sanoqli kunlar qoldi.</span><span class="when-post">2026-yil oktyabr oxirida ishga tushirildi.</span></p>
           <div class="countdown" data-countdown>
             <div><b data-cd="d">--</b><span>kun</span></div>
             <div><b data-cd="h">--</b><span>soat</span></div>
@@ -368,9 +368,9 @@
             <div><dt>Hamkorlik</dt><dd>Xitoy</dd></div>
             <div><dt>Loyiha qiymati</dt><dd>2,5 mln $</dd></div>
             <div><dt>Yillik aylanma</dt><dd>8,7 mlrd so'm</dd></div>
-            <div><dt>Xonadonlar</dt><dd>4 000–4 500</dd></div>
+            <div><dt>Xonadonlar</dt><dd>~4 000</dd></div>
           </dl>
-          <p class="pcard__eco"><svg class="i" viewBox="0 0 24 24"><path d="M5 19c9 0 14-5 14-14-9 0-14 5-14 14Zm0 0 7-7"/></svg>Har yili 3 500 t ko'mir yoqilmaydi, 6 000 t CO₂ chiqmaydi</p>
+          <p class="pcard__eco"><svg class="i" viewBox="0 0 24 24"><path d="M5 19c9 0 14-5 14-14-9 0-14 5-14 14Zm0 0 7-7"/></svg>Har yili 3 500 t ko'mir yoqilmaydi, 6 700 t CO₂ chiqmaydi</p>
         </div>
       </article>
     </div>
@@ -389,16 +389,16 @@
     </header>
     <div class="eco__grid">
       <article class="eco__tile eco__tile--num" data-reveal>
-        <span class="eco__num"><b data-count="5500">5 500</b> t</span>
+        <span class="eco__num"><b data-count="5600">5 600</b> t</span>
         <span class="eco__lbl">ko'mir yoqilmaydi</span>
         <div class="eco__bar" aria-hidden="true"><i style="--w:36%"></i><i style="--w:64%"></i></div>
-        <div class="eco__split mono"><span>Ulug'nor 2 000 t</span><span>Baliqchi 3 500 t</span></div>
+        <div class="eco__split mono"><span>Ulug'nor 2 100 t</span><span>Baliqchi 3 500 t</span></div>
       </article>
       <article class="eco__tile eco__tile--num" data-reveal>
         <span class="eco__num"><b data-count="10700">10 700</b> t</span>
         <span class="eco__lbl">CO₂ atmosferaga chiqmaydi</span>
         <div class="eco__bar" aria-hidden="true"><i style="--w:44%"></i><i style="--w:56%"></i></div>
-        <div class="eco__split mono"><span>Ulug'nor 4 700 t</span><span>Baliqchi 6 000 t</span></div>
+        <div class="eco__split mono"><span>Ulug'nor 4 000 t</span><span>Baliqchi 6 700 t</span></div>
       </article>
       <article class="eco__tile" data-reveal>
         <svg class="eco__i" viewBox="0 0 32 32"><path d="M4 12h15a4 4 0 1 0-4-4M4 18h21a4 4 0 1 1-4 4M4 24h9"/></svg>
@@ -412,7 +412,7 @@
       </article>
     </div>
     <p class="eco__foot" data-reveal><svg class="i" viewBox="0 0 24 24"><path d="M5 19c9 0 14-5 14-14-9 0-14 5-14 14Zm0 0 7-7"/></svg><span>Bu — real, o'lchanadigan ekologik ta'sir.</span></p>
-    <p class="eco__note mono">Baliqchi GES ko'rsatkichlari ishga tushgandan keyingi rejali qiymatlar.</p>
+    <p class="eco__note mono">Hisob: har kVt·soat uchun 0,77 kg CO₂ va 0,4 kg ko'mir. Baliqchi GES ko'rsatkichlari ishga tushgandan keyingi rejali qiymatlar.</p>
   </div>
 </section>
 
@@ -489,7 +489,7 @@
       <li class="ci ci--now">
         <span class="ci__dot" aria-hidden="true"></span>
         <figure class="ci__img"><img src="assets/timeline/tl-12-sm.webp" srcset="assets/timeline/tl-12-sm.webp 560w, assets/timeline/tl-12.webp 960w" sizes="(max-width: 620px) 88vw, (max-width: 1100px) 40vw, 320px" width="560" height="420" alt="Turbinalar montaji" loading="lazy" decoding="async"></figure>
-        <div class="ci__body"><time class="mono">2026 · Oktyabr</time><h3>Gidroagregatlar montaji <span class="pill pill--build pill--dark"><i></i>Hozir</span></h3><p>Ikki gorizontal turbina o'rnatilmoqda. Ishga tushirish: oktyabr oxiri.</p></div>
+        <div class="ci__body"><time class="mono">2026 · Oktyabr</time><h3>Gidroagregatlar montaji <span class="pill pill--now pill--dark when-pre"><i></i>Hozir</span></h3><p>Ikki gorizontal turbina o'rnatilmoqda. Ishga tushirish: oktyabr oxiri.</p></div>
       </li>
     </ol>
   </div>
@@ -693,18 +693,17 @@
         </div>
         <div class="field-t">
           <label for="inT">Elektr narxi, so'm / kVt·soat</label>
-          <div class="tariffs" role="group" aria-label="het.uz tariflari">
-            <button type="button" class="tariff" data-t="650"><b>650</b><span>0–200 kVt·s</span></button>
-            <button type="button" class="tariff" data-t="900"><b>900</b><span>201–500 kVt·s</span></button>
-            <button type="button" class="tariff is-on" data-t="1100"><b>1 100</b><span>501–1 000 kVt·s</span></button>
+          <div class="tariffs" role="group" aria-label="Elektr narxi">
+            <button type="button" class="tariff is-on" data-t="1000"><b>1 000</b><span>tarmoqqa sotish</span></button>
+            <button type="button" class="tariff" data-t="1100"><b>1 100</b><span>501–1 000 kVt·s</span></button>
             <button type="button" class="tariff" data-t="1600"><b>1 600</b><span>1 001–5 000 kVt·s</span></button>
             <button type="button" class="tariff" data-t="1900"><b>1 900</b><span>5 001–10 000 kVt·s</span></button>
             <button type="button" class="tariff" data-t="2200"><b>2 200</b><span>10 001+ kVt·s</span></button>
           </div>
-          <input type="number" id="inT" min="0" step="50" value="1100" inputmode="numeric">
-          <p class="field-t__src mono">Manba: het.uz — maishiy iste'molchilar tariflari, 2026-yil 1-iyundan. Narxni qo'lda ham kiritishingiz mumkin.</p>
+          <input type="number" id="inT" min="0" step="50" value="1000" inputmode="numeric">
+          <p class="field-t__src mono">1 000 so'm: bizning obyektlar hisobidagi tarmoqqa sotish narxi. Qolganlari: tokni o'zingiz ishlatsangiz tejaladigan narx (het.uz, maishiy tariflar, 2026-yil 1-iyundan). Narxni qo'lda ham kiritishingiz mumkin.</p>
         </div>
-        <p class="calc__assume mono">Hisobda: FIK η = 0,80 · yillik yuklama 90% (bizning obyektlarda ~99%) · xonadon 2 200 kVt·soat/yil · CO₂ 0,77 kg/kVt·soat</p>
+        <p class="calc__assume mono">Hisobda: FIK η = 0,80 · yillik yuklama 90% (bizning obyektlarda ~99%) · xonadon 2 200 kVt·soat/yil · CO₂ 0,77 kg/kVt·soat · loyiha qiymati 1 700–2 500 $/kVt (bizning obyektlar) · 1 $ ≈ 12 700 so'm</p>
       </div>
 
       <div class="calc__out" aria-live="polite">
@@ -722,6 +721,8 @@
           <div><span class="mono">Taxminiy yillik daromad</span><b><em id="rR">0</em> mln so'm</b></div>
           <div><span class="mono">Ta'minlanadigan xonadon</span><b><em id="rHh">0</em> ta</b></div>
           <div><span class="mono">Oldi olingan CO₂</span><b><em id="rC">0</em> t/yil</b></div>
+          <div><span class="mono">Taxminiy loyiha qiymati</span><b><em id="rCap">0</em></b></div>
+          <div><span class="mono">Qoplash muddati</span><b><em id="rPay">0</em></b></div>
         </div>
         <button type="button" class="btn btn--green magnetic calc__send" id="calcSend"><span>Shu hisob bilan murojaat qilish</span><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </div>
@@ -758,7 +759,7 @@
       </details>
       <details class="acc__item" data-reveal>
         <summary>Narxi qancha turadi?<i></i></summary>
-        <div class="acc__body"><p>Har bir obyekt alohida hisoblanadi: quvvat, derivatsiya kanali uzunligi, uskuna turi va qurilish hajmiga qarab. Texnik-iqtisodiy hisob-kitobda loyiha qiymati va qoplash muddatini yozma ko'rinishda beramiz.</p></div>
+        <div class="acc__body"><p>Har bir obyekt alohida hisoblanadi: quvvat, derivatsiya kanali uzunligi, uskuna turi va qurilish hajmiga qarab. Texnik-iqtisodiy hisob-kitobda loyiha qiymati va qoplash muddatini yozma ko'rinishda beramiz. Mo'ljal uchun: bizning obyektlarda 1 kVt quvvat taxminan 1 700–2 500 $ turdi (Ulug'nor GES, 600 kVt: 1 mln $; Baliqchi GES, 1 000 kVt: 2,5 mln $).</p></div>
       </details>
       <details class="acc__item" data-reveal>
         <summary>Ishlab chiqarilgan tokni nima qilaman?<i></i></summary>
@@ -885,11 +886,12 @@
         <div class="lead__ok" id="leadOk" hidden>
           <svg viewBox="0 0 52 52" class="lead__check"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg>
           <h3>Telegram ochildi</h3>
-          <p>Chatda ariza matni tayyor turibdi, "Yuborish"ni bosing. Telegram ochilmagan bo'lsa, quyidagi tugmani bosing yoki qo'ng'iroq qiling: <span class="mono">+998 99 020 97 11</span></p>
+          <p>Chatda ariza matni tayyor turibdi, "Yuborish"ni bosing. Telegram ochilmagan bo'lsa, matnni nusxalab istalgan messenjerga yuboring yoki qo'ng'iroq qiling: <span class="mono">+998 99 020 97 11</span></p>
           <pre class="lead__text mono" id="leadText"></pre>
           <div class="lead__ok-ctas">
             <a class="btn btn--green" id="leadTg" href="https://t.me/ozodbekov" target="_blank" rel="noopener"><span>Telegramda ochish</span></a>
             <a class="btn btn--ghost" href="tel:+998990209711"><span>Qo'ng'iroq&nbsp;qilish</span></a>
+            <button class="btn btn--ghost" type="button" id="leadCopy"><span>Matnni nusxalash</span></button>
             <button class="btn btn--ghost" type="button" id="leadBack"><span>Tahrirlash</span></button>
           </div>
         </div>
