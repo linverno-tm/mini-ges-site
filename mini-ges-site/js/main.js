@@ -669,25 +669,27 @@ function mainGES() {
   // play while it is visible and pause when it is not; steps without a clip show a still that drifts.
   const REAL = { 0: 0, 1: 1, 2: 1, 3: 0, 4: 0, 5: 1 };          // camera key -> has a clip
   const diaWrap = $('.dia-wrap'), diaReal = $('#diaReal');
-  const real = { key: null, front: 0, near: false, seen: false };
+  const real = { key: null, front: 0, near: false, seen: false, hd: false };   // hd: full-screen presentation
   const realLayers = diaReal ? $$('.dia-real__layer', diaReal) : [];
   const realBig = () => {
     const c = navigator.connection || {};
     return !(c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '')) && diaReal.clientWidth * (window.devicePixelRatio || 1) > 1000;
   };
   const realOn = () => diaWrap && diaWrap.classList.contains('is-real');
+  const realIn = (m) => { const r = diaReal.getBoundingClientRect(); return r.bottom > -m && r.top < window.innerHeight + m; };
   const realPlay = () => {
     const v = $('video', realLayers[real.front]);
-    if (v.getAttribute('src') && realOn() && real.seen && !reduced) { const p = v.play(); if (p) p.catch(() => {}); }
+    if (v.getAttribute('src') && realOn() && (real.seen || realIn(0)) && !reduced) { const p = v.play(); if (p) p.catch(() => {}); }
   };
   const showReal = (key) => {
     if (!diaReal) return;
     real.key = key;
-    if (!real.near) return;
+    if (!real.near && !realIn(500)) return;
+    real.near = true;
     const layer = realLayers[real.front];
     if (layer.dataset.key === key) { realPlay(); return; }
     const back = realLayers[1 - real.front], img = $('img', back), v = $('video', back);
-    const base = SITE_BASE + 'assets/real/' + 'real-' + key, sfx = realBig() ? '' : '-sm';
+    const base = SITE_BASE + 'assets/real/' + 'real-' + key, sfx = real.hd ? '-hd' : realBig() ? '' : '-sm';
     back.dataset.key = key;
     back.classList.toggle('is-still', !REAL[key] || reduced);
     back.classList.toggle('has-video', !!REAL[key] && !reduced);
@@ -783,6 +785,30 @@ function mainGES() {
       showPhoto(n);
     };
     const go = (n) => { setStep(n); camTo(String(n)); };
+
+    // presentation mode: the card goes full screen, the presenter steps with buttons or arrow keys
+    const fsBtn = $('.dia-fs'), navBtns = $$('.dia-nav button');
+    const fsOn = () => document.fullscreenElement === diaWrap;
+    const navSync = () => navBtns.forEach(b => { b.disabled = +b.dataset.dir < 0 ? camKey === '0' : camKey !== '0' && currentStep >= 5; });
+    const stepBy = (d) => {
+      if (camKey === '0') { if (d > 0) go(currentStep); }
+      else if (currentStep + d < 1) camTo('0');
+      else go(Math.min(5, currentStep + d));
+      navSync();
+    };
+    if (fsBtn && diaWrap.requestFullscreen) {
+      fsBtn.addEventListener('click', () => (fsOn() ? document.exitFullscreen() : diaWrap.requestFullscreen()).catch(() => {}));
+      navBtns.forEach(b => b.addEventListener('click', () => stepBy(+b.dataset.dir)));
+      document.addEventListener('fullscreenchange', () => {
+        fsBtn.setAttribute('aria-pressed', String(fsOn())); navSync(); setTimeout(() => applyCam(camKey, 0), 60);
+        if (real.hd !== fsOn()) { real.hd = fsOn(); realLayers[real.front].dataset.key = ''; showReal(real.key); }   // sharper files on the big screen
+      });
+      document.addEventListener('keydown', (e) => {
+        if (!fsOn()) return;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); stepBy(1); }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); stepBy(-1); }
+      });
+    } else if (fsBtn) fsBtn.hidden = true;
 
     setStep(1);                       // at rest: model readable, camera on the whole scene
     hsteps.forEach((s) => {
