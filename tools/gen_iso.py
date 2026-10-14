@@ -208,6 +208,9 @@ PLASTER = ('#D8D0BE', '#C9C0AC', '#B4AB97')      # powerhouse walls
 STEEL = ('#9AA6AF', '#7F8B94', '#66717A')
 SAFETY = ('#E3B23E', '#C6952C', '#A97E23')       # hoist and crane paint
 MACHINE = ('#6E8A78', '#5A7464', '#4A6153')      # generator housing
+CLAD = ('#3D67C4', '#3158AE', '#264892')         # blue wall panels of the powerhouse
+CRANE = ('#D9472E', '#B93B26', '#98301F')        # red overhead crane, coupling guards
+GEN = ('#4876C0', '#3A64A6', '#2D528C')          # blue turbines and generators
 NOISE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAQAAABIkb+zAAAG50lEQVR42q1c15UjMQxzJe5g2nD/Hc19zOrEAJCg7H3vgu2xAsUAgtS+XuDn/Xn+rL9fr9frvtC77Mc/YV+t/69/72uNfV97LvvK//j33x+yGP71+Px95Q2tbT6j+LHu6/2Jm9CEUjy3ZYseZZtBn+JnnyXvGZ6tPa+zSOy7aDz+yWD3a0FLxnE4VZ7oWf86LxScOdY5ZY/rGX9a1nLswra0/fv89CtFFSUzMVj+jf3JFhYb+TndvcV2HVaKXOrdeWw5PtLC2+hP9Vl+Nu98qgdWEBXGT+ClfP6TF2itbXswMEs1MVeM9d3a3Dr1YgLy1nLkJrbxeWVjhoWDmF0I+39lwug58B7WXe97o0wmCpNdZqWW6NveAbjn2OJZEEdy1A42+i38TaZIaU3sQz8A07+oSN5VoiVaGe6nqq1LDp2BAK6VbHiLhLIFVGBD34JT5ogt9sOHVh8ULI6sO1Jkyu/PM/b/Z+qoyAbGQO9RHx/QuhG3+13PxzEVB5yQ4H1ZredDMC9dw7O16G7EfBbEXmv955hQlQnPORi8UyIDDp4HKKOXI8s5OgXDywYgIod8j0hqJ5pzAa/V3nImoS+mQSPXqqB0PAH3XVGCDD+hhVlRSQLge2NJixI5ebozsyr3DRQ7o/w1FNlBuiX7PHo/GzVY3WN0eVaF6OPJocTcKyRf7haGi8Q1Q6EkHlh7uUWMc9w+smMPwSOqkiJqiZHmioWZMzpEhMli6ZAifJdOnmeEkt53S2WO1wI7HlP0lUAhWd23R7oSys6oTsOTLnFLt4S5KjfISKq1KayNKrBD89UCgdtfSfqGrpG88OAp+wGFR9DsZM+gnJJjp4WYB8jY9yf6kDV5VL5eCTXPthEVZCWspOPmamCHY0CH7xE5MPZk3ksomro3UmXN29lqrM5zZrXu0ywM88x5ay+hYpAtKcbsnO9NqEbyTTskUxNblIgFizkbFLMJRukiWk2E1J2XmVEzasKJqjYiYuujJDLbPiajBWWV1CgCYFs5s9Kia47XdTkQpYGcj4rCFDNqn3pEiOdZhGjYFW5VgEhepv8UlWOlym5VT6z8UFXvVbeIgFxwB6cAmPOZ2eTXVnaUQW6ho5m/guo2A9i5rS1bd7KrocrKM3p/V2bHzJ9wujUTH7aOVbk8RSG/lnn2E1VtABux5hwzzqqYoRavWhkqTAEy/K3ZPn5nLsLaCqtEIEQV4HQXS5XEBY/GTqWSOIIb2RuGGlmk/nTA1Xc44LE8iaaetZsnS2FvhFGpPomJ1WK7nOgxGKfDlQtXJQNWrg5yW0EeSje5aSjr6kb0k7dcj0cdPZjxRE/Y1J0rTo66scJ5X1/19lR6j3onqlOpAXRJDnhGqPI7rF7fF2YVIeV2Bk4kiB6kA8gHCUe7mZzdLQO3mDicwH19w0xWRfA618o8E4s1uO/x/wZ0pDJpAOxYbq3TTmFg27rgbKEq+FUsCqktOS/UtDEhPSrQpct40j0KYcSEBMT1rhPD1QgsbabXJMdiTTWcjKmqZ5haawUaJ5wRrXrgsYusgV9uZkO4qygxoUkq+vw3RSXWJxqFSKszvBXgwZ6PXHqTrHvd6oqAn2HXr7PDNe/YskbXUpZT7i5jmBQAWQ9GDneCj7Td5RHg8lhRtWNgqMcVlvW7NJQy5uxZPMV9KnNnh/JexpUTDik3ijEjtrU0vd1pUj7/QURh9QHmizi05paxWvd0+kuqL/dpvO9pqVpxdB8VCyaYPhZOI1KyqDMIDYhKglifM+PcSXzU5F0BrEplQifn0TyxXIubAeP5S9ubocXcoK1W3XEuVienf6+8DuL6SN8APnGZrB9x1GrG3Rxuec3wGVF9J4h+3tAm0hl1XoAwJT+hk9OqJC+0vG6z4ubS9ZBOL88hwh5lIWFFDLXkwj+uNJ7nYLhxtsl+/VMYaeiN3MpkExCB2SfcT+xucOw8CPWRqv07KC2qazYs8Z/eqAISsLe3WNg6b9RQ7MJ2r6A+lsBLfKfPNaOkZnK7vtALiAqF36morqXUsuZJT6TrlWsrhNDRLmFFv2EthzeCYFU86Q496Om6L3YGKDh91wbLaJea9id0a2M0PypHcxXBTARx9LH+VSfvCEVNrk9rC550ZAA6CZuocuNO65rYcCAjnKpvO4muvkLyEosOfZztDDhf1apvGxxkZv2t+erORs/581/wgBuxhEKH0nqHEhEWhCq6pgeJcel/ryMIy/VKjoMyf9dTMB3YqH5/yODSb1V87m+y9pU2pJpKYPO4oBAMv+yJ/q5adH5zhZHzhINbirE+i5/hv15hQr53F+NFgjF6EVzPR+WlFQr3t+tplcomukkCALUqNf1X6ORAyLV9Xof+ByW5rq0GRHVKAAAAAElFTkSuQmCC'
 
 def shadow(x0, x1, y0, y1, h, k=.55):
@@ -224,6 +227,8 @@ W(f'''<defs>
   <linearGradient id="gW" gradientUnits="userSpaceOnUse" x1="-260" y1="0" x2="1300" y2="90"><stop offset="0" stop-color="#5F9EA4"/><stop offset=".5" stop-color="#4C8D96"/><stop offset="1" stop-color="#3D7B86"/></linearGradient>
   <linearGradient id="gWdeep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4A8790"/><stop offset="1" stop-color="#2C5F6A"/></linearGradient>
   <linearGradient id="gGlint" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="gGen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FA6E0"/><stop offset=".45" stop-color="#3F6CB5"/><stop offset="1" stop-color="#22406F"/></linearGradient>
+  <linearGradient id="gGenT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86ABE2"/><stop offset=".5" stop-color="#4371BA"/><stop offset="1" stop-color="#244373"/></linearGradient>
   <linearGradient id="gTube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D3DA"/><stop offset=".45" stop-color="#7E8E9A"/><stop offset="1" stop-color="#46535D"/></linearGradient>
   <linearGradient id="gBlade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EEE6D2"/><stop offset=".5" stop-color="#C7B994"/><stop offset="1" stop-color="#8F8262"/></linearGradient>
   <linearGradient id="gPole" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EEF1F2"/><stop offset=".45" stop-color="#C9CFD2"/><stop offset="1" stop-color="#8A9398"/></linearGradient>
@@ -417,24 +422,61 @@ out += [f'<path class="flow flow--out" d="{path_xy(offset(tail[:nseg + 3], [th[j
 W('<g class="w-out">' + xy(-3.8) + ''.join(out) + '</g></g>')
 
 # ---------------------------------------------------------------- powerhouse (cutaway); water enters at x=380, leaves at x=270
-PX0, PX1, PY0, PY1, PZ0, PZ1 = 270, 380, 46 + DY, 116 + DY, -6, 34
-W(shadow(PX0, PX1, PY0, PY1, 30))
+# As built (photos 13.10.2026): a three-storey reinforced-concrete frame clad in blue panels, pitched roof, a tall
+# turbine hall with a red overhead crane; the near walls are cut away (ghosted) so the units can be seen.
+PX0, PX1, PY0, PY1, PZ0, PZ1 = 270, 380, 46 + DY, 116 + DY, -6, 46
+FL = (15, 30)                                                  # floor levels of the three storeys
+W(shadow(PX0, PX1, PY0, PY1, 40))
 W(xy(PZ0) + rect(PX0, PY0, PX1 - PX0, PY1 - PY0, '#86837A') + '</g>')
 W(xy(PZ0 + .2) + f'<circle class="ph-glow" cx="325" cy="{81 + DY}" r="58" fill="url(#gGlow)"/></g>')
-W(xz(PY0) + rect(PX0, PZ0, PX1 - PX0, PZ1 - PZ0, PLASTER[1]) + ''.join(
-    rect(PX0 + 12 + i * 26, 14, 14, 12, '#5D6B74') + rect(PX0 + 12 + i * 26, 14, 14, 3, '#7F8E97') for i in range(4)) + '</g>')
-W(yz(PX0) + rect(PY0, PZ0, PY1 - PY0, PZ1 - PZ0, PLASTER[2]) + rect(58 + DY, -4, 16, 18, '#3A3B37') + rect(88 + DY, -4, 16, 18, '#3A3B37') + '</g>')
+
+def frame_wall(u0, u1, cols):
+    """inner face of a back wall: bare concrete, frame columns, floor beams, a high band of windows"""
+    g = rect(u0, PZ0, u1 - u0, PZ1 - PZ0, '#CBC7BE')
+    g += ''.join(rect(c - 1.6, PZ0, 3.2, PZ1 - PZ0, '#B3AFA6') for c in cols)
+    g += ''.join(rect(u0, z - .8, u1 - u0, 2, '#A9A59C') for z in FL)
+    for k in range(len(cols) - 1):
+        c0, c1 = cols[k] + 3, cols[k + 1] - 3
+        if c1 - c0 > 6:
+            g += rect(c0, 33, c1 - c0, 9, '#E6EBEE') + rect(c0 + 1.2, 34.2, c1 - c0 - 2.4, 6.6, '#9FB4C4')
+            g += rect((c0 + c1) / 2 - .4, 34.2, .8, 6.6, '#E6EBEE')
+    return g
+
+W(xz(PY0) + frame_wall(PX0, PX1, [PX0 + 2, 297, 325, 353, PX1 - 2]) + '</g>')
+W(yz(PX0) + frame_wall(PY0, PY1, [PY0 + 2, 81 + DY, PY1 - 2]) + rect(58 + DY, -4, 16, 18, '#3A3B37') + rect(88 + DY, -4, 16, 18, '#3A3B37') + '</g>')
 W('<g class="w-out">' + yz(PX0) + ''.join(rect(y0, -4, 16, 9, 'url(#gWdeep)') + f'<rect class="foam foam--lip" x="{y0}" y="3.2" width="16" height="2.2" fill="#F4FBFA"/>'
                                           for y0 in (58 + DY, 88 + DY)) + '</g></g>')     # water rushing out through the outlets
+# upper floors at the downstream end (control rooms above the outlets)
+for z in FL:
+    W(box(PX0, PX0 + 16, PY0, PY1, z, z + 1.6, *CONC))
+    W(xz(PY1) + rect(PX0, z + 1.6, 16, 3, 'none', ' stroke="#E8EEF2" stroke-width=".5"') + '</g>')   # balcony rail
 
 def unit(yc, k):
+    """inline unit: blue ribbed turbine (runner face at x=358) -> red coupling guard -> blue finned generator"""
     zc = 6
     s = [f'<g class="unit unit--{k}">']
-    s.append(xy(PZ0 + .1) + f'<ellipse cx="326" cy="{yc + 3}" rx="44" ry="13" fill="#000" opacity=".25"/></g>')
-    s.append(tube(280, 9, 292, 11, yc, zc, 'url(#gCone)'))                 # draft tube toward the outlet
-    s.append(tube(292, 11, 358, 11, yc, zc, 'url(#gTube)'))
-    for fx_ in (300, 324, 346):
-        s.append(tube(fx_, 12, fx_ + 2.2, 12, yc, zc, STEEL[2]))
+    s.append(xy(PZ0 + .1) + f'<ellipse cx="320" cy="{yc + 3}" rx="46" ry="13" fill="#000" opacity=".25"/></g>')
+    s.append(box(279, 306, yc - 9, yc + 9, PZ0, -2.6, GEN[1], GEN[2], GEN[2]))     # base frame of the generator
+    # generator: horizontal cylinder with longitudinal cooling fins and a terminal box on top
+    s.append('<g class="gen">')
+    s.append(tube(281, 8.5, 304, 8.5, yc, zc, 'url(#gGen)'))
+    for t in (-50, -25, 0, 25, 50, 75):
+        a_ = math.radians(90 + t)
+        p0 = P(282, yc + 8.6 * math.cos(a_), zc + 8.6 * math.sin(a_)); p1 = P(303, yc + 8.6 * math.cos(a_), zc + 8.6 * math.sin(a_))
+        s.append(f'<path d="M{f(p0[0])} {f(p0[1])}L{f(p1[0])} {f(p1[1])}" stroke="{GEN[2]}" stroke-width=".55" opacity=".9"/>')
+    s.append(yz(304) + f'<circle cx="{yc}" cy="{zc}" r="8.5" fill="{GEN[2]}"/><circle cx="{yc}" cy="{zc}" r="3" fill="#1F3557"/></g>')
+    s.append(box(288, 297, yc - 3.2, yc + 3.2, 14.3, 18.6, *GEN))                # terminal box
+    s.append(xz(yc + 3.2) + f'<path class="gen-bolt" d="M294.6 18 l-2.6 -1.9 h2 l-1 -1.6 l3.6 2.1 h-2z" fill="#4AF745"/></g>')
+    s.append('</g>')
+    # shaft and red coupling guard
+    s.append(tube(304, 1.6, 316, 1.6, yc, zc, '#4C565D'))
+    s.append(tube(307, 5.4, 313.5, 5.4, yc, zc, CRANE[1]))
+    s.append(xy(zc + 5.4) + rect(307, yc - 5.4, 6.5, 10.8, CRANE[0], ' opacity=".55"') + '</g>')
+    # turbine: neck, ribbed body, bolted flanges, runner face toward the forebay
+    s.append(tube(316, 6, 326, 11, yc, zc, GEN[2]))
+    s.append(tube(326, 11, 358, 11, yc, zc, 'url(#gGenT)'))
+    for fx_ in (329, 336, 343, 350, 356):
+        s.append(tube(fx_, 11.7, fx_ + 1.4, 11.7, yc, zc, GEN[2]))
     s.append(yz(358) + f'<circle cx="{yc}" cy="{zc}" r="11" fill="#2F3A42"/>'   # intake face with the runner
              f'<circle cx="{yc}" cy="{zc}" r="11" fill="none" stroke="#B5C2CB" stroke-width="1.2"/>'
              f'<g class="runner" style="transform-origin:{yc}px {zc}px">'
@@ -444,25 +486,47 @@ def unit(yc, k):
              + f'<circle cx="{yc}" cy="{zc}" r="3.3" fill="#C4302B"/><circle cx="{f(yc - .9)}" cy="{f(zc - .9)}" r="1.3" fill="#EA6F63"/></g>'
              f'<circle class="spin-ring" cx="{yc}" cy="{zc}" r="8" fill="none" stroke="#BDEBFF" stroke-width="1" stroke-dasharray="3 5"/>'
              '</g>')
-    s.append(f'<g class="gen">' + box(306, 332, yc - 8, yc + 8, 16, 28, *MACHINE)
-             + xz(yc + 8) + f'<path class="gen-bolt" d="M322 25 l-5 -7 h4 l-2 -6 l7 8 h-4z" fill="#4AF745"/>'
-             + rect(306, 16, 26, 12, 'none', ' stroke="#4AF745" stroke-width=".6" stroke-opacity=".55"') + '</g>'
-             + yz(332) + rect(yc - 8, 16, 16, 12, 'none', ' stroke="#4AF745" stroke-width=".6" stroke-opacity=".55"') + '</g>'
-             + '</g>')
     s.append('</g>')
     return ''.join(s)
 
 W(unit(66 + DY, 'a'))
 W(unit(96 + DY, 'b'))
-W(f'<g class="crane">' + box(PX0 + 4, PX1 - 4, 48 + DY, 50 + DY, 31, 32.5, *SAFETY)
-  + box(PX0 + 4, PX1 - 4, 112 + DY, 114 + DY, 31, 32.5, *SAFETY)
-  + box(300, 306, 48 + DY, 114 + DY, 32, 34, *SAFETY)
-  + box(300, 306, 62 + DY, 70 + DY, 26, 32, *SAFETY) + '</g>')
+W(xy(PZ0 + .3) + f'<rect x="{PX0 + 4}" y="{PY0 + 3}" width="7" height="7" rx="3.5" fill="#3E7A4A"/></g>')   # green air tank (footprint)
+W(f'<g class="crane">' + box(PX0 + 4, PX1 - 4, 48 + DY, 50 + DY, 40, 41.5, *CRANE)
+  + box(PX0 + 4, PX1 - 4, 112 + DY, 114 + DY, 40, 41.5, *CRANE)
+  + box(300, 306, 48 + DY, 114 + DY, 41, 43, *CRANE)
+  + box(300, 306, 62 + DY, 70 + DY, 35, 41, *CRANE) + '</g>')
 for cx_, cy_ in ((PX1, PY1), (PX1, PY0), (PX0, PY1)):
     W(box(cx_ - 3, cx_, cy_ - 3, cy_, PZ0, PZ1, *CONC))
-W(xz(PY1) + rect(PX0, PZ0, PX1 - PX0, 8, PLASTER[1]) + '</g>')
-W(yz(PX1) + rect(PY0, PZ0, PY1 - PY0, 8, PLASTER[2]) + rect(56 + DY, -6, 20, 6, '#3A3B37') + rect(86 + DY, -6, 20, 6, '#3A3B37') + '</g>')
+# near walls: blue parapet up to the cut, the rest ghosted with its frame, floors and windows
+W(xz(PY1) + rect(PX0, PZ0, PX1 - PX0, 8, CLAD[1]) + rect(PX0, 1.4, PX1 - PX0, .6, '#D9DEE2') + '</g>')
+W(yz(PX1) + rect(PY0, PZ0, PY1 - PY0, 8, CLAD[2]) + rect(56 + DY, -6, 20, 6, '#3A3B37') + rect(86 + DY, -6, 20, 6, '#3A3B37') + rect(PY0, 1.4, PY1 - PY0, .6, '#D9DEE2') + '</g>')
+def ghost(u0, u1, cols):
+    """near wall shown as tinted glass: blue panels, white frame lines, a window band on every storey"""
+    g = rect(u0, 2, u1 - u0, PZ1 - 2, CLAD[1], ' fill-opacity=".46"')
+    for k in range(len(cols) - 1):
+        for z in (6, ) + tuple(z + 4 for z in FL):
+            if cols[k + 1] - cols[k] > 12:
+                g += rect(cols[k] + 3.5, z, cols[k + 1] - cols[k] - 7, 6.5, '#DCEBF7', ' fill-opacity=".07" stroke="#F2F5F7" stroke-opacity=".55" stroke-width=".6"')
+    g += ''.join(f'<path d="M{c} 2V{PZ1}" stroke="#F2F5F7" stroke-opacity=".75" stroke-width="1.3"/>' for c in cols)
+    g += ''.join(f'<path d="M{u0} {z}H{u1}" stroke="#F2F5F7" stroke-opacity=".75" stroke-width="1.3"/>' for z in FL + (PZ1, ))
+    return g
+W(xz(PY1) + ghost(PX0, PX1, [PX0, 297, 325, 353, PX1]) + '</g>')
+W(yz(PX1) + ghost(PY0, PY1, [PY0, 81 + DY, PY1]) + '</g>')
+# pitched roof, ghosted: eaves, ridge along the hall, gables
+RZ = PZ1 + 9
 W(f'<polygon points="{pts((PX0, PY0, PZ1), (PX1, PY0, PZ1), (PX1, PY1, PZ1), (PX0, PY1, PZ1))}" fill="#FFFFFF" fill-opacity=".04" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="1" stroke-dasharray="5 4"/>')
+W(f'<polygon points="{pts((PX0, 81 + DY, RZ), (PX1, 81 + DY, RZ), (PX1, PY1, PZ1), (PX0, PY1, PZ1))}" fill="{CLAD[0]}" fill-opacity=".22" stroke="#FFFFFF" stroke-opacity=".6" stroke-width="1" stroke-dasharray="5 4"/>')
+W(f'<polygon points="{pts((PX1, PY0, PZ1), (PX1, 81 + DY, RZ), (PX1, PY1, PZ1))}" fill="{CLAD[2]}" fill-opacity=".26" stroke="#FFFFFF" stroke-opacity=".6" stroke-width="1" stroke-dasharray="5 4"/>')
+W(f'<path d="M{" L".join(f"{f(a)} {f(b)}" for a, b in (P(PX0, PY0, PZ1), P(PX0, 81 + DY, RZ), P(PX1, 81 + DY, RZ)))}" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width="1" stroke-dasharray="5 4"/>')
+
+# trash rack in front of the intake face: inclined black bars across the forebay, leaning toward the building
+PR0, PR1 = 56 + DY, 106 + DY
+rb = ''.join(f'M{f(P(393, y, -4)[0])} {f(P(393, y, -4)[1])}L{f(P(383, y, 12)[0])} {f(P(383, y, 12)[1])}' for y in [PR0 + 1.25 * i for i in range(41)])
+rs = ''.join(f'M{f(P(393 - 10 * t, PR0, -4 + 16 * t)[0])} {f(P(393 - 10 * t, PR0, -4 + 16 * t)[1])}L{f(P(393 - 10 * t, PR1, -4 + 16 * t)[0])} {f(P(393 - 10 * t, PR1, -4 + 16 * t)[1])}' for t in (.35, .7))
+rt = f'M{f(P(383, PR0, 12.4)[0])} {f(P(383, PR0, 12.4)[1])}L{f(P(383, PR1, 12.4)[0])} {f(P(383, PR1, 12.4)[1])}'
+W(f'<g class="rack rack--ph" fill="none" stroke-linecap="round"><path d="{rb}" stroke="#2E353A" stroke-width=".4"/>'
+  f'<path d="{rs}" stroke="#2A3035" stroke-width="1"/><path d="{rt}" stroke="#262B2F" stroke-width="1.6"/></g>')
 
 # ---------------------------------------------------------------- transformer, pylons, village (downstream side)
 # switchyard as built: concrete pad and panel fence, two portals of galvanized round columns on concrete plinths,
@@ -555,15 +619,15 @@ def bolt(a, b, n=7, amp=4.5):
 
 arcs, gen_arcs = [], []
 for yc in (66 + DY, 96 + DY):
-    top = P(319, yc, 28)
+    top = P(292.5, yc, 18.6)
     for i in range(3):
         gen_arcs.append(bolt(top, (top[0] + rnd.uniform(-14, 14), top[1] - rnd.uniform(16, 26)), 6, 4))
     # small discharges crawling along the generator's top edges
-    edges = [((306, yc - 8), (332, yc - 8)), ((332, yc - 8), (332, yc + 8)), ((306, yc + 8), (332, yc + 8))]
+    edges = [((282, yc - 6), (303, yc - 6)), ((303, yc - 6), (303, yc + 6)), ((282, yc + 6), (303, yc + 6))]
     for (ax_, ay_), (bx_, by_) in edges:
         t1, t2 = sorted((rnd.uniform(0, 1), rnd.uniform(0, 1)))
-        a_ = P(ax_ + (bx_ - ax_) * t1, ay_ + (by_ - ay_) * t1, 28.4)
-        b_ = P(ax_ + (bx_ - ax_) * t2, ay_ + (by_ - ay_) * t2, 28.4)
+        a_ = P(ax_ + (bx_ - ax_) * t1, ay_ + (by_ - ay_) * t1, 12.8)
+        b_ = P(ax_ + (bx_ - ax_) * t2, ay_ + (by_ - ay_) * t2, 12.8)
         gen_arcs.append(bolt(a_, b_, 5, 2.5))
 t0 = P(242, 137 + DY, 26)                    # discharges at the bushing tops
 for i in range(2):
@@ -578,10 +642,10 @@ W('<g class="arcs" filter="url(#fArc)">' + ''.join(
 # energy links (turbine shaft -> generator) and a floating bolt above each generator
 fx = []
 for i, yc in enumerate((66 + DY, 96 + DY)):
-    a_, b_ = P(319, yc, 17), P(319, yc, 16)
+    a_, b_ = P(296, yc, 15), P(296, yc, 14.5)
     s_ = P(352, yc, 12)
     fx.append(f'<path class="gen-link" d="M{f(s_[0])} {f(s_[1])}Q{f((s_[0] + a_[0]) / 2)} {f(a_[1] - 6)} {f(a_[0])} {f(a_[1])}"/>')
-    zx, zy = P(319, yc, 46)
+    zx, zy = P(292, yc, 30)
     fx.append(f'<g class="gen-zap" style="animation-delay:-{i * .8}s" transform="translate({f(zx)} {f(zy)})">'
               '<circle r="11" class="gen-zap__halo"/>'
               '<path d="M1.5 -9 L-5 1.5 H-0.5 L-2.5 9 L5 -2 H0.5 L3 -9Z"/></g>')
@@ -599,7 +663,7 @@ def label(cls, world, dx, dy, text, anchor='start'):
 W(label('lbl-1', (G[0], G[1], 30), -40, -34, 'SUV QABUL QILGICH · FILTR · ZATVOR', 'end'))
 W(label('lbl-2', (route[30][0], route[30][1] - 11, 2), 0, -58, 'DERIVATSIYA KANALI', 'middle'))   # above the arch, on the open ground
 W(label('lbl-3', (358, 96 + DY, -2), -14, 50, '2 × GORIZONTAL TURBINA', 'end'))
-W(label('lbl-4', (319, 96 + DY, 28), -30, -46, '2 × GENERATOR', 'end'))
+W(label('lbl-4', (292, 96 + DY, 18), -30, -46, '2 × GENERATOR', 'end'))
 W(label('lbl-4b', (242, 137 + DY, 26), 34, 22, 'TRANSFORMATOR'))
 W(label('lbl-5', (TMID[0], TMID[1], -4), 30, -34, 'SUV KANALGA QAYTADI'))
 W(label('lbl-5b', (17, 290 + DY, 22), 0, -56, 'TARMOQ · ISTE\'MOLCHI', 'middle'))
@@ -619,8 +683,8 @@ cams = {
     '0': cam(-48, 1132, 20 - KW // 2, 330 + DY, 0, 30, .0),
     '1': cam(G[0] - 60, G[0] + 75, 8, G[1] + 30, -12, 40, .1, .04),
     '2': cam(372, 1060, 10, 205, -12, 20, .04, .14),   # shifted so the photo inset (bottom-left) leaves the arch visible
-    '3': cam(252, 392, 40 + DY, 125 + DY, -6, 36, .16, .1),
-    '4': cam(150, 402, 20, 165 + DY, -6, 36, .1, .1),
+    '3': cam(252, 396, 40 + DY, 125 + DY, -6, 50, .12, .1),
+    '4': cam(150, 402, 20, 165 + DY, -6, 50, .1, .1),
     '5': cam(-58, 392, 30, 340 + DY, 0, 50, .06, .08),
 }
 
