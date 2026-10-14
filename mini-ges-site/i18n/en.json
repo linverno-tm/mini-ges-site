@@ -87,7 +87,6 @@
     "Maket": "Model",
     "To'liq ekranda ko'rsatish": "Show full screen",
     "Ekran": "Screen",
-    "Mini-GES maketi: Katta Farg'ona kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, ikki gorizontal turbinali stansiya, qaytish o'zani, transformator va qishloqqa boruvchi elektr tarmog'i": "Small HPP model: the Great Fergana Canal, a gated intake, a 400-metre derivation channel, a powerhouse with two horizontal turbines, a tailrace, a transformer and a power line to the village",
     "400 m": "400 m",
     "SUV QABUL QILGICH · FILTR · ZATVOR": "INTAKE · TRASH RACK · GATE",
     "DERIVATSIYA KANALI": "DERIVATION CHANNEL",
@@ -96,7 +95,6 @@
     "TRANSFORMATOR": "TRANSFORMER",
     "SUV KANALGA QAYTADI": "WATER BACK TO THE CANAL",
     "TARMOQ · ISTE'MOLCHI": "GRID · CONSUMER",
-    "Katta Farg'ona kanali bo'yidagi mini-GES, AI vizualizatsiya": "Small hydropower plant on the Great Fergana Canal, AI visualisation",
     "AI vizualizatsiya": "AI visualisation",
     "G'ildirakli po'lat zatvor": "Steel wheeled gate",
     "Haqiqiy obyekt": "Real site",
@@ -395,6 +393,8 @@
     "electricity": "electricity",
     "from the water on your land”": "from the water on your land”",
     "“Generate": "“Generate",
-    "EN": "EN"
+    "EN": "EN",
+    "Mini-GES maketi: Andijon kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, ikki gorizontal turbinali stansiya, qaytish o'zani, transformator va qishloqqa boruvchi elektr tarmog'i": "Small HPP model: the Andijan Canal, a gated intake, a 400-metre derivation channel, a powerhouse with two horizontal turbines, a tailrace, a transformer and a power line to the village",
+    "Andijon kanali bo'yidagi mini-GES, AI vizualizatsiya": "Small hydropower plant on the Andijan Canal, AI visualisation"
   }
 }

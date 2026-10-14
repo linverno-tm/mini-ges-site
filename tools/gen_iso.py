@@ -248,7 +248,7 @@ W(xy(0) + rect(-900, -800, 2900, 2000, 'url(#gGround)') + rect(-900, -800, 2900,
 M = lambda x: 1092 - x
 DY = 50                 # powerhouse, tailrace, grid and village sit this much further from the canal than in v2
 FY = 110                # near-side fields move back so the arched channel has open ground around it
-KW = 46                 # the Great Fergana Canal is wide: its far bank, road and poplars sit this much further away
+KW = 30                 # the Andijan canal is wider than the derivation channel: its far bank, road and poplars sit this much further away
 
 fields = [(-120, 130, 230, 150, 'pRows'), (150, 140, 200, 140, 'pRows2'), (380, 140, 230, 150, 'pRows'),
           (-140, -130, 330, 90, 'pRows2'), (240, -130, 330, 95, 'pRows'), (620, -130, 360, 100, 'pRows2'),
@@ -625,7 +625,7 @@ cams = {
 }
 
 svg = (f'<svg class="dia" id="dia" viewBox="{cams["0"]}" data-cams=\'{json.dumps(cams)}\' role="img" '
-       'aria-label="Mini-GES maketi: Katta Farg\'ona kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, '
+       'aria-label="Mini-GES maketi: Andijon kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, '
        'ikki gorizontal turbinali stansiya, qaytish o\'zani, transformator va qishloqqa boruvchi elektr tarmog\'i">'
        + ''.join(o) + '</svg>')
 open(sys.argv[1], 'w', encoding='utf-8').write(svg)

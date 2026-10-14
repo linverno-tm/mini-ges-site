@@ -79,7 +79,6 @@
     "Turbinadan o'tgan suv chiqish o'zani orqali yana o'sha kanalga qaytadi, sug'orish uchun bir tomchi ham yo'qolmaydi. Tok esa tarmoqqa yoki to'g'ridan-to'g'ri iste'molchiga uzatiladi.": "Прошедшая через турбину вода по отводящему руслу возвращается в тот же канал — для полива не теряется ни капли. А ток передаётся в сеть или напрямую потребителю.",
     "kVt·soat — yillik ishlab chiqarish": "кВт·ч — годовая выработка",
     "Mini-GES maketi": "Макет мини-ГЭС",
-    "Mini-GES maketi: Katta Farg'ona kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, ikki gorizontal turbinali stansiya, qaytish o'zani, transformator va qishloqqa boruvchi elektr tarmog'i": "Макет мини-ГЭС: Большой Ферганский канал, водозабор с затворами, деривационный канал длиной 400 м, станция с двумя горизонтальными турбинами, отводящее русло, трансформатор и линия электропередачи к посёлку",
     "400 m": "400 м",
     "DERIVATSIYA KANALI": "ДЕРИВАЦИОННЫЙ КАНАЛ",
     "2 × GORIZONTAL TURBINA": "2 × ГОРИЗОНТАЛЬНАЯ ТУРБИНА",
@@ -373,7 +372,6 @@
     "Suv qabul qilgich": "Водозабор",
     "Maket": "Макет",
     "Ko'rinish": "Вид",
-    "Katta Farg'ona kanali bo'yidagi mini-GES, AI vizualizatsiya": "Мини-ГЭС у Большого Ферганского канала, AI-визуализация",
     "Real": "Реально",
     "To'liq ekranda ko'rsatish": "Показать на весь экран",
     "Oldingi bosqich": "Предыдущий этап",
@@ -408,6 +406,8 @@
     "yildan beri Ulug'nor GES tarmoqqa tok beradi: O'zbekistondagi birinchi xususiy mini-GESlardan biri": "года Улугнор ГЭС отдаёт ток в сеть — одна из первых частных мини-ГЭС в Узбекистане",
     "Chatda ariza matni tayyor turibdi, \"Yuborish\"ni bosing. Telegram ochilmagan bo'lsa, matnni nusxalab istalgan messenjerga yuboring yoki qo'ng'iroq qiling:": "Текст заявки уже в чате, нажмите «Отправить». Если Telegram не открылся, скопируйте текст и отправьте в любой мессенджер или позвоните:",
     "Matnni nusxalash": "Скопировать текст",
-    "EN": "EN"
+    "EN": "EN",
+    "Mini-GES maketi: Andijon kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, ikki gorizontal turbinali stansiya, qaytish o'zani, transformator va qishloqqa boruvchi elektr tarmog'i": "Макет мини-ГЭС: Андижанский канал, водозабор с затворами, деривационный канал длиной 400 м, станция с двумя горизонтальными турбинами, отводящее русло, трансформатор и линия электропередачи к посёлку",
+    "Andijon kanali bo'yidagi mini-GES, AI vizualizatsiya": "Мини-ГЭС у Андижанского канала, AI-визуализация"
   }
 }
