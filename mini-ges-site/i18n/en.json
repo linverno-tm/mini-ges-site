@@ -1,7 +1,7 @@
 {
   "html": {
     "hero.title": "“Generate <em>electricity</em> from the water on your land”",
-    "hero.quote": "<img class=\"pres__photo\" src=\"assets/president/mirziyoyev-2025-12-05-sm.webp\" srcset=\"assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w\" sizes=\"(max-width: 620px) 84px, 160px\" width=\"600\" height=\"750\" alt=\"President Shavkat Mirziyoyev speaking at the «Sustainable Energy» conference, 5 December 2025\" decoding=\"async\"><blockquote class=\"pres__q\"><p>The richer our entrepreneurs are, the more prosperous our people will be and the more powerful our state. <strong>The success of an entrepreneur is the success of our whole nation.</strong></p></blockquote><figcaption class=\"pres__by\"><b>Shavkat Mirziyoyev</b><span>President of the Republic of Uzbekistan</span><small>Meeting with entrepreneurs, 20 December 2024 (translated) · <a href=\"https://president.uz/oz/lists/view/7778\" target=\"_blank\" rel=\"noopener\">president.uz</a><br>Photo: «Sustainable Energy» conference, 5 December 2025 · <a href=\"https://president.uz/oz/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></small></figcaption>"
+    "hero.quote": "<img class=\"pres__photo\" src=\"assets/president/mirziyoyev-2025-12-05-sm.webp\" srcset=\"assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w\" sizes=\"(max-width: 620px) 84px, 160px\" width=\"600\" height=\"750\" alt=\"President Shavkat Mirziyoyev speaking at the «Sustainable Energy» conference, 5 December 2025\" decoding=\"async\"><blockquote class=\"pres__q\"><p>Our entrepreneurs have also made efficient use of water resources and, this year, built 40 small and micro hydropower plants with a capacity of 40 megawatts. <strong>As a result, 120 million kilowatt-hours of electricity were generated, providing an additional source of income.</strong></p></blockquote><figcaption class=\"pres__by\"><b>Shavkat Mirziyoyev</b><span>President of the Republic of Uzbekistan</span><small>Address at the forum «Powering the Future – Sustainable Energy for New Uzbekistan», 5 December 2025 · <a href=\"https://president.uz/en/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></small></figcaption>"
   },
   "text": {
     "MINI GES — mini gidroelektrostansiyalar": "MINI GES — small hydropower plants",
@@ -383,18 +383,17 @@
     "Sug'orish kanallari bo'yida mini gidroelektrostansiyalarni loyihalash, qurish va sotish.": "Design, construction and sale of small hydropower plants on irrigation canals.",
     "Tayyor mini-GES sotish": "Sale of finished small HPPs",
     "Qo'ng'iroq qilish": "Call us",
-    "Meeting with entrepreneurs, 20 December 2024 (translated) ·": "Meeting with entrepreneurs, 20 December 2024 (translated) ·",
-    "Photo: «Sustainable Energy» conference, 5 December 2025 ·": "Photo: «Sustainable Energy» conference, 5 December 2025 ·",
     "President Shavkat Mirziyoyev speaking at the «Sustainable Energy» conference, 5 December 2025": "President Shavkat Mirziyoyev speaking at the «Sustainable Energy» conference, 5 December 2025",
     "President of the Republic of Uzbekistan": "President of the Republic of Uzbekistan",
     "Shavkat Mirziyoyev": "Shavkat Mirziyoyev",
-    "The richer our entrepreneurs are, the more prosperous our people will be and the more powerful our state.": "The richer our entrepreneurs are, the more prosperous our people will be and the more powerful our state.",
-    "The success of an entrepreneur is the success of our whole nation.": "The success of an entrepreneur is the success of our whole nation.",
     "electricity": "electricity",
     "from the water on your land”": "from the water on your land”",
     "“Generate": "“Generate",
     "EN": "EN",
     "Mini-GES maketi: Andijon kanali, zatvorli suv qabul qilgich, 400 metrlik derivatsiya kanali, ikki gorizontal turbinali stansiya, qaytish o'zani, transformator va qishloqqa boruvchi elektr tarmog'i": "Small HPP model: the Andijan Canal, a gated intake, a 400-metre derivation channel, a powerhouse with two horizontal turbines, a tailrace, a transformer and a power line to the village",
-    "Baliqchi GES binosi, AI vizualizatsiya": "Baliqchi HPP building, AI visualisation"
+    "Baliqchi GES binosi, AI vizualizatsiya": "Baliqchi HPP building, AI visualisation",
+    "Address at the forum «Powering the Future – Sustainable Energy for New Uzbekistan», 5 December 2025 ·": "Address at the forum «Powering the Future – Sustainable Energy for New Uzbekistan», 5 December 2025 ·",
+    "As a result, 120 million kilowatt-hours of electricity were generated, providing an additional source of income.": "As a result, 120 million kilowatt-hours of electricity were generated, providing an additional source of income.",
+    "Our entrepreneurs have also made efficient use of water resources and, this year, built 40 small and micro hydropower plants with a capacity of 40 megawatts.": "Our entrepreneurs have also made efficient use of water resources and, this year, built 40 small and micro hydropower plants with a capacity of 40 megawatts."
   }
 }
