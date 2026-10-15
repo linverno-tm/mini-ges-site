@@ -325,7 +325,8 @@ main:focus { outline: none; }
   .dia-wrap { max-width: calc((100vh - 215px) * 1.5625 + 38px); margin-left: auto; }
 }
 .how__steps { display: grid; }
-.hstep { min-height: 62vh; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding-block: 24px; opacity: .28; transition: opacity .6s var(--ease); }
+/* one screen of scrolling per step: time to watch each clip before the next one */
+.hstep { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding-block: 24px; opacity: .28; transition: opacity .6s var(--ease); }
 .hstep.is-active { opacity: 1; }
 .hstep__n { font-size: 12px; color: var(--sky); letter-spacing: .1em; }
 .hstep h3 { font-size: clamp(28px, 3vw, 42px); font-weight: 800; }
@@ -869,7 +870,7 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   #diaStep { white-space: nowrap; }
   .dia-top__step { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .dia-photo { left: 16px; bottom: 22px; width: 34%; border-radius: 10px; }
-  .hstep { min-height: 46vh; }
+  .hstep { min-height: 85vh; }
   .pcard { grid-template-columns: minmax(0, 1fr); min-height: 0; position: relative; top: auto !important; }
   .pcard__media { min-height: 220px; }
   .offers { grid-template-columns: minmax(0, 1fr); }

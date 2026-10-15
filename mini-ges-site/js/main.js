@@ -777,7 +777,8 @@ function mainGES() {
       if (key === camKey || !cams[key]) return;
       camKey = key;
       applyCam(key, reduced ? 0 : 1.7);
-      showReal(key);
+      clearTimeout(camTo._t);                  // the clip changes only once the reader stays on a step (no flashing on a fast scroll)
+      camTo._t = setTimeout(() => showReal(camKey), real.hd ? 0 : 300);
     };
     const diaName = $('#diaName');
     const showPhoto = (n) => {
