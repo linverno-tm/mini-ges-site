@@ -845,6 +845,20 @@ function mainGES() {
     if (reduced) { for (let i = 1; i <= 5; i++) dia.classList.add('on-' + i); fill.setAttribute('x', 350); fill.setAttribute('width', 730); }
   }
 
+  // ------------------------------------------------------------------ project card film (Baliqchi GES at dusk)
+  // loads only near the screen (small file on phones and slow links), plays while visible
+  $$('.pcard__film').forEach((v) => {
+    if (reduced || !('IntersectionObserver' in window)) return;
+    const c = navigator.connection || {};
+    const small = c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '') || v.clientWidth * (window.devicePixelRatio || 1) <= 900;
+    new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) {
+        if (!v.getAttribute('src')) { if (!small) v.poster = v.dataset.poster; v.src = small ? v.dataset.srcSm : v.dataset.src; }
+        const p = v.play(); if (p) p.catch(() => {});
+      } else v.pause();
+    }), { rootMargin: '300px 0px' }).observe(v);
+  });
+
   // ------------------------------------------------------------------ project ripples
   $$('canvas.ripple').forEach((cvs) => {
     const ctx = cvs.getContext('2d');
