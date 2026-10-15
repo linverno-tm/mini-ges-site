@@ -684,6 +684,7 @@ function mainGES() {
   // photos; step 5 is untouched footage, so its tag says so). Clips load only when the stage is near the screen
   // (small files on phones and slow links), play while it is visible and pause when it is not.
   const REAL = { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };          // camera key -> has a clip
+  const REAL_V = '3';                                            // bump when the clips change: old copies in browser/SW caches are skipped
   const REAL_FOOTAGE = { 5: 1 };                                 // camera key -> real, not AI
   const realTag = $('.dia-real__tag');
   const diaWrap = $('.dia-wrap'), diaReal = $('#diaReal');
@@ -719,14 +720,14 @@ function mainGES() {
       setTimeout(() => { const old = $('video', layer); if (layer.classList.contains('is-out')) old.pause(); }, 1100);
       realPlay();
     };
-    const url = base + sfx + '.webp';
+    const url = base + sfx + '.webp?v=' + REAL_V;
     const tagText = REAL_FOOTAGE[key] ? L.realVid : L.aiViz;
     img.alt = ($('#diaName') ? $('#diaName').textContent + ', ' : '') + tagText;
     if (realTag) { realTag.textContent = tagText; realTag.classList.toggle('is-footage', !!REAL_FOOTAGE[key]); }
     if (img.src === url && img.complete) swap(); else { img.onload = swap; img.src = url; }
     if (REAL[key] && !reduced) {
       v.oncanplay = () => { v.classList.add('is-ready'); if (back === realLayers[real.front]) realPlay(); };
-      v.src = base + sfx + '.mp4'; v.load();
+      v.src = base + sfx + '.mp4?v=' + REAL_V; v.load();
     } else { v.removeAttribute('src'); v.load(); }
   };
   if (diaReal && 'IntersectionObserver' in window) {
