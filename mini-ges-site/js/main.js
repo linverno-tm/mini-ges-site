@@ -24,7 +24,7 @@ const L = {
     leadHello: "Assalomu alaykum! Mini-GES loyihasi bo'yicha ariza.", fName: 'Ism', fPhone: 'Telefon', fRegion: 'Hudud', fSource: "Yo'nalish", fMsg: 'Izoh',
     calcMsg: (q, h, p, e) => `Kalkulyator: Q = ${q} m³/s, H = ${h} m → taxminan ${p} kVt, ${e} kVt·soat/yil.`,
     uQ: ' m³/s', uH: ' m', usdM: ' mln $', usdK: ' ming $', yr: ' yil',
-    aiViz: 'AI vizualizatsiya',
+    aiViz: 'AI vizualizatsiya', realVid: 'Haqiqiy video',
     photos: ["G'ildirakli po'lat zatvor", '400 metrlik beton kanal', 'Ikki gorizontal turbina montaji', "Stansiya binosi va ko'prik krani", 'Stansiya va elektr uzatish liniyasi'],
   },
   ru: {
@@ -35,7 +35,7 @@ const L = {
     leadHello: 'Здравствуйте! Заявка по проекту мини-ГЭС.', fName: 'Имя', fPhone: 'Телефон', fRegion: 'Регион', fSource: 'Направление', fMsg: 'Комментарий',
     calcMsg: (q, h, p, e) => `Калькулятор: Q = ${q} м³/с, H = ${h} м → примерно ${p} кВт, ${e} кВт·ч/год.`,
     uQ: ' м³/с', uH: ' м', usdM: ' млн $', usdK: ' тыс. $', yr: ' г.',
-    aiViz: 'AI-визуализация',
+    aiViz: 'AI-визуализация', realVid: 'Реальное видео',
     photos: ['Стальной колёсный затвор', 'Бетонный канал длиной 400 м', 'Монтаж двух горизонтальных турбин', 'Здание станции и мостовой кран', 'Станция и линия электропередачи'],
   },
   en: {
@@ -46,7 +46,7 @@ const L = {
     leadHello: 'Hello! An enquiry about a small hydropower project.', fName: 'Name', fPhone: 'Phone', fRegion: 'Region', fSource: 'Type', fMsg: 'Comment',
     calcMsg: (q, h, p, e) => `Calculator: Q = ${q} m³/s, H = ${h} m → about ${p} kW, ${e} kWh/year.`,
     uQ: ' m³/s', uH: ' m', usdM: ' mln $', usdK: 'k $', yr: ' yrs',
-    aiViz: 'AI visualisation',
+    aiViz: 'AI visualisation', realVid: 'Real footage',
     photos: ['Steel wheeled gate', 'The 400-metre concrete channel', 'Installing two horizontal turbines', 'Powerhouse and overhead crane', 'Plant and power line'],
   },
 }[LANG];
@@ -680,10 +680,12 @@ function mainGES() {
   const hsteps = $$('.hstep');
   const PHOTOS = ['assets/gallery/ges-05-sm.webp', 'assets/timeline/tl-10-sm.webp', 'assets/gallery/ges-07-sm.webp',
     'assets/gallery/ges-10-sm.webp', 'assets/how/how-5.webp'].map((src, i) => [SITE_BASE + src, L.photos[i]]);
-  // Realistic view: an AI visualisation of the same scene for every camera, over the model.
-  // Clips load only when the stage is near the screen (small files on phones and slow links),
-  // play while it is visible and pause when it is not; steps without a clip show a still that drifts.
-  const REAL = { 0: 0, 1: 1, 2: 1, 3: 0, 4: 0, 5: 1 };          // camera key -> has a clip
+  // Realistic view: a 4K clip of the real plant for every camera, over the model (AI-enhanced from the site
+  // photos; step 5 is untouched footage, so its tag says so). Clips load only when the stage is near the screen
+  // (small files on phones and slow links), play while it is visible and pause when it is not.
+  const REAL = { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };          // camera key -> has a clip
+  const REAL_FOOTAGE = { 5: 1 };                                 // camera key -> real, not AI
+  const realTag = $('.dia-real__tag');
   const diaWrap = $('.dia-wrap'), diaReal = $('#diaReal');
   const real = { key: null, front: 0, near: false, seen: false, hd: false };   // hd: full-screen presentation
   const realLayers = diaReal ? $$('.dia-real__layer', diaReal) : [];
@@ -718,7 +720,9 @@ function mainGES() {
       realPlay();
     };
     const url = base + sfx + '.webp';
-    img.alt = ($('#diaName') ? $('#diaName').textContent + ', ' : '') + L.aiViz;
+    const tagText = REAL_FOOTAGE[key] ? L.realVid : L.aiViz;
+    img.alt = ($('#diaName') ? $('#diaName').textContent + ', ' : '') + tagText;
+    if (realTag) { realTag.textContent = tagText; realTag.classList.toggle('is-footage', !!REAL_FOOTAGE[key]); }
     if (img.src === url && img.complete) swap(); else { img.onload = swap; img.src = url; }
     if (REAL[key] && !reduced) {
       v.oncanplay = () => { v.classList.add('is-ready'); if (back === realLayers[real.front]) realPlay(); };

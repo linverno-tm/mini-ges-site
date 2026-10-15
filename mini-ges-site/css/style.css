@@ -439,6 +439,7 @@ main:focus { outline: none; }
 .dia-real__tag { position: absolute; z-index: 2; top: 10px; right: 10px; padding: 5px 9px; border-radius: 999px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
   color: var(--white); background: rgba(6, 18, 38, .6); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(6px); }
 .dia-real__tag::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--volt); box-shadow: 0 0 8px var(--volt); vertical-align: 1px; }
+.dia-real__tag.is-footage::before { background: var(--sky); box-shadow: 0 0 8px var(--sky); }
 .dia-mode { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12); margin: -6px auto -6px 14px; }
 .dia-mode button { font: 600 10.5px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-d); background: none; border: 0; border-radius: 999px; padding: 7px 11px; cursor: pointer; transition: background .3s, color .3s; }
 .dia-mode button[aria-pressed="true"] { background: var(--white); color: var(--ink); }
