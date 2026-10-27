@@ -1047,6 +1047,14 @@ function mainGES() {
     });
   }
 
+  // ------------------------------------------------------------------ motion icons: animate only while on screen
+  const mos = $$('.mo');
+  if (reduced || !('IntersectionObserver' in window)) mos.forEach(m => m.classList.add('is-in'));
+  else {
+    const moIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('is-in', e.isIntersecting)), { rootMargin: '0px 0px -8% 0px' });
+    mos.forEach(m => moIO.observe(m));
+  }
+
   // ------------------------------------------------------------------ timeline
   const tlFill = $('#tlFill');
   if (tlFill) {

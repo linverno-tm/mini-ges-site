@@ -938,6 +938,58 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   .field-r__scale span:nth-child(2), .field-r__scale span:nth-child(3), .field-r__scale span:nth-child(4) { display: none; }
 }
 
+/* ---------------- motion icons: the picture tells it, text stays one line ----------------
+   Animations run only while the icon is on screen (.is-in from main.js); the resting
+   style of every part is its finished pose, so reduced motion shows a complete icon. */
+.mo { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; overflow: visible; --sun: #F5B82E; }
+.mo * { animation-play-state: paused !important; }
+.mo.is-in * { animation-play-state: running !important; }
+.mo .ac { color: var(--azure); stroke: currentColor; }
+.mo .gr { color: var(--green); stroke: currentColor; }
+.mo .dim { opacity: .35; }
+.mo .fl { fill: currentColor; stroke: none; }
+.mo .flow { stroke-dasharray: 12 9; animation: mo-flow 1.4s linear var(--d, 0s) infinite; }
+.mo .flow-s { stroke-dasharray: 2.5 3.5; animation: mo-flow-s 1s linear var(--d, 0s) infinite; }
+.mo .spin, .mo .ring, .mo .bob, .mo .wiggle, .mo .shake, .mo .tide, .mo .grow, .mo .drop { transform-box: fill-box; transform-origin: center; }
+.mo .hub { transform-box: view-box; transform-origin: 16px 16px; }
+.mo .spin { animation: mo-spin var(--t, 3s) linear var(--d, 0s) infinite; }
+.mo .ring { animation: mo-ring 2.4s ease-out var(--d, 0s) infinite; }
+.mo .bolt { fill: currentColor; fill-opacity: .14; animation: mo-bolt 2.8s linear var(--d, 0s) infinite; }
+.mo .lit { fill: var(--sun); stroke: none; animation: mo-lit 3.2s ease-in-out var(--d, 0s) infinite; }
+.mo rect.lit.ac, .mo rect.lit.gr { fill: currentColor; }
+.mo .draw { stroke-dasharray: 1; animation: mo-draw 3.4s var(--ease) var(--d, 0s) infinite; }
+.mo .bob { animation: mo-bob 1.8s ease-in-out var(--d, 0s) infinite; }
+.mo .wiggle { animation: mo-wiggle 2.6s var(--ease) var(--d, 0s) infinite; }
+.mo .shake { animation: mo-shake 2.2s ease-in-out var(--d, 0s) infinite; }
+.mo .ping { animation: mo-ping 2.2s ease-out var(--d, 0s) infinite; }
+.mo .tide { animation: mo-tide 3s ease-in-out var(--d, 0s) infinite; }
+.mo .grow { transform-origin: bottom; animation: mo-grow 3s var(--ease) var(--d, 0s) infinite; }
+.mo .drop { animation: mo-drop 3.2s var(--ease) var(--d, 0s) infinite; }
+@keyframes mo-flow { to { stroke-dashoffset: -42; } }
+@keyframes mo-flow-s { to { stroke-dashoffset: -12; } }
+@keyframes mo-spin { to { transform: rotate(360deg); } }
+@keyframes mo-ring { 0% { transform: scale(.5); opacity: .9; } 100% { transform: scale(2.3); opacity: 0; } }
+@keyframes mo-bolt { 0%, 58%, 100% { fill-opacity: .14; } 62% { fill-opacity: 1; } 66% { fill-opacity: .35; } 70%, 86% { fill-opacity: 1; } }
+@keyframes mo-lit { 0%, 100% { fill-opacity: .14; } 25%, 72% { fill-opacity: 1; } }
+@keyframes mo-draw { 0% { stroke-dashoffset: 1; opacity: 1; } 42%, 88% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes mo-bob { 50% { transform: translateY(3px); } }
+@keyframes mo-wiggle { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-18deg); } 80% { transform: rotate(12deg); } 90% { transform: rotate(-6deg); } }
+@keyframes mo-shake { 0%, 50%, 100% { transform: rotate(0); } 55%, 65%, 75% { transform: rotate(-9deg); } 60%, 70%, 80% { transform: rotate(9deg); } }
+@keyframes mo-ping { 0%, 40% { opacity: 0; } 55% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes mo-tide { 50% { transform: translateY(-9px); } }
+@keyframes mo-grow { 0% { transform: scaleY(.15); } 40%, 85% { transform: scaleY(1); } 100% { transform: scaleY(.15); } }
+@keyframes mo-drop { 0% { transform: translateY(-16px); opacity: 0; } 25%, 85% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(0); opacity: 0; } }
+
+.fact__mo { width: 56px; height: 56px; color: var(--brand); }
+.svc__i.mo { color: var(--brand); }
+.eco__scene { width: 100%; max-width: 260px; height: auto; color: var(--green); stroke-width: 1.4; margin-bottom: 6px; }
+.chain { display: block; width: 100%; height: auto; color: var(--brand); stroke-width: 3; margin: calc(clamp(64px, 9vw, 120px) * -.45) 0 clamp(56px, 8vw, 104px); }
+.chain text { fill: var(--muted); stroke: none; font: 500 26px var(--f-mono); text-anchor: middle; }
+@media (max-width: 620px) { .chain { stroke-width: 4.5; } .chain text { font-size: 28px; } }
+.tl__item > div { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 18px; align-items: start; }
+.tl__mo { width: 48px; height: 48px; grid-row: span 2; color: var(--muted); transition: color .4s; }
+.tl__item.is-on .tl__mo { color: var(--brand); }
+
 @media (hover: none) {
   .btn:active, .copy:active, .tariff:active, .chips label:active, .gph__btn:active, .vcard:active { transform: scale(.97); }
   .btn, .copy, .tariff, .chips label, .gph__btn { transition: transform .15s ease, background .3s; -webkit-tap-highlight-color: transparent; }
