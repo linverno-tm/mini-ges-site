@@ -143,9 +143,11 @@ function mainGES() {
 
   const loader = $('#loader');
   const langSwitch = root.classList.contains('lang-switch');   // set by js/boot.js
+  let heroHold = false;   // the opaque loader hides the hero canvas: no point drawing it until the loader starts to leave
   if (reduced || !loader || langSwitch || LATE_JS) {
     loader?.remove();
   } else {
+    heroHold = true;
     document.body.classList.add('is-loading');
     lenis?.stop();
     gsap.set(splits.get(heroTitle), { yPercent: 115 });
@@ -157,7 +159,7 @@ function mainGES() {
     const ready = Promise.race([
       Promise.all([
         document.fonts ? document.fonts.ready : Promise.resolve(),
-        new Promise(r => setTimeout(r, 900)),
+        new Promise(r => setTimeout(r, 600)),
       ]),
       new Promise(r => setTimeout(r, 2200)),
     ]);
@@ -165,6 +167,7 @@ function mainGES() {
       climb.kill();
       gsap.timeline()
         .to(prog, { v: 100, duration: 0.45, ease: 'power2.inOut', onUpdate: paint })
+        .add(() => { heroHold = false; })
         .to('.loader__inner', { y: -30, autoAlpha: 0, duration: 0.6, ease: 'power3.in' }, '+=0.1')
         .to('.loader__curtain', { yPercent: -100, duration: 0.9, ease: 'expo.inOut' }, '-=0.25')
         .to(loader, { yPercent: -100, duration: 1, ease: 'expo.inOut' }, '-=0.55')
@@ -174,7 +177,7 @@ function mainGES() {
           gsap.set(splits.get(heroTitle), { clearProps: 'all' });
           gsap.set(heroFades, { clearProps: 'all' });
           heroIntro();
-        }, '-=0.7')
+        }, '-=0.9')
         .add(() => { loader.remove(); ScrollTrigger.refresh(); });
     });
   }
@@ -553,7 +556,7 @@ function mainGES() {
 
     const loop = (now) => {
       if (!ready && cvs.clientWidth > 0) build();
-      if (running && ready) frame(now);
+      if (running && ready && !heroHold) frame(now);
       requestAnimationFrame(loop);
     };
     build();
