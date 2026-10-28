@@ -143,43 +143,23 @@ function mainGES() {
 
   const loader = $('#loader');
   const langSwitch = root.classList.contains('lang-switch');   // set by js/boot.js
-  let heroHold = false;   // the opaque loader hides the hero canvas: no point drawing it until the loader starts to leave
-  if (reduced || !loader || langSwitch || LATE_JS) {
+  const introCss = root.classList.contains('intro-css');       // phone / repeat visit: CSS intro, no loader (js/boot.js)
+  if (reduced || !loader || langSwitch || LATE_JS || introCss) {
     loader?.remove();
   } else {
-    heroHold = true;
+    // First desktop visit of the session: a 0.6 s brand moment on a see-through loader,
+    // while the hero is already coming in underneath (the text is never held back).
     document.body.classList.add('is-loading');
     lenis?.stop();
-    gsap.set(splits.get(heroTitle), { yPercent: 115 });
-    gsap.set(heroFades, { autoAlpha: 0 });
+    heroIntro();
     const fill = $('#loaderFill'), count = $('#loaderCount');
     const prog = { v: 0 };
     const paint = () => { fill.style.clipPath = `inset(${100 - prog.v}% 0 0 0)`; count.textContent = Math.round(prog.v); };
-    const climb = gsap.to(prog, { v: 86, duration: 1.3, ease: 'power2.out', onUpdate: paint });
-    const ready = Promise.race([
-      Promise.all([
-        document.fonts ? document.fonts.ready : Promise.resolve(),
-        new Promise(r => setTimeout(r, 600)),
-      ]),
-      new Promise(r => setTimeout(r, 2200)),
-    ]);
-    ready.then(() => {
-      climb.kill();
-      gsap.timeline()
-        .to(prog, { v: 100, duration: 0.45, ease: 'power2.inOut', onUpdate: paint })
-        .add(() => { heroHold = false; })
-        .to('.loader__inner', { y: -30, autoAlpha: 0, duration: 0.6, ease: 'power3.in' }, '+=0.1')
-        .to('.loader__curtain', { yPercent: -100, duration: 0.9, ease: 'expo.inOut' }, '-=0.25')
-        .to(loader, { yPercent: -100, duration: 1, ease: 'expo.inOut' }, '-=0.55')
-        .add(() => {
-          document.body.classList.remove('is-loading');
-          lenis?.start();
-          gsap.set(splits.get(heroTitle), { clearProps: 'all' });
-          gsap.set(heroFades, { clearProps: 'all' });
-          heroIntro();
-        }, '-=0.9')
-        .add(() => { loader.remove(); ScrollTrigger.refresh(); });
-    });
+    gsap.timeline({ onComplete: () => { document.body.classList.remove('is-loading'); lenis?.start(); loader.remove(); ScrollTrigger.refresh(); } })
+      .to(prog, { v: 100, duration: 0.2, ease: 'power2.out', onUpdate: paint })
+      .to('.loader__inner', { y: -20, autoAlpha: 0, duration: 0.2, ease: 'power3.in' })
+      .to('.loader__curtain', { yPercent: -100, duration: 0.3, ease: 'expo.inOut' }, '-=0.1')
+      .to(loader, { yPercent: -100, duration: 0.3, ease: 'expo.inOut' }, '<');
   }
 
   // ------------------------------------------------------------------ hero: power grid scene
@@ -556,7 +536,7 @@ function mainGES() {
 
     const loop = (now) => {
       if (!ready && cvs.clientWidth > 0) build();
-      if (running && ready && !heroHold) frame(now);
+      if (running && ready) frame(now);
       requestAnimationFrame(loop);
     };
     build();

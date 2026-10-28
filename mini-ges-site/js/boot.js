@@ -6,13 +6,11 @@ try {
   if (s && Date.now() - s.t < 15000) document.documentElement.classList.add('lang-switch');
 } catch (e) { /* storage blocked: normal load with the loader */ }
 
-// Web fonts without blocking the first paint: a script-added stylesheet does not hold rendering,
-// and the loader covers the short fallback-font moment. <noscript> in index.html keeps the plain link.
+// The brand loader plays once per session, on desktops only. Phones, reduced motion and repeat
+// visits get .intro-css: no loader, the hero rises in with CSS (style.css, "loader").
 (function () {
-  var fonts = document.getElementById('fonts');
-  if (!fonts) return;
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = fonts.href;
-  document.head.appendChild(link);
+  var root = document.documentElement, seen = false;
+  try { seen = !!sessionStorage.getItem('ges:intro'); sessionStorage.setItem('ges:intro', '1'); } catch (e) { /* no storage: treat as first visit */ }
+  if (root.classList.contains('lang-switch')) return;
+  if (seen || window.matchMedia('(max-width: 768px), (prefers-reduced-motion: reduce)').matches) root.classList.add('intro-css');
 })();
