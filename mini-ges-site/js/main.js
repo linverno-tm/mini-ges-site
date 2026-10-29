@@ -687,6 +687,10 @@ function mainGES() {
     if (!diaReal) return;
     real.key = key;
     if (!real.near && !realIn(500)) return;
+    if (!real.near) {   // first time near: fetch every step's still, so a fast scroll never waits on one
+      const sfx0 = real.hd ? '-hd' : realBig() ? '' : '-sm';
+      Object.keys(REAL).forEach(k => { new Image().src = SITE_BASE + 'assets/real/' + 'real-' + k + sfx0 + '.webp?v=' + REAL_V; });
+    }
     real.near = true;
     const layer = realLayers[real.front];
     if (layer.dataset.key === key) { realPlay(); return; }
@@ -1061,6 +1065,30 @@ function mainGES() {
     near.observe(turb);
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; view?.setRunning(visible && !document.hidden); }).observe(cvs);
     document.addEventListener('visibilitychange', () => view?.setRunning(visible && !document.hidden));
+  }
+
+  // ------------------------------------------------------------------ warm-up: fetch the remaining photos, two at a time in page order,
+  // once the page has loaded, so they are ready before the reader scrolls to them (skipped on slow links / data saver)
+  if (!lite) {
+    const warm = () => {
+      const queue = $$('img[loading="lazy"]').filter(i => !i.complete);
+      let active = 0;
+      const next = () => {
+        while (active < 2 && queue.length) {
+          const img = queue.shift();
+          if (img.complete) continue;
+          active++;
+          const done = () => { active--; next(); };
+          img.addEventListener('load', done, { once: true });
+          img.addEventListener('error', done, { once: true });
+          img.loading = 'eager';
+        }
+      };
+      next();
+    };
+    const idle = window.requestIdleCallback || (f => setTimeout(f, 200));
+    const start = () => setTimeout(() => idle(warm), 1500);
+    if (document.readyState === 'complete') start(); else window.addEventListener('load', start, { once: true });
   }
 
   // ------------------------------------------------------------------ timeline

@@ -491,6 +491,7 @@ main:focus { outline: none; }
 .dia-real__layer img, .dia-real__layer video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .dia-real__layer video { opacity: 0; transition: opacity .6s; }
 .dia-real__layer.has-video video.is-ready { opacity: 1; }
+.dia-real__layer.is-out video { transition: none; }   /* a reused layer drops its old clip at once, no ghost of it over the new still */
 .dia-real__layer.is-still img { animation: diaDrift 14s ease-in-out infinite alternate; }
 @keyframes diaDrift { from { transform: scale(1.02); } to { transform: scale(1.1) translate(-1.5%, -1%); } }
 .dia-real__tag { position: absolute; z-index: 2; top: 10px; right: 10px; padding: 5px 9px; border-radius: 999px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;

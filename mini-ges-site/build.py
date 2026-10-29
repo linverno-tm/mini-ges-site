@@ -132,6 +132,23 @@ def copy_tree(rel, keep):
                 shutil.copy2(s, d)
 
 
+def lqip(html):
+    """Paint each lazy image's tiny blurred preview (data/lqip.json, tools/lqip.py) as its background."""
+    path = os.path.join(ROOT, 'data', 'lqip.json')
+    if not os.path.exists(path):
+        return html
+    previews = json.load(open(path, encoding='utf-8'))
+
+    def add(m):
+        tag = m.group(0)
+        src = re.search(r'\ssrc="([^"]+)"', tag)
+        uri = src and previews.get(src.group(1).split('?')[0])
+        if not uri or ' style="' in tag:
+            return tag
+        return tag[:-1].rstrip('/').rstrip() + f' style="background:url({uri}) center/cover no-repeat">'
+    return re.sub(r'<img[^>]*loading="lazy"[^>]*>', add, html)
+
+
 def main():
     assert SITE_URL.endswith('/'), 'SITE_URL must end with a slash'
     shutil.rmtree(DIST, ignore_errors=True)
@@ -143,6 +160,7 @@ def main():
 
     css_v, js_v, boot_v = fingerprint('css/style.css'), fingerprint('js/main.js'), fingerprint('js/boot.js')
     source = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
+    source = lqip(source)
 
     def finish(html):
         html = re.sub(r'href="((?:\.\./)?css/style\.css)"', rf'href="\1?v={css_v}"', html)
