@@ -1038,6 +1038,29 @@ function mainGES() {
     mos.forEach(m => moIO.observe(m));
   }
 
+  // ------------------------------------------------------------------ 3D turbine: desktops only, fetched when the block is near
+  const turb = $('#turb3d');
+  const turbOk = turb && finePointer && !reduced && !lite && 'IntersectionObserver' in window && window.matchMedia('(min-width: 901px)').matches;
+  if (turbOk) {
+    const cvs = $('.turb3d__cvs', turb);
+    let view = null, visible = false;
+    const load = () => new Promise((ok, fail) => {
+      const s = document.createElement('script');
+      s.src = SITE_BASE + 'js/vendor/turbine3d.min.js?v=1'; s.onload = ok; s.onerror = fail;
+      document.head.appendChild(s);
+    });
+    const near = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      near.disconnect();
+      load().then(() => window.GESTurbine.mount(cvs, SITE_BASE + 'assets/3d/kaplan.glb?v=1')).then((v) => {
+        view = v; turb.classList.add('is-3d'); view.setRunning(visible && !document.hidden);
+      }).catch(() => { /* WebGL or network failed: the poster stays */ });
+    }, { rootMargin: '600px 0px' });
+    near.observe(turb);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; view?.setRunning(visible && !document.hidden); }).observe(cvs);
+    document.addEventListener('visibilitychange', () => view?.setRunning(visible && !document.hidden));
+  }
+
   // ------------------------------------------------------------------ timeline
   const tlFill = $('#tlFill');
   if (tlFill) {

@@ -410,6 +410,15 @@
     "Sinov, topshirish va keyingi servis.": "Испытания, сдача и дальнейший сервис.",
     "Suv sarfi va balandlik farqini kiriting: taxminiy natija darhol chiqadi.": "Введите расход воды и перепад высот — примерный результат сразу.",
     "Suv turbinani aylantiradi, generator tok ishlab chiqaradi, tok uyga boradi": "Вода вращает турбину, генератор вырабатывает ток, ток идёт в дома",
-    "Uy": "Дом"
+    "Uy": "Дом",
+    ", litsenziya": ", лицензия",
+    "3D model: «hydro turbine kaplan», muallif": "3D-модель «hydro turbine kaplan», автор",
+    "Bu namunaviy model, bizning agregatimizning aniq nusxasi emas.": "Это типовая модель, а не точная копия нашего агрегата.",
+    "CC BY 4.0": "CC BY 4.0",
+    "Kaplan turbinasi g'ildiragining 3D modeli": "3D-модель рабочего колеса турбины Каплана",
+    "Kaplan turbinasi past naporli kanal stansiyalari uchun yaratilgan. Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.": "Турбина Каплана создана для низконапорных станций на каналах. Угол лопастей подстраивается под расход воды, поэтому турбина работает с хорошим КПД даже в дни, когда воды в канале меньше.",
+    "Sichqoncha bilan aylantiring": "Поверните мышкой",
+    "Turbina g'ildiragi yaqindan": "Рабочее колесо турбины вблизи",
+    "stas2001a": "stas2001a"
   }
 }

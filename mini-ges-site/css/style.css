@@ -368,6 +368,23 @@ main:focus { outline: none; }
 .dia-top__step { display: none; color: var(--white); }
 .dia-top { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-d); padding: 2px 4px 12px; }
 .dia { width: 100%; height: auto; }
+
+/* 3D Kaplan runner: a poster first; on desktops main.js swaps in a WebGL canvas near the section */
+.turb3d { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(32px, 5vw, 80px); align-items: center; margin-top: clamp(72px, 10vw, 140px); }
+.turb3d__stage { position: relative; aspect-ratio: 9 / 7; max-width: 100%; border: 1px solid rgba(255,255,255,.1); border-radius: 24px; overflow: hidden; background: radial-gradient(60% 60% at 50% 45%, rgba(70, 198, 247, .18), transparent 70%), linear-gradient(180deg, rgba(0, 74, 173, .16), rgba(6, 18, 38, .6)); }
+.turb3d__poster, .turb3d__cvs { position: absolute; inset: 0; width: 100%; height: 100%; }
+.turb3d__poster { object-fit: contain; transition: opacity .6s var(--ease); }
+.turb3d__cvs { opacity: 0; transition: opacity .6s var(--ease); cursor: grab; touch-action: pan-y; }
+.turb3d__cvs:active { cursor: grabbing; }
+.turb3d.is-3d .turb3d__cvs { opacity: 1; }
+.turb3d.is-3d .turb3d__poster { opacity: 0; }
+.turb3d__hint { position: absolute; left: 16px; bottom: 14px; font-size: 11px; color: var(--muted-d); opacity: 0; transition: opacity .6s var(--ease); }
+.turb3d.is-3d .turb3d__hint { opacity: 1; }
+.turb3d__title { font-size: clamp(28px, 3vw, 42px); font-weight: 800; line-height: 1.1; text-wrap: balance; margin-bottom: 20px; }
+.turb3d__text p { color: var(--muted-d); max-width: 44ch; }
+.turb3d__text p + p { margin-top: 12px; }
+.turb3d__credit { font-size: 11px; line-height: 1.6; }
+.turb3d__credit a { color: var(--sky); text-decoration: underline; text-underline-offset: 2px; }
 .dia-bar { height: 2px; background: rgba(255,255,255,.08); border-radius: 2px; margin-top: 12px; overflow: hidden; }
 .dia-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--sky), var(--volt)); transform: scaleX(0); transform-origin: left; }
 
@@ -898,6 +915,7 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   .nav__phone { display: none; }
   .sec-head--split, .how__grid, .process__grid, .calc__grid, .faq__grid, .contact__grid { grid-template-columns: minmax(0, 1fr); }
   .how__grid { gap: 0; }
+  .turb3d { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .how__stage { order: -1; top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 2; margin-inline: calc(var(--gutter) * -1); padding: 8px var(--gutter) 12px; background: linear-gradient(var(--ink) 85%, transparent); }
   .dia-wrap { padding: 10px; border-radius: 18px; }
   .dia { aspect-ratio: 1.12; height: auto; }

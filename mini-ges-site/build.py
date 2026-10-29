@@ -163,7 +163,7 @@ def main():
         page = page.replace('<meta property="og:url" content="%SITE_URL%">', f'<meta property="og:url" content="%SITE_URL%{code}/">')
         page = page.replace('href="./" hreflang="uz" lang="uz" aria-current="page"', 'href="./" hreflang="uz" lang="uz"')
         page = page.replace(f'href="{code}/" hreflang="{code}" lang="{code}"', f'href="{code}/" hreflang="{code}" lang="{code}" aria-current="page"')
-        page = re.sub(r'(\s(?:src|href|data-src)=")(?!https?:|//|#|data:|tel:|mailto:|%SITE_URL%|/|\.\./)', r'\1../', page)
+        page = re.sub(r'(\s(?:src|href|data-src|data-src-sm|poster|data-poster)=")(?!https?:|//|#|data:|tel:|mailto:|%SITE_URL%|/|\.\./)', r'\1../', page)
         page = re.sub(r'(\ssrcset=")([^"]+)"', lambda m: m.group(1) + ', '.join(
             p.strip() if p.strip().startswith(('http', '/', 'data:')) else '../' + p.strip()
             for p in m.group(2).split(',')) + '"', page)
@@ -185,7 +185,7 @@ def main():
     write('sw.js', sw)
 
     # only what pages reference: web images + icons (source PNG logos stay out)
-    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg', '.mp4')) or f in (
+    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg', '.mp4', '.glb')) or f in (
         'favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'))
     copy_tree('js/vendor', lambda f: f.endswith('.js'))
     shutil.copy2(os.path.join(ROOT, '.htaccess'), os.path.join(DIST, '.htaccess'))

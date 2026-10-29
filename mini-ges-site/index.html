@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://mc.yandex.ru; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://mc.yandex.ru; connect-src 'self' https://mc.yandex.ru; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://mc.yandex.ru; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://mc.yandex.ru; connect-src 'self' https://mc.yandex.ru; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>MINI GES — mini gidroelektrostansiyalar</title>
 <meta name="description" content="MINI GES — sug'orish kanallari bo'yida mini gidroelektrostansiyalarni loyihalash, qurish va sotish. Ulug'nor GES (600 kVt) va Baliqchi GES (1 000 kVt).">
@@ -303,6 +303,20 @@
           </figure>
           <div class="dia-nav"><button type="button" data-dir="-1" aria-label="Oldingi bosqich">‹</button><button type="button" data-dir="1" aria-label="Keyingi bosqich">›</button></div><div class="dia-bar"><i id="diaBar"></i></div>
         </div>
+      </div>
+    </div>
+
+    <div class="turb3d" id="turb3d">
+      <div class="turb3d__stage">
+        <img class="turb3d__poster" src="assets/3d/kaplan-poster.webp" alt="Kaplan turbinasi g'ildiragining 3D modeli" width="720" height="560" loading="lazy" decoding="async">
+        <canvas class="turb3d__cvs" aria-hidden="true"></canvas>
+        <span class="turb3d__hint mono">Sichqoncha bilan aylantiring</span>
+      </div>
+      <div class="turb3d__text">
+        <h3 class="turb3d__title">Turbina g'ildiragi yaqindan</h3>
+        <p>Kaplan turbinasi past naporli kanal stansiyalari uchun yaratilgan. Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.</p>
+        <p class="turb3d__note">Bu namunaviy model, bizning agregatimizning aniq nusxasi emas.</p>
+        <p class="turb3d__credit mono">3D model: «hydro turbine kaplan», muallif <a href="https://sketchfab.com/3d-models/hydro-turbine-kaplan-9ec55a901f5b482a837499bc1be6bed2" target="_blank" rel="noopener">stas2001a</a>, litsenziya <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></p>
       </div>
     </div>
   </div>

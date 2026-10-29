@@ -396,6 +396,15 @@
     "Sinov, topshirish va keyingi servis.": "Testing, handover and ongoing service.",
     "Suv sarfi va balandlik farqini kiriting: taxminiy natija darhol chiqadi.": "Enter the flow and the height difference to get an instant estimate.",
     "Suv turbinani aylantiradi, generator tok ishlab chiqaradi, tok uyga boradi": "Water spins the turbine, the generator makes power, and the power goes to homes",
-    "Uy": "Home"
+    "Uy": "Home",
+    ", litsenziya": ", licence",
+    "3D model: «hydro turbine kaplan», muallif": "3D model: “hydro turbine kaplan” by",
+    "Bu namunaviy model, bizning agregatimizning aniq nusxasi emas.": "This is a generic model, not an exact copy of our unit.",
+    "CC BY 4.0": "CC BY 4.0",
+    "Kaplan turbinasi g'ildiragining 3D modeli": "3D model of a Kaplan turbine runner",
+    "Kaplan turbinasi past naporli kanal stansiyalari uchun yaratilgan. Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.": "The Kaplan turbine is built for low-head canal plants. Its blade pitch follows the water flow, so the turbine stays efficient even on days when the canal runs low.",
+    "Sichqoncha bilan aylantiring": "Drag to rotate",
+    "Turbina g'ildiragi yaqindan": "The turbine runner up close",
+    "stas2001a": "stas2001a"
   }
 }
