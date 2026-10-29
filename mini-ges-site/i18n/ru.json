@@ -419,6 +419,7 @@
     "Kaplan turbinasi past naporli kanal stansiyalari uchun yaratilgan. Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.": "Турбина Каплана создана для низконапорных станций на каналах. Угол лопастей подстраивается под расход воды, поэтому турбина работает с хорошим КПД даже в дни, когда воды в канале меньше.",
     "Sichqoncha bilan aylantiring": "Поверните мышкой",
     "Turbina g'ildiragi yaqindan": "Рабочее колесо турбины вблизи",
-    "stas2001a": "stas2001a"
+    "stas2001a": "stas2001a",
+    "3D model yuklanmoqda": "3D-модель загружается"
   }
 }

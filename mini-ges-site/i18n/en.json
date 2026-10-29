@@ -405,6 +405,7 @@
     "Kaplan turbinasi past naporli kanal stansiyalari uchun yaratilgan. Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.": "The Kaplan turbine is built for low-head canal plants. Its blade pitch follows the water flow, so the turbine stays efficient even on days when the canal runs low.",
     "Sichqoncha bilan aylantiring": "Drag to rotate",
     "Turbina g'ildiragi yaqindan": "The turbine runner up close",
-    "stas2001a": "stas2001a"
+    "stas2001a": "stas2001a",
+    "3D model yuklanmoqda": "Loading the 3D model"
   }
 }

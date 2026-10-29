@@ -4,25 +4,31 @@
  *   npx esbuild js/3d/turbine3d.src.js --bundle --minify --format=iife --target=es2019 --outfile=js/vendor/turbine3d.min.js
  * The model (assets/3d/kaplan.glb) is meshopt-compressed: gltf-transform meshopt <src.glb> kaplan.glb
  * main.js loads that file only on desktops, near the section, without reduced motion.
- * Exposes window.GESTurbine.mount(canvas, glbUrl) → Promise<{ setRunning(bool) }>. */
-import { WebGLRenderer, Scene, PerspectiveCamera, HemisphereLight, DirectionalLight, MeshStandardMaterial, Box3, Vector3, Group, SRGBColorSpace, ACESFilmicToneMapping } from 'three';
+ * Exposes window.GESTurbine.mount(canvas, glbUrl, onProgress(0..1)) → Promise<{ setRunning(bool) }>. */
+import { WebGLRenderer, Scene, PerspectiveCamera, HemisphereLight, DirectionalLight, MeshStandardMaterial, Box3, Vector3, Group, SRGBColorSpace, ACESFilmicToneMapping, PMREMGenerator } from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 
-function mount(canvas, url) {
+function mount(canvas, url, onProgress) {
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
 
   const scene = new Scene();
+  // A soft studio room for reflections: bare lights alone leave metal nearly black.
+  const pmrem = new PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
   const camera = new PerspectiveCamera(32, 1, 0.01, 100);
-  scene.add(new HemisphereLight(0xcfe6ff, 0x0b1b33, 1.6));
-  const key = new DirectionalLight(0xffffff, 2.4); key.position.set(3, 4, 5); scene.add(key);
-  const rim = new DirectionalLight(0x46c6f7, 1.8); rim.position.set(-4, 1, -3); scene.add(rim);
+  scene.add(new HemisphereLight(0xe4f1ff, 0x1d3557, 0.5));
+  const key = new DirectionalLight(0xffffff, 2.0); key.position.set(3, 4, 5); scene.add(key);
+  const rim = new DirectionalLight(0x46c6f7, 2.4); rim.position.set(-4, 1, -3); scene.add(rim);
 
-  // The model ships with one untextured material: brushed steel with a faint brand-blue cast.
-  const steel = new MeshStandardMaterial({ color: 0xb9c6d4, metalness: 0.85, roughness: 0.32 });
+  // The model ships with one untextured material: light brushed steel with a faint brand-blue cast.
+  const steel = new MeshStandardMaterial({ color: 0x9aa9ba, metalness: 0.9, roughness: 0.38, envMapIntensity: 0.32 });
 
   const spin = new Group(); scene.add(spin);
   let w = 0, h = 0;
@@ -34,7 +40,7 @@ function mount(canvas, url) {
     camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix();
   };
 
-  return new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url).then((gltf) => {
+  return new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url, (e) => { if (onProgress && e.total) onProgress(e.loaded / e.total); }).then((gltf) => {
     const model = gltf.scene;
     model.traverse((o) => { if (o.isMesh) o.material = steel; });
     // Centre on the origin and scale to a unit sphere so the camera framing never depends on the file.

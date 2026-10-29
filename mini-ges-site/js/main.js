@@ -1042,20 +1042,22 @@ function mainGES() {
   const turb = $('#turb3d');
   const turbOk = turb && finePointer && !reduced && !lite && 'IntersectionObserver' in window && window.matchMedia('(min-width: 901px)').matches;
   if (turbOk) {
-    const cvs = $('.turb3d__cvs', turb);
+    const cvs = $('.turb3d__cvs', turb), pct = $('.turb3d__pct', turb);
     let view = null, visible = false;
     const load = () => new Promise((ok, fail) => {
       const s = document.createElement('script');
-      s.src = SITE_BASE + 'js/vendor/turbine3d.min.js?v=1'; s.onload = ok; s.onerror = fail;
+      s.src = SITE_BASE + 'js/vendor/turbine3d.min.js?v=2'; s.onload = ok; s.onerror = fail;
       document.head.appendChild(s);
     });
     const near = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       near.disconnect();
-      load().then(() => window.GESTurbine.mount(cvs, SITE_BASE + 'assets/3d/kaplan.glb?v=1')).then((v) => {
+      turb.classList.add('is-loading');
+      const progress = (f) => { pct.textContent = Math.round(f * 100) + '%'; };
+      load().then(() => window.GESTurbine.mount(cvs, SITE_BASE + 'assets/3d/kaplan.glb?v=1', progress)).then((v) => {
         view = v; turb.classList.add('is-3d'); view.setRunning(visible && !document.hidden);
-      }).catch(() => { /* WebGL or network failed: the poster stays */ });
-    }, { rootMargin: '600px 0px' });
+      }).catch(() => { /* WebGL or network failed: the poster stays */ }).finally(() => turb.classList.remove('is-loading'));
+    }, { rootMargin: '1200px 0px' });
     near.observe(turb);
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; view?.setRunning(visible && !document.hidden); }).observe(cvs);
     document.addEventListener('visibilitychange', () => view?.setRunning(visible && !document.hidden));

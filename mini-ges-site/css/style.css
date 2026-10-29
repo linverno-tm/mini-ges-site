@@ -380,6 +380,14 @@ main:focus { outline: none; }
 .turb3d.is-3d .turb3d__poster { opacity: 0; }
 .turb3d__hint { position: absolute; left: 16px; bottom: 14px; font-size: 11px; color: var(--muted-d); opacity: 0; transition: opacity .6s var(--ease); }
 .turb3d.is-3d .turb3d__hint { opacity: 1; }
+.turb3d__load { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: none; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 999px; background: rgba(6, 18, 38, .72); border: 1px solid rgba(70, 198, 247, .3); font-size: 12px; color: var(--white); white-space: nowrap; }
+.turb3d__load i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(70, 198, 247, .25); border-top-color: var(--sky); animation: turb3d-spin .8s linear infinite; }
+.turb3d__load b { min-width: 3.5ch; font-weight: 500; color: var(--sky); font-variant-numeric: tabular-nums; }
+.turb3d.is-loading .turb3d__load { display: inline-flex; }
+.turb3d__load b:empty { display: none; }
+.turb3d.is-loading .turb3d__poster { animation: turb3d-pulse 1.6s ease-in-out infinite; }
+@keyframes turb3d-spin { to { transform: rotate(360deg); } }
+@keyframes turb3d-pulse { 50% { opacity: .55; } }
 .turb3d__title { font-size: clamp(28px, 3vw, 42px); font-weight: 800; line-height: 1.1; text-wrap: balance; margin-bottom: 20px; }
 .turb3d__text p { color: var(--muted-d); max-width: 44ch; }
 .turb3d__text p + p { margin-top: 12px; }
