@@ -420,6 +420,13 @@
     "Sichqoncha bilan aylantiring": "Поверните мышкой",
     "Turbina g'ildiragi yaqindan": "Рабочее колесо турбины вблизи",
     "stas2001a": "stas2001a",
-    "3D model yuklanmoqda": "3D-модель загружается"
+    "3D model yuklanmoqda": "3D-модель загружается",
+    "Andijon kanali va stansiya": "Андижанский канал и станция",
+    "Aylanishni tokka aylantiradi": "Превращает вращение в ток",
+    "Ikki gorizontal agregat": "Два горизонтальных агрегата",
+    "Kanaldan olinadi va kanalga qaytadi": "Берётся из канала и возвращается в канал",
+    "Stansiya va elektr uzatish liniyasi": "Станция и линия электропередачи",
+    "Tarmoq": "Сеть",
+    "Tok qishloq va uylarga boradi": "Ток идёт в посёлки и дома"
   }
 }

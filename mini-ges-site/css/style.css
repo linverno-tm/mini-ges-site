@@ -1043,6 +1043,34 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
 .chain { display: block; width: 100%; height: auto; color: var(--brand); stroke-width: 3; margin: calc(clamp(64px, 9vw, 120px) * -.45) 0 clamp(56px, 8vw, 104px); }
 .chain text { fill: var(--muted); stroke: none; font: 500 26px var(--f-mono); text-anchor: middle; }
 @media (max-width: 620px) { .chain { stroke-width: 4.5; } .chain text { font-size: 28px; } }
+
+/* Photo chain (About): the real plant, step by step; the links and badges carry the motion.
+   Figures are display: contents so photos share row 1 (links centre on them) and captions row 2. */
+.pchain { display: grid; grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr) 40px minmax(0, 1fr) 40px minmax(0, 1fr); column-gap: 6px; row-gap: 14px; align-items: center; color: var(--brand); stroke-width: 2.2; margin: calc(clamp(64px, 9vw, 120px) * -.3) 0 clamp(56px, 8vw, 104px); }
+.pchain__step { display: contents; }
+.pchain__ph { grid-row: 1; position: relative; aspect-ratio: 4 / 3; border-radius: 18px; overflow: hidden; background: var(--tint); box-shadow: 0 18px 40px -24px rgba(11, 27, 51, .45); }
+.pchain figcaption { grid-row: 2; align-self: start; display: flex; flex-direction: column; gap: 4px; }
+.pchain__step:nth-of-type(1) > * { grid-column: 1; } .pchain__step:nth-of-type(2) > * { grid-column: 3; }
+.pchain__step:nth-of-type(3) > * { grid-column: 5; } .pchain__step:nth-of-type(4) > * { grid-column: 7; }
+.pchain__link { grid-row: 1; width: 100%; height: auto; }
+.pchain__link:nth-of-type(1) { grid-column: 2; } .pchain__link:nth-of-type(2) { grid-column: 4; } .pchain__link:nth-of-type(3) { grid-column: 6; }
+.pchain__ph img { width: 100%; height: 100%; object-fit: cover; animation: pchain-kb 14s ease-in-out infinite alternate; }
+.pchain__step:nth-of-type(2) .pchain__ph img { animation-delay: -3.5s; }
+.pchain__step:nth-of-type(3) .pchain__ph img { animation-delay: -7s; }
+.pchain__step:nth-of-type(4) .pchain__ph img { animation-delay: -10.5s; }
+.pchain__badge { position: absolute; left: 12px; bottom: 12px; width: 46px; height: 46px; padding: 3px; border-radius: 14px; background: rgba(255, 255, 255, .9); box-shadow: 0 6px 18px -8px rgba(11, 27, 51, .5); backdrop-filter: blur(6px); }
+.pchain figcaption b { font: 800 clamp(18px, 1.6vw, 22px)/1.2 var(--f-display); color: var(--ink); }
+.pchain figcaption span { font-size: 14px; color: var(--muted); }
+@media (max-width: 900px) {
+  .pchain { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; row-gap: 10px; }
+  .pchain__link { display: none; }
+  .pchain__step:nth-of-type(odd) > * { grid-column: 1; } .pchain__step:nth-of-type(even) > * { grid-column: 2; }
+  .pchain__step:nth-of-type(n+3) .pchain__ph { grid-row: 3; margin-top: 16px; } .pchain__step:nth-of-type(n+3) figcaption { grid-row: 4; }
+  .pchain__ph { border-radius: 14px; }
+  .pchain__badge { width: 38px; height: 38px; left: 8px; bottom: 8px; border-radius: 11px; }
+  .pchain figcaption span { font-size: 13px; }
+}
+@keyframes pchain-kb { from { transform: scale(1.02); } to { transform: scale(1.12) translate(-2%, -1.5%); } }
 .tl__item > div { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 18px; align-items: start; }
 .tl__mo { width: 48px; height: 48px; grid-row: span 2; color: var(--muted); transition: color .4s; }
 .tl__item.is-on .tl__mo { color: var(--brand); }
