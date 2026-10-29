@@ -143,23 +143,40 @@ function mainGES() {
 
   const loader = $('#loader');
   const langSwitch = root.classList.contains('lang-switch');   // set by js/boot.js
-  const introCss = root.classList.contains('intro-css');       // phone / repeat visit: CSS intro, no loader (js/boot.js)
-  if (reduced || !loader || langSwitch || LATE_JS || introCss) {
+  if (reduced || !loader || langSwitch || LATE_JS) {
     loader?.remove();
   } else {
-    // First desktop visit of the session: a 0.6 s brand moment on a see-through loader,
-    // while the hero is already coming in underneath (the text is never held back).
     document.body.classList.add('is-loading');
     lenis?.stop();
-    heroIntro();
+    gsap.set(splits.get(heroTitle), { yPercent: 115 });
+    gsap.set(heroFades, { autoAlpha: 0 });
     const fill = $('#loaderFill'), count = $('#loaderCount');
     const prog = { v: 0 };
     const paint = () => { fill.style.clipPath = `inset(${100 - prog.v}% 0 0 0)`; count.textContent = Math.round(prog.v); };
-    gsap.timeline({ onComplete: () => { document.body.classList.remove('is-loading'); lenis?.start(); loader.remove(); ScrollTrigger.refresh(); } })
-      .to(prog, { v: 100, duration: 0.2, ease: 'power2.out', onUpdate: paint })
-      .to('.loader__inner', { y: -20, autoAlpha: 0, duration: 0.2, ease: 'power3.in' })
-      .to('.loader__curtain', { yPercent: -100, duration: 0.3, ease: 'expo.inOut' }, '-=0.1')
-      .to(loader, { yPercent: -100, duration: 0.3, ease: 'expo.inOut' }, '<');
+    const climb = gsap.to(prog, { v: 86, duration: 1.3, ease: 'power2.out', onUpdate: paint });
+    const ready = Promise.race([
+      Promise.all([
+        document.fonts ? document.fonts.ready : Promise.resolve(),
+        new Promise(r => setTimeout(r, 900)),
+      ]),
+      new Promise(r => setTimeout(r, 2200)),
+    ]);
+    ready.then(() => {
+      climb.kill();
+      gsap.timeline()
+        .to(prog, { v: 100, duration: 0.45, ease: 'power2.inOut', onUpdate: paint })
+        .to('.loader__inner', { y: -30, autoAlpha: 0, duration: 0.6, ease: 'power3.in' }, '+=0.1')
+        .to('.loader__curtain', { yPercent: -100, duration: 0.9, ease: 'expo.inOut' }, '-=0.25')
+        .to(loader, { yPercent: -100, duration: 1, ease: 'expo.inOut' }, '-=0.55')
+        .add(() => {
+          document.body.classList.remove('is-loading');
+          lenis?.start();
+          gsap.set(splits.get(heroTitle), { clearProps: 'all' });
+          gsap.set(heroFades, { clearProps: 'all' });
+          heroIntro();
+        }, '-=0.7')
+        .add(() => { loader.remove(); ScrollTrigger.refresh(); });
+    });
   }
 
   // ------------------------------------------------------------------ hero: power grid scene
