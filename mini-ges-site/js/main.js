@@ -1073,10 +1073,24 @@ function mainGES() {
   }
 
   // ------------------------------------------------------------------ chronicle
+  // Blueprint beside the steps: one more layer of the plant per step reached; date and caption follow the step.
+  const bp = $('#chronBp'), ciAll = $$('.ci');
+  const bpLayers = bp ? $$('[data-s]', bp) : [];
+  bpLayers.forEach(g => $$('path:not(.flow):not(.dash):not(.thin):not(.bolt), rect', g).forEach(el => { el.setAttribute('pathLength', '1'); el.classList.add('draw'); }));
+  const bpSet = () => {
+    if (!bp) return;
+    const n = (reduced || !hasGsap) ? ciAll.length : ciAll.filter(it => it.classList.contains('is-on')).length;
+    bpLayers.forEach(g => g.classList.toggle('on', n >= +g.dataset.s && (!g.dataset.until || n <= +g.dataset.until)));
+    const cur = ciAll[Math.max(0, n - 1)];
+    if (cur) { $('#bpDate').textContent = $('time', cur).textContent; $('#bpCap').textContent = $('h3', cur).firstChild.textContent.trim(); }
+    $('#bpN').textContent = String(n).padStart(2, '0');
+    $('#bpBar').style.transform = `scaleX(${n / ciAll.length})`;
+  };
+  bpSet();
   const chronFill = $('#chronFill');
   if (chronFill) {
     gsap.to(chronFill, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#chron', start: 'top 70%', end: 'bottom 70%', scrub: true } });
-    $$('.ci').forEach(it => ScrollTrigger.create({ trigger: it, start: 'top 72%', end: 'max', onToggle: self => it.classList.toggle('is-on', self.isActive) }));
+    $$('.ci').forEach(it => ScrollTrigger.create({ trigger: it, start: 'top 72%', end: 'max', onToggle: self => { it.classList.toggle('is-on', self.isActive); bpSet(); } }));
   }
 
   // ------------------------------------------------------------------ calculator

@@ -614,6 +614,30 @@ main:focus { outline: none; }
 .chron__stats { display: flex; gap: 36px; }
 .chron__stats b { display: block; font: 800 clamp(34px, 3.4vw, 48px)/1 var(--f-display); color: var(--brand); letter-spacing: -.03em; }
 .chron__stats span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+/* Blueprint: the plant builds itself as the steps scroll by (main.js sets .on per layer) */
+.bp { width: 100%; margin: 36px 0 0; padding: 16px 18px 14px; border: 1px solid var(--line); border-radius: 18px; background: var(--white); color: var(--brand); stroke-width: 1.3; box-shadow: 0 24px 50px -36px rgba(11, 27, 51, .5); }
+.bp__top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.bp__date { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--azure); }
+.bp__n { font-size: 12px; color: var(--muted); } .bp__n b { font: 800 22px/1 var(--f-display); color: var(--ink); }
+.bp__bar { height: 3px; margin: 10px 0 6px; border-radius: 3px; background: var(--tint); overflow: hidden; }
+.bp__bar i { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, var(--azure), var(--green)); transition: transform .8s var(--ease); }
+.bp__svg { display: block; width: 100%; height: auto; }
+.bp__grid { color: var(--line); stroke: currentColor; opacity: .7; }
+.bp__soil { color: #B9C4D3; stroke: currentColor; }
+.bp__base { color: #8090A6; }
+.bp__water { fill: rgba(0, 160, 227, .14); }
+.bp__conc { fill: url(#bpConc); color: #8090A6; }
+.bp__crane { color: #D64545; stroke: currentColor; }
+.bp text { fill: var(--muted); stroke: none; font: 500 10px var(--f-mono); text-anchor: middle; letter-spacing: .04em; }
+.bp text.end { text-anchor: end; }
+.bp .dash { stroke-dasharray: 4 4; }
+.bp .thin { stroke-width: .8; opacity: .8; }
+.bp [data-s] { opacity: 0; transition: opacity .7s var(--ease); }
+.bp [data-s].on { opacity: 1; }
+.bp [data-s] .draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s var(--ease); }
+.bp [data-s].on .draw { stroke-dashoffset: 0; }
+.bp__cap { margin-top: 4px; font: 700 15px/1.3 var(--f-display); color: var(--ink); }
+@media (max-height: 1000px) { .chron__stats { display: none; } .chron__lead { margin-bottom: 0; } .bp { margin-top: 24px; } }
 .chron__list { list-style: none; margin: 0; padding: 0 0 0 36px; position: relative; display: grid; gap: 28px; }
 .chron__line { position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
 .chron__line i { position: absolute; inset: 0; background: linear-gradient(var(--azure), var(--green)); transform: scaleY(0); transform-origin: top; }
@@ -806,7 +830,8 @@ input[type="range"]:active::-webkit-slider-thumb { box-shadow: 0 0 0 12px rgba(7
 
 /* ---------------- contact ---------------- */
 .contact { background: radial-gradient(70% 70% at 0% 100%, rgba(84, 175, 58, .18), transparent 60%), radial-gradient(70% 70% at 100% 0%, rgba(0, 74, 173, .6), transparent 60%), var(--ink); }
-.contact__title { font-size: clamp(44px, 9vw, 148px); line-height: .95; font-weight: 800; letter-spacing: -.045em; margin-bottom: clamp(56px, 8vw, 96px); max-width: 12ch; }
+/* Title sits in the left column, so the form rises beside it instead of leaving the right half empty */
+.contact__title { font-size: clamp(44px, 6.2vw, 112px); line-height: .95; font-weight: 800; letter-spacing: -.045em; margin-bottom: clamp(40px, 5vw, 64px); max-width: 10ch; }
 .contact__grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 64px; align-items: start; }
 .team { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .person { display: grid; gap: 14px; min-width: 0; }
@@ -941,6 +966,7 @@ a.copy { font: 500 12px/1 var(--f-mono); color: var(--sky); padding: 8px 12px; b
   .process__head { position: static; }
   .chron__grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .chron__head { position: static; }
+  .bp { display: none; }
   .gallery__pin { min-height: 0; padding-block: var(--sec) calc(var(--sec) * .6); gap: 28px; }
   .gallery__hint { display: inline-flex; }
   .gallery__head { grid-template-columns: minmax(0, 1fr); }

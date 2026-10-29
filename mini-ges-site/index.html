@@ -476,6 +476,38 @@
         <div><b>12</b><span class="mono">bosqich</span></div>
         <div><b>400</b><span class="mono">m kanal</span></div>
       </div>
+      <figure class="bp mo" id="chronBp" aria-hidden="true">
+        <div class="bp__top"><span class="bp__date mono" id="bpDate">2025 · May</span><span class="bp__n mono"><b id="bpN">00</b> / 12</span></div>
+        <div class="bp__bar"><i id="bpBar"></i></div>
+        <svg class="bp__svg" viewBox="0 36 520 254">
+          <defs>
+            <pattern id="bpGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0v20" stroke-width=".5"/></pattern>
+            <pattern id="bpSoil" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0v8" stroke-width=".7"/></pattern>
+            <pattern id="bpConc" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".9"/><circle cx="7" cy="7" r=".7"/></pattern>
+          </defs>
+          <rect class="bp__grid" y="36" width="520" height="254" fill="url(#bpGrid)" stroke="none"/>
+          <g class="bp__base">
+            <path class="bp__soil" d="M0 210h10l20 40h80l20-40h150l2 70h136l2-70h80v80H0Z" fill="url(#bpSoil)" stroke="none"/>
+            <path d="M0 210h10M130 210h150M420 210h100"/>
+            <path d="M10 210l20 40h80l20-40"/>
+            <path class="bp__water" d="M18 226l10 24h84l10-24Z" stroke="none"/>
+            <path class="flow ac" d="M20 226h100"/>
+            <text x="70" y="272">Andijon kanali</text>
+          </g>
+          <g data-s="1"><path class="dash" d="M270 210V96M430 210V96M270 96h160"/><path d="M350 210l-6-16h12Z"/><path class="dash" d="M244 226v36M238 226h12M238 262h12"/><text x="232" y="248" class="end">H</text></g>
+          <g data-s="3" data-until="11"><path d="M482 210V44M474 210l8-12 8 12M372 50h140M482 44l-90 6M482 44l26 6"/><path class="dash" d="M410 50v52"/><path d="M404 102h12l-6 8Z"/></g>
+          <g data-s="4"><path class="dash" d="M280 210l2 70h136l2-70"/></g>
+          <g data-s="5"><path class="thin" d="M292 240v38M304 240v38M316 240v38M328 240v38M340 240v38M352 240v38M364 240v38M376 240v38M388 240v38M400 240v38M412 240v38M286 250h130M286 264h130"/></g>
+          <g data-s="6"><rect class="bp__conc" x="282" y="250" width="136" height="30"/></g>
+          <g data-s="7"><rect x="300" y="226" width="96" height="22" rx="11"/><path d="M396 237h22"/><text x="348" y="221">2 × agregat</text></g>
+          <g data-s="8"><path d="M130 226h152M130 210v16M282 210v16"/><text x="206" y="204">400 m</text></g>
+          <g data-s="9"><path d="M286 250V118M350 250V118M414 250V118M278 118h144M286 160h128"/></g>
+          <g data-s="10"><path class="flow ac" d="M132 219h148"/><path class="flow ac" style="--d:.4s" d="M418 262h12"/></g>
+          <g data-s="11"><rect x="276" y="196" width="8" height="34"/><path class="dash" d="M280 196v-36"/><path class="bp__crane" d="M290 132h120M330 132v12M326 144h8"/></g>
+          <g data-s="12"><g class="spin" style="--t:1.2s;transform-box:view-box;transform-origin:348px 237px"><path d="M348 229v16M340 237h16M342.3 231.3l11.4 11.4M353.7 231.3l-11.4 11.4"/></g><path d="M482 210V60M470 210l12-150 12 150M468 90h28M472 120h20"/><path class="dim" d="M414 140Q448 104 482 92"/><path class="flow gr" d="M414 140Q448 104 482 92"/><path class="bolt gr" d="M452 64l-10 16h7l-3 12 11-17h-7l3-11Z"/></g>
+        </svg>
+        <figcaption class="bp__cap" id="bpCap">Joy tanlandi</figcaption>
+      </figure>
     </header>
     <ol class="chron__list" id="chron">
       <li class="chron__line" aria-hidden="true"><i id="chronFill"></i></li>
@@ -828,9 +860,9 @@
 <!-- ============ CONTACT ============ -->
 <section class="contact section section--dark" id="contact">
   <div class="wrap">
-    <h2 class="contact__title" data-split>Suvingiz bekorga oqmasin</h2>
     <div class="contact__grid">
       <div class="contact__left">
+        <h2 class="contact__title" data-split>Suvingiz bekorga oqmasin</h2>
         <p class="eyebrow eyebrow--light">Rahbariyat</p>
         <div class="team">
           <article class="person">
