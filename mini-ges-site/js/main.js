@@ -1081,6 +1081,11 @@ function mainGES() {
     document.addEventListener('visibilitychange', () => view?.setRunning(visible && !document.hidden));
   }
 
+  // ------------------------------------------------------------------ blurred previews (build.py, tools/lqip.py) leave once the photo is in
+  const unblur = img => { if (img.style.background) img.style.background = ''; };
+  $$('img[style*="background"]').forEach(img => { if (img.complete && img.naturalWidth) unblur(img); });
+  document.addEventListener('load', e => { if (e.target.tagName === 'IMG') unblur(e.target); }, true);
+
   // ------------------------------------------------------------------ warm-up: fetch the remaining photos one at a time, in page order and at
   // low priority, once the page has loaded, so they are ready before the reader scrolls to them (skipped on slow links / data saver)
   if (!lite) {
