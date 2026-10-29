@@ -687,10 +687,6 @@ function mainGES() {
     if (!diaReal) return;
     real.key = key;
     if (!real.near && !realIn(500)) return;
-    if (!real.near) {   // first time near: fetch every step's still, so a fast scroll never waits on one
-      const sfx0 = real.hd ? '-hd' : realBig() ? '' : '-sm';
-      Object.keys(REAL).forEach(k => { new Image().src = SITE_BASE + 'assets/real/' + 'real-' + k + sfx0 + '.webp?v=' + REAL_V; });
-    }
     real.near = true;
     const layer = realLayers[real.front];
     if (layer.dataset.key === key) { realPlay(); return; }
@@ -700,22 +696,40 @@ function mainGES() {
     back.classList.toggle('is-still', !REAL[key] || reduced);
     back.classList.toggle('has-video', !!REAL[key] && !reduced);
     v.classList.remove('is-ready');
+    v.oncanplay = null; v.removeAttribute('src'); v.load();   // drop a clip still downloading for a step the reader already left
+    // The still comes first (high priority); its clip starts only once the still is on screen, so on a slow link
+    // a fast scroll is never stuck behind megabytes of video.
     const swap = () => {
       if (back.dataset.key !== real.key) return;
       back.classList.remove('is-out'); layer.classList.add('is-out');
       real.front = 1 - real.front;
       setTimeout(() => { const old = $('video', layer); if (layer.classList.contains('is-out')) old.pause(); }, 1100);
+      if (REAL[key] && !reduced) {
+        v.oncanplay = () => { v.classList.add('is-ready'); if (back === realLayers[real.front]) realPlay(); };
+        v.src = base + sfx + '.mp4?v=' + REAL_V; v.load();
+      }
       realPlay();
+      realWarm();
     };
     const url = base + sfx + '.webp?v=' + REAL_V;
     const tagText = REAL_FOOTAGE[key] ? L.realVid : L.aiViz;
     img.alt = ($('#diaName') ? $('#diaName').textContent + ', ' : '') + tagText;
     if (realTag) { realTag.textContent = tagText; realTag.classList.toggle('is-footage', !!REAL_FOOTAGE[key]); }
-    if (img.src === url && img.complete) swap(); else { img.onload = swap; img.src = url; }
-    if (REAL[key] && !reduced) {
-      v.oncanplay = () => { v.classList.add('is-ready'); if (back === realLayers[real.front]) realPlay(); };
-      v.src = base + sfx + '.mp4?v=' + REAL_V; v.load();
-    } else { v.removeAttribute('src'); v.load(); }
+    if (img.src === url && img.complete) swap(); else { img.fetchPriority = 'high'; img.onload = swap; img.src = url; }
+  };
+  // After the first still is up, fetch the other steps' stills one by one at low priority: later steps then swap at once.
+  const realWarm = () => {
+    if (real.warm) return;
+    real.warm = true;
+    const sfx = real.hd ? '-hd' : realBig() ? '' : '-sm', keys = Object.keys(REAL);
+    const next = () => {
+      const k = keys.shift();
+      if (k === undefined) return;
+      const im = new Image();
+      im.fetchPriority = 'low'; im.onload = im.onerror = next;
+      im.src = SITE_BASE + 'assets/real/' + 'real-' + k + sfx + '.webp?v=' + REAL_V;
+    };
+    next();
   };
   if (diaReal && 'IntersectionObserver' in window) {
     new IntersectionObserver((es) => es.forEach((e) => {
@@ -1067,20 +1081,21 @@ function mainGES() {
     document.addEventListener('visibilitychange', () => view?.setRunning(visible && !document.hidden));
   }
 
-  // ------------------------------------------------------------------ warm-up: fetch the remaining photos, two at a time in page order,
-  // once the page has loaded, so they are ready before the reader scrolls to them (skipped on slow links / data saver)
+  // ------------------------------------------------------------------ warm-up: fetch the remaining photos one at a time, in page order and at
+  // low priority, once the page has loaded, so they are ready before the reader scrolls to them (skipped on slow links / data saver)
   if (!lite) {
     const warm = () => {
       const queue = $$('img[loading="lazy"]').filter(i => !i.complete);
       let active = 0;
       const next = () => {
-        while (active < 2 && queue.length) {
+        while (active < 1 && queue.length) {
           const img = queue.shift();
           if (img.complete) continue;
           active++;
           const done = () => { active--; next(); };
           img.addEventListener('load', done, { once: true });
           img.addEventListener('error', done, { once: true });
+          img.fetchPriority = 'low';
           img.loading = 'eager';
         }
       };
