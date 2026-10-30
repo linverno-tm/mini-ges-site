@@ -21,3 +21,6 @@ video-ai/real-paket/
 video-ai/tg-prev/
 video-ai/qoshimcha/
 video-ai/kadrlar-4k/
+
+# npm install in tools/3d
+node_modules/
