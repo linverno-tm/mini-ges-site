@@ -101,7 +101,7 @@ for name in PAGES:
 css = open(os.path.join(SITE, 'css', 'style.css'), encoding='utf-8').read()
 for ref in re.findall(r'url\(["\']?([^"\')]+)', css):
     if not ref.startswith('%23'):          # fragment refs inside inline data: SVGs
-        check_ref('style.css', ref, 'url()')
+        check_ref('style.css', ref[3:] if ref.startswith('../') else ref, 'url()')   # css/ -> site root
 
 js = open(os.path.join(SITE, 'js', 'main.js'), encoding='utf-8').read()
 for ref in set(re.findall(r'["\'](assets/[^"\']+)["\']', js)):

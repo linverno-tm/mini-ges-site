@@ -173,7 +173,9 @@ def main():
         html = re.sub(r'src="((?:\.\./)?js/main\.js)"', rf'src="\1?v={js_v}"', html)
         html = re.sub(r'(src="(?:\.\./)?js/vendor/[^"?]+)"', r'\1?v=1"', html)
         html = re.sub(r'\n\s*\n', '\n', html)
-        html, n1 = re.subn(r'<link rel="stylesheet" href="(?:\.\./)?css/style\.css">', lambda m: f'<style>{css_inline}</style>', html)
+        # url(../assets/...) in the CSS is relative to css/; inline it is relative to the page
+        css_here = css_inline if 'src="../js/main.js' in html else css_inline.replace('url(../assets/', 'url(assets/')
+        html, n1 = re.subn(r'<link rel="stylesheet" href="(?:\.\./)?css/style\.css">', lambda m: f'<style>{css_here}</style>', html)
         html, n2 = re.subn(r'<script src="(?:\.\./)?js/boot\.js"></script>', lambda m: f'<script>{boot_inline}</script>', html)
         html, n3 = re.subn(r"script-src 'self'", lambda m: f"script-src 'self' 'sha256-{boot_hash}'", html, count=1)
         assert n1 == n2 == n3 == 1, (n1, n2, n3)
@@ -204,7 +206,7 @@ def main():
 
     # service worker: version = content hash of the pages, precache the shell (not the photos)
     build_id = hashlib.md5((css_v + js_v + open(os.path.join(DIST, 'index.html'), 'rb').read().hex()[:4000]).encode()).hexdigest()[:10]
-    precache = ['./', 'ru/', 'en/', f'js/main.js?v={js_v}',
+    precache = ['./', 'ru/', 'en/', f'js/main.js?v={js_v}', 'assets/fonts/unbounded-latin.woff2',
                 'assets/logo-ulugnor.webp', 'assets/logo-baliqchi.webp', 'assets/favicon.png', 'manifest.webmanifest']
     sw = open(os.path.join(ROOT, 'sw.js'), encoding='utf-8').read()
     sw = sw.replace('%BUILD_ID%', build_id)
@@ -212,7 +214,7 @@ def main():
     write('sw.js', sw)
 
     # only what pages reference: web images + icons (source PNG logos stay out)
-    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg', '.mp4', '.glb')) or f in (
+    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg', '.mp4', '.glb', '.woff2')) or f in (
         'favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'))
     copy_tree('js/vendor', lambda f: f.endswith('.js'))
     shutil.copy2(os.path.join(ROOT, '.htaccess'), os.path.join(DIST, '.htaccess'))

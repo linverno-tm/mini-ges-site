@@ -15,3 +15,5 @@ Saytdagi hamma vizual — kompaniyaning o'z materiallari yoki ochiq litsenziyali
 | `3d/kaplan.glb`, `3d/kaplan-poster.webp` | Kaplan turbinasi g'ildiragi (namunaviy) | Sketchfab: [«hydro turbine kaplan»](https://sketchfab.com/3d-models/hydro-turbine-kaplan-9ec55a901f5b482a837499bc1be6bed2), muallif stas2001a, meshopt bilan siqilgan (0,3 MB) | CC BY 4.0 — muallif saytda ko'rsatilgan |
 
 Unsplash/Pexels rasmlari ishlatilmagan: obyektning o'z suratlari yetarli.
+
+Shrift `fonts/unbounded-latin.woff2` — Unbounded (NONTYPE), SIL Open Font License 1.1; Google Fonts'dagi lotin qismi, tezlik uchun saytning o'zidan beriladi. Kirill qismi va Inter Google Fonts'dan yuklanadi.
