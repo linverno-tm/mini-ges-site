@@ -5,7 +5,7 @@ Usage:  python build.py            ->  dist/ (upload its contents to any static 
 
 Needs Node.js (esbuild is fetched by npx on first run) and Python 3.8+.
 """
-import datetime, hashlib, html, json, os, re, shutil, subprocess, sys
+import base64, datetime, hashlib, html, json, os, re, shutil, subprocess, sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'tools'))
 import i18n  # noqa: E402  (tools/i18n.py)
@@ -158,16 +158,26 @@ def main():
     esbuild('js/boot.js', 'js/boot.js', '--target=es2019')
     esbuild('css/style.css', 'css/style.css')
 
-    css_v, js_v, boot_v = fingerprint('css/style.css'), fingerprint('js/main.js'), fingerprint('js/boot.js')
+    css_v, js_v = fingerprint('css/style.css'), fingerprint('js/main.js')
     source = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
     source = lqip(source)
 
+    # First paint needs only the HTML: the CSS (~9 KB gzip) and the tiny boot script are inlined,
+    # saving two round trips on a phone. The inline boot script is allowed by its CSP hash.
+    css_inline = open(os.path.join(DIST, 'css/style.css'), encoding='utf-8').read().strip()
+    boot_inline = open(os.path.join(DIST, 'js/boot.js'), encoding='utf-8').read().strip()
+    boot_hash = base64.b64encode(hashlib.sha256(boot_inline.encode('utf-8')).digest()).decode()
+    assert '</style' not in css_inline and '</script' not in boot_inline
+
     def finish(html):
-        html = re.sub(r'href="((?:\.\./)?css/style\.css)"', rf'href="\1?v={css_v}"', html)
         html = re.sub(r'src="((?:\.\./)?js/main\.js)"', rf'src="\1?v={js_v}"', html)
-        html = re.sub(r'src="((?:\.\./)?js/boot\.js)"', rf'src="\1?v={boot_v}"', html)
         html = re.sub(r'(src="(?:\.\./)?js/vendor/[^"?]+)"', r'\1?v=1"', html)
-        return re.sub(r'\n\s*\n', '\n', html)
+        html = re.sub(r'\n\s*\n', '\n', html)
+        html, n1 = re.subn(r'<link rel="stylesheet" href="(?:\.\./)?css/style\.css">', lambda m: f'<style>{css_inline}</style>', html)
+        html, n2 = re.subn(r'<script src="(?:\.\./)?js/boot\.js"></script>', lambda m: f'<script>{boot_inline}</script>', html)
+        html, n3 = re.subn(r"script-src 'self'", lambda m: f"script-src 'self' 'sha256-{boot_hash}'", html, count=1)
+        assert n1 == n2 == n3 == 1, (n1, n2, n3)
+        return html
 
     write('index.html', finish(template(source)).replace('<!--NEWS-->', render_news('uz')))
 
@@ -194,7 +204,7 @@ def main():
 
     # service worker: version = content hash of the pages, precache the shell (not the photos)
     build_id = hashlib.md5((css_v + js_v + open(os.path.join(DIST, 'index.html'), 'rb').read().hex()[:4000]).encode()).hexdigest()[:10]
-    precache = ['./', 'ru/', 'en/', f'css/style.css?v={css_v}', f'js/main.js?v={js_v}', f'js/boot.js?v={boot_v}',
+    precache = ['./', 'ru/', 'en/', f'js/main.js?v={js_v}',
                 'assets/logo-ulugnor.webp', 'assets/logo-baliqchi.webp', 'assets/favicon.png', 'manifest.webmanifest']
     sw = open(os.path.join(ROOT, 'sw.js'), encoding='utf-8').read()
     sw = sw.replace('%BUILD_ID%', build_id)
