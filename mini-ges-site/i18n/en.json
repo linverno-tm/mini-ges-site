@@ -1,7 +1,7 @@
 {
   "html": {
-    "hero.title": "“Generate <em>electricity</em> from the water on your land”",
-    "hero.quote": "<img class=\"pres__photo\" src=\"assets/president/mirziyoyev-2025-12-05-sm.webp\" srcset=\"assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w\" sizes=\"(max-width: 620px) 84px, 160px\" width=\"600\" height=\"750\" alt=\"President Shavkat Mirziyoyev speaking at the «Sustainable Energy» conference, 5 December 2025\" decoding=\"async\"><blockquote class=\"pres__q\"><p>Our entrepreneurs have also made efficient use of water resources and, this year, built 40 small and micro hydropower plants with a capacity of 40 megawatts. <strong>As a result, 120 million kilowatt-hours of electricity were generated, providing an additional source of income.</strong></p></blockquote><figcaption class=\"pres__by\"><b>Shavkat Mirziyoyev</b><span>President of the Republic of Uzbekistan</span><small>Address at the forum «Powering the Future – Sustainable Energy for New Uzbekistan», 5 December 2025 · <a href=\"https://president.uz/en/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></small></figcaption>"
+    "hero.title": "Generate electricity from the water on your land",
+    "hero.quote": "<img class=\"pres__photo\" src=\"assets/president/mirziyoyev-2025-12-05-sm.webp\" srcset=\"assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w\" sizes=\"(max-width: 620px) 84px, 160px\" width=\"600\" height=\"750\" alt=\"President Shavkat Mirziyoyev speaking at the «Sustainable Energy» conference, 5 December 2025\" loading=\"lazy\" decoding=\"async\"><blockquote class=\"pres__q\"><p>Our entrepreneurs have also made efficient use of water resources and, this year, built small and micro hydropower plants with a total capacity of 40 megawatts. <strong>As a result, 120 million kilowatt-hours of electricity were generated, providing an additional source of income.</strong></p></blockquote><figcaption class=\"pres__by\"><b>Shavkat Mirziyoyev</b><span>President of the Republic of Uzbekistan</span><small>Address at the forum «Powering the Future – Sustainable Energy for New Uzbekistan», 5 December 2025 · <a href=\"https://president.uz/en/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></small></figcaption>"
   },
   "text": {
     "MINI GES — mini gidroelektrostansiyalar": "MINI GES — small hydropower plants",
@@ -416,6 +416,23 @@
     "Tok qishloq va uylarga boradi": "Power goes to villages and homes",
     "2 × agregat": "2 × units",
     "Andijon kanali": "Andijan canal",
-    "H": "H"
+    "H": "H",
+    "3D modelni aylantirish": "Rotate the 3D model",
+    "400 metrlik beton kanal": "The 400-metre concrete channel",
+    "Andijon kanali, Baliqchi GES binosi va elektr uzatish liniyasi": "The Andijan canal, the Baliqchi HPP powerhouse and the power line",
+    "Baliqchi GES binosi kechqurun, suv turbinadan kanalga qaytmoqda": "Baliqchi HPP at dusk, water returning from the turbines to the canal",
+    "Baliqchi GES: ikki gorizontal gidroagregat montaji": "Baliqchi HPP: installing two horizontal hydro units",
+    "Bu namunaviy model, bizning agregatimizning aniq nusxasi emas. 3D model: «hydro turbine kaplan», muallif": "This is a generic model, not an exact copy of our unit. 3D model: “hydro turbine kaplan” by",
+    "Haqiqiy video": "Real footage",
+    "Ikki gorizontal turbina montaji": "Installing two horizontal turbines",
+    "Kanal bo'yida mini-GES loyihalaymiz, quramiz va kalitini topshiramiz.": "We design, build and hand over turnkey small hydropower plants on irrigation canals.",
+    "Keyingi": "Next",
+    "Oldingi": "Previous",
+    "Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.": "The blade pitch adapts to the flow, so the turbine keeps a good efficiency even on days when the canal carries less water.",
+    "Suv kanaldan olinadi, turbinadan o'tadi, tok tarmoqqa ketadi": "Water is taken from the canal, passes the turbine, and the current goes to the grid",
+    "Tanlang": "Choose",
+    "Yilnoma": "Chronicle",
+    "Generate electricity from the water on your land": "Generate electricity from the water on your land",
+    "Our entrepreneurs have also made efficient use of water resources and, this year, built small and micro hydropower plants with a total capacity of 40 megawatts.": "Our entrepreneurs have also made efficient use of water resources and, this year, built small and micro hydropower plants with a total capacity of 40 megawatts."
   }
 }

@@ -7,20 +7,27 @@ mini gidroelektrostansiyalarini tanishtiruvchi va mini-GES qurish xizmatini sotu
 
 [![CI / Deploy](https://github.com/linverno-tm/mini-ges-site/actions/workflows/deploy.yml/badge.svg)](https://github.com/linverno-tm/mini-ges-site/actions/workflows/deploy.yml)
 
+## Dizayn g'oyasi (01.11.2026 redizayn)
+
+**Suv kuchi → elektr.** Sahifa — kanal: yuqorida suv (chuqur kanal ko'ki, azure), turbina bo'limidan keyin tok (volt yashil).
+Chap chetdagi ingichka oqim chizig'i, «Qanday ishlaydi»dagi sxema va kalkulyatordagi jonli chizma — bitta g'oya.
+Shriftlar: Unbounded (sarlavha) + Inter (matn). Bo'limlar: kanal (hero) → qanday ishlaydi → turbina 3D → ikki obyekt → yilnoma → hisob-kitob → aloqa.
+
 ## Texnik qarorlar
 
 | Qaror | Sabab |
 |---|---|
 | Framework'siz statik HTML/CSS/JS | Bitta sahifali marketing sayti: server ham, build zanjiri ham minimal. Istalgan statik hostingda ishlaydi |
-| Kutubxonalar repo ichida (`js/vendor`) | CDN'ga bog'liq emas, yuklanish tartibi kafolatlangan, bitta tashqi ulanish kam |
-| "Qanday ishlaydi" maketi — generatsiya qilingan izometrik SVG | ~53 KB, har qanday ekranda tiniq, arzon telefonda ham silliq. 3D model (WebGL) 1–3 MB bo'lardi |
+| Animatsiya kutubxonasiz (01.11 redizayn) | Harakat CSS'da (transition, keyframes, scroll-driven), JS faqat holatni almashtiradi. GSAP/Lenis olib tashlandi: telefonda ~130 KB kam JS |
+| "Qanday ishlaydi" — haqiqiy kadrlar + kichik SVG sxema | Qadam ekran o'rtasiga kelganda kadr almashadi; video faqat ko'rinib turganda o'ynaydi, data saver'da faqat surat |
+| 3D Kaplan turbinasi (Sketchfab CC BY, 0,3 MB) | Kompyuterda yaqinlashganda, telefonda faqat tugma bosilganda yuklanadi; avval poster |
 | Rasmlar WebP, 2 o'lcham (`srcset`), `loading="lazy"` | Birinchi ochilishda rasm yuklanmaydi, telefon kichik nusxani oladi |
-| Hero CSS + JS animatsiyasi, CSS failsafe | Skriptlar yuklanmasa ham sahifa ochiladi (yuklanish ekrani 6 soniyada o'zi yo'qoladi) |
+| Yuklanish ekrani yo'q, sarlavha darhol ko'rinadi | LCP elementi (sarlavha yoki kanal kadri) hech qachon opacity:0 dan boshlanmaydi; video kadr yuklangandan keyin ustiga chiqadi |
 | `prefers-reduced-motion` | Harakatni kamaytirishni yoqqan foydalanuvchilarga animatsiyasiz versiya |
 | "Soha yangiliklari" build vaqtida HTML'ga yoziladi | Sahifa ochilganda begona saytga so'rov ketmaydi: tez, CSP buzilmaydi, oflaynda ham ko'rinadi |
-| UZ/RU almashtirish yuklanish ekranisiz | `js/boot.js` birinchi kadrdan oldin ishlaydi: o'quvchi turgan bo'limida qoladi |
+| UZ/RU almashtirish yuklanish ekranisiz | `js/boot.js` birinchi kadrdan oldin ishlaydi: Baliqchi GES holati (ishga tushgan/yo'q) va til almashganda o'sha bo'lim |
 
-**Performance budjeti** (telefon, birinchi ochilish): HTML+CSS+JS+shriftlar ≈ 250 KB (gzip bilan ≈ 170 KB), rasm — 0 KB.
+**Performance budjeti** (telefon, birinchi ochilish): HTML+CSS+JS+shriftlar gzip bilan ≈ 60 KB, birinchi ekran rasmi ≈ 66 KB (telefon), video sahifa yuklangandan keyin.
 
 ## Tuzilishi
 
@@ -28,9 +35,9 @@ mini gidroelektrostansiyalarini tanishtiruvchi va mini-GES qurish xizmatini sotu
 mini-ges-site/
   index.html            sahifa: barcha matnlar, SEO/OG meta, JSON-LD, CSP
   css/style.css         dizayn tizimi (tokenlar :root da, brendbuk ranglari va shriftlari)
-  js/main.js            animatsiyalar va interaktivlik (bo'limlarga ajratilgan)
-  js/vendor/            GSAP 3.12.5, ScrollTrigger, Lenis 1.1.13
-  assets/               logotiplar, ikonkalar, og-image, galereya, yilnoma, jamoa (WebP)
+  js/main.js            interaktivlik: qadamlar, video, 3D, kalkulyator, forma (kutubxonasiz)
+  js/vendor/            turbine3d.min.js (three.js + Kaplan modeli, faqat kerak bo'lganda yuklanadi)
+  assets/               logotiplar, ikonkalar, og-image, galereya, yilnoma, jamoa (WebP); manbalar: assets/MANBALAR.md
   404.html  robots.txt  sitemap.xml  manifest.webmanifest  .htaccess
   build.py              production build -> dist/
 tools/check_site.py     statik sifat tekshiruvi (CI'da ishlaydi)

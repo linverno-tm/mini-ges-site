@@ -1,7 +1,7 @@
 {
   "html": {
-    "hero.title": "«Производите <em>электричество</em> из воды на своей земле»",
-    "hero.quote": "<img class=\"pres__photo\" src=\"assets/president/mirziyoyev-2025-12-05-sm.webp\" srcset=\"assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w\" sizes=\"(max-width: 620px) 84px, 160px\" width=\"600\" height=\"750\" alt=\"Президент Шавкат Мирзиёев выступает на конференции «Устойчивая энергетика», 5 декабря 2025\" decoding=\"async\"><blockquote class=\"pres__q\"><p>Наши предприниматели, эффективно используя водные ресурсы, в этом году также построили малые и микроГЭС на 40 мегаватт. <strong>В результате выработано 120 миллионов киловатт-часов электроэнергии, что обеспечило им дополнительный источник дохода.</strong></p></blockquote><figcaption class=\"pres__by\"><b>Шавкат Мирзиёев</b><span>Президент Республики Узбекистан</span><small>Выступление на конференции «Устойчивая энергетика», 5 декабря 2025 · <a href=\"https://president.uz/ru/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></small></figcaption>"
+    "hero.title": "Производите электричество из воды на своей земле",
+    "hero.quote": "<img class=\"pres__photo\" src=\"assets/president/mirziyoyev-2025-12-05-sm.webp\" srcset=\"assets/president/mirziyoyev-2025-12-05-sm.webp 300w, assets/president/mirziyoyev-2025-12-05.webp 600w\" sizes=\"(max-width: 620px) 84px, 160px\" width=\"600\" height=\"750\" alt=\"Президент Шавкат Мирзиёев выступает на конференции «Устойчивая энергетика», 5 декабря 2025\" loading=\"lazy\" decoding=\"async\"><blockquote class=\"pres__q\"><p>Наши предприниматели, эффективно используя водные ресурсы, в этом году также построили малые и микроГЭС на 40 мегаватт. <strong>В результате выработано 120 миллионов киловатт-часов электроэнергии, что обеспечило им дополнительный источник дохода.</strong></p></blockquote><figcaption class=\"pres__by\"><b>Шавкат Мирзиёев</b><span>Президент Республики Узбекистан</span><small>Выступление на конференции «Устойчивая энергетика», 5 декабря 2025 · <a href=\"https://president.uz/ru/lists/view/8751\" target=\"_blank\" rel=\"noopener\">president.uz</a></small></figcaption>"
   },
   "text": {
     "MINI GES — mini gidroelektrostansiyalar": "MINI GES — мини-гидроэлектростанции",
@@ -430,6 +430,21 @@
     "Tok qishloq va uylarga boradi": "Ток идёт в посёлки и дома",
     "2 × agregat": "2 × агрегата",
     "Andijon kanali": "Андижанский канал",
-    "H": "H"
+    "H": "H",
+    "3D modelni aylantirish": "Покрутить 3D-модель",
+    "400 metrlik beton kanal": "Бетонный канал длиной 400 м",
+    "Andijon kanali, Baliqchi GES binosi va elektr uzatish liniyasi": "Андижанский канал, здание Балыкчи ГЭС и линия электропередачи",
+    "Baliqchi GES binosi kechqurun, suv turbinadan kanalga qaytmoqda": "Здание Балыкчи ГЭС вечером, вода после турбины возвращается в канал",
+    "Baliqchi GES: ikki gorizontal gidroagregat montaji": "Балыкчи ГЭС: монтаж двух горизонтальных гидроагрегатов",
+    "Bu namunaviy model, bizning agregatimizning aniq nusxasi emas. 3D model: «hydro turbine kaplan», muallif": "Это типовая модель, а не точная копия нашего агрегата. 3D-модель: «hydro turbine kaplan», автор",
+    "Haqiqiy video": "Реальное видео",
+    "Ikki gorizontal turbina montaji": "Монтаж двух горизонтальных турбин",
+    "Kanal bo'yida mini-GES loyihalaymiz, quramiz va kalitini topshiramiz.": "Проектируем, строим и сдаём под ключ мини-ГЭС на берегу канала.",
+    "Keyingi": "Далее",
+    "Oldingi": "Назад",
+    "Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.": "Угол лопастей подстраивается под расход воды, поэтому турбина работает с хорошим КПД даже в дни, когда воды в канале меньше.",
+    "Suv kanaldan olinadi, turbinadan o'tadi, tok tarmoqqa ketadi": "Вода берётся из канала, проходит через турбину, ток уходит в сеть",
+    "Tanlang": "Выберите",
+    "Yilnoma": "Хроника"
   }
 }

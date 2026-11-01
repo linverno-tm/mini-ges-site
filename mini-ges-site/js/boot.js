@@ -1,7 +1,11 @@
 /* Runs in <head>, before the first paint (tiny and blocking on purpose).
-   After a UZ/RU switch the reader stays in place: no loader, the page fades in where they were.
-   The rest happens in main.js (search "language switch"). */
-try {
-  var s = JSON.parse(sessionStorage.getItem('ges:lang-switch') || 'null');
-  if (s && Date.now() - s.t < 15000) document.documentElement.classList.add('lang-switch');
-} catch (e) { /* storage blocked: normal load with the loader */ }
+   1) Baliqchi GES launch state is decided here, so "under construction" text never flashes and swaps (no CLS).
+   2) After a language switch the reader returns to the same section (main.js reads the note). */
+(function () {
+  var d = document.documentElement;
+  if (Date.now() > Date.parse('2026-10-31T23:59:59+05:00')) d.classList.add('launched');
+  try {
+    var s = JSON.parse(sessionStorage.getItem('ges:lang-switch') || 'null');
+    if (s && Date.now() - s.t < 15000) d.classList.add('lang-switch');
+  } catch (e) { /* storage blocked */ }
+})();

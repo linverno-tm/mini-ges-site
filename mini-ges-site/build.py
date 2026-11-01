@@ -195,7 +195,6 @@ def main():
     # service worker: version = content hash of the pages, precache the shell (not the photos)
     build_id = hashlib.md5((css_v + js_v + open(os.path.join(DIST, 'index.html'), 'rb').read().hex()[:4000]).encode()).hexdigest()[:10]
     precache = ['./', 'ru/', 'en/', f'css/style.css?v={css_v}', f'js/main.js?v={js_v}', f'js/boot.js?v={boot_v}',
-                'js/vendor/gsap.min.js?v=1', 'js/vendor/ScrollTrigger.min.js?v=1', 'js/vendor/lenis.min.js?v=1',
                 'assets/logo-ulugnor.webp', 'assets/logo-baliqchi.webp', 'assets/favicon.png', 'manifest.webmanifest']
     sw = open(os.path.join(ROOT, 'sw.js'), encoding='utf-8').read()
     sw = sw.replace('%BUILD_ID%', build_id)
