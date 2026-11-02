@@ -276,7 +276,7 @@ html[data-phase="beton"] .stream__fill { background: repeating-linear-gradient(t
 .turb3d__go { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; background: rgba(232, 241, 250, .12); border: 1px solid rgba(232, 241, 250, .3); color: #fff; font-weight: 600; font-size: 15px; white-space: nowrap; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background var(--t-1); }
 .turb3d__go:hover { background: rgba(232, 241, 250, .2); }
 .turb3d.is-3d .turb3d__go, .turb3d.is-loading .turb3d__go { display: none; }
-.turb3d__load { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: none; align-items: center; gap: 8px; font-size: 14px; color: var(--muted-d); white-space: nowrap; }
+.turb3d__load { position: absolute; left: 50%; bottom: 28px; translate: -50% 0; display: none; align-items: center; gap: 8px; font-size: 14px; color: var(--muted-d); white-space: nowrap; }
 .turb3d__load i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--sky); border-right-color: transparent; animation: spin .8s linear infinite; }
 .turb3d.is-loading .turb3d__load { display: inline-flex; }
 .turb__copy { display: grid; gap: 22px; align-content: start; }
@@ -560,4 +560,22 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ---------- loading state over a poster (main.js busy()): light shimmer + bar of what has arrived ----------
+   The poster stays visible underneath. --p = buffered / duration (video) or model progress (3D);
+   unknown share: a short segment runs. Fades out on `playing`; on an error it fades too and the poster stays. */
+.ld { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; border-radius: inherit; transition: opacity .45s;
+  background: linear-gradient(100deg, transparent 38%, rgba(232, 241, 250, .16) 50%, transparent 62%) no-repeat; background-size: 250% 100%;
+  animation: ld-shine 1.6s linear infinite; }
+.ld i { position: absolute; left: 16px; right: 16px; bottom: 12px; height: 3px; border-radius: 3px; overflow: hidden; background: rgba(232, 241, 250, .28); }
+.ld i::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--volt); box-shadow: 0 0 8px rgba(74, 247, 69, .7);
+  transform-origin: left center; transform: scaleX(var(--p, 0)); transition: transform .35s ease-out; }
+.ld:not(.has-p) i::after { transform: translateX(-100%) scaleX(.35); animation: ld-run 1.3s ease-in-out infinite; }
+.ld.done { opacity: 0; }
+@keyframes ld-shine { from { background-position: 130% 0; } to { background-position: -30% 0; } }
+@keyframes ld-run { to { transform: translateX(290%) scaleX(.35); } }
+@media (prefers-reduced-motion: reduce) {
+  .ld { animation: none; background: none; transition: none; }
+  .ld:not(.has-p) i::after { animation: none; transform: scaleX(.35); }
 }

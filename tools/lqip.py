@@ -35,7 +35,7 @@ def thumb(path):
 def main():
     html = open(os.path.join(SITE, 'index.html'), encoding='utf-8').read()
     out = {}
-    for tag in re.findall(r'<img[^>]*loading="lazy"[^>]*>', html):
+    for tag in re.findall(r'<img[^>]*(?:loading="lazy"|fetchpriority="high")[^>]*>', html):   # + the hero still
         src = re.search(r'\ssrc="([^"]+)"', tag)
         if not src or src.group(1).startswith(('http', 'data:', '//')):
             continue

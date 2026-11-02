@@ -65,22 +65,116 @@ const L = {
   }, { rootMargin: '-50% 0px -50% 0px' });
   Object.keys(PHASE).forEach((id) => { const el = document.getElementById(id); if (el) phaseObs.observe(el); });
 
+  // ------------------------------------------------------------------ loading state: shimmer over the poster + bar (CSS .ld)
+  // busy(box) → { pct(0..1), done() }. Several waits can share a box (poster + clip); the layer fades when all are done.
+  function busy(box) {
+    let st = box._ld;
+    if (!st) {
+      const el = document.createElement('span');
+      el.className = 'ld'; el.setAttribute('aria-hidden', 'true'); el.appendChild(document.createElement('i'));
+      box.appendChild(el);
+      st = box._ld = { n: 0, el };
+    }
+    st.n++;
+    let over = false;
+    return {
+      pct(p) { if (over || !(p >= 0)) return; st.el.classList.add('has-p'); st.el.style.setProperty('--p', Math.min(1, p).toFixed(3)); },
+      done() {
+        if (over) return;
+        over = true;
+        if (--st.n > 0) return;
+        st.el.classList.add('done');
+        if (box._ld === st) box._ld = null;
+        setTimeout(() => st.el.remove(), 500);
+      },
+    };
+  }
+  // a poster that has not arrived yet (slow network) shows the state instead of an empty grey box
+  function waitPoster(img, box) {
+    if (!img || img.complete) return;
+    const watch = () => {
+      if (img.complete) return;
+      const b = busy(box);
+      img.addEventListener('load', b.done, { once: true });
+      img.addEventListener('error', b.done, { once: true });
+    };
+    if (img.loading !== 'lazy') return watch();
+    io(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); watch(); } }, { rootMargin: '200px 0px' }).observe(box);
+  }
+  waitPoster($('.hero__poster'), $('.hero__media'));
+  $$('.shot').forEach(s => waitPoster($('img', s), s));
+  waitPoster($('.plant__photo'), $('.plant--new .plant__visual'));
+  waitPoster($('.turb3d__poster'), $('#turb3d'));
+
   // ------------------------------------------------------------------ media: clips play only on screen, never on data saver
-  // A clip is fetched the first time it is needed (phone-size file under 900 px) and paused off screen.
+  // A clip is fetched the first time it is needed (phone-size file under 900 px), AV1 WebM where it decodes smoothly,
+  // otherwise MP4. One clip downloads at a time: the one on screen first, the next when it has arrived.
+  const AV1 = 'video/webm; codecs="av01.0.08M.08"';
+  let av1Check = null;
+  const canAv1 = () => av1Check || (av1Check = (async () => {
+    if (!document.createElement('video').canPlayType(AV1)) return false;
+    if (!navigator.mediaCapabilities) return true;
+    try {
+      const r = await navigator.mediaCapabilities.decodingInfo({ type: 'file', video: { contentType: AV1, width: wide() ? 1920 : 1280, height: wide() ? 1080 : 720, bitrate: 2e6, framerate: 30 } });
+      return r.supported && r.smooth;
+    } catch (e) { return true; }
+  })());
+  const lane = { busy: false, wait: [] };
+  const takeLane = (fn) => { if (lane.busy) lane.wait.push(fn); else { lane.busy = true; fn(); } };
+  const freeLane = () => { const next = lane.wait.shift(); if (next) next(); else lane.busy = false; };
+
   function clip(video) {
     if (!video || lite || reduced) return { play() {}, pause() {} };
-    let loaded = false;
+    const box = video.parentElement, d = video.dataset;
+    let state = 0, wanted = false, ld = null;            // 0 idle · 1 waiting for the lane · 2 fetching or ready
+    const go = () => {
+      const p = video.play();
+      if (p && p.catch) p.catch(() => { if (ld) ld.done(); /* autoplay refused: the still stays */ });
+    };
+    const start = () => {
+      if (!wanted) { state = 0; if (ld) { ld.done(); ld = null; } freeLane(); return; }   // scrolled away while queued
+      state = 2;
+      let freed = false;
+      const release = () => {
+        if (freed) return;
+        freed = true; clearTimeout(cap); clearInterval(poll);
+        ['progress', 'suspend', 'canplaythrough'].forEach(t => video.removeEventListener(t, arrived));
+        freeLane();
+      };
+      // arrived: fully buffered, or the browser stopped fetching with enough to play
+      const arrived = (e) => {
+        if (video.readyState >= 3 && (video.networkState === 1 || (e && e.type === 'suspend'))) return release();
+        try { if (video.duration > 0 && video.buffered.end(video.buffered.length - 1) >= video.duration - 0.3) release(); } catch (x) { /* nothing buffered yet */ }
+      };
+      const share = () => {
+        try { if (video.duration > 0 && video.buffered.length) ld.pct(video.buffered.end(video.buffered.length - 1) / video.duration); } catch (x) { /* ignore */ }
+      };
+      const cap = setTimeout(release, 12000), poll = setInterval(arrived, 400);   // a very slow clip must not hold the lane
+      ['progress', 'suspend', 'canplaythrough'].forEach(t => video.addEventListener(t, arrived));
+      video.addEventListener('progress', share);
+      video.addEventListener('loadedmetadata', share);
+      video.addEventListener('playing', () => { share(); video.classList.add('is-playing'); ld.done(); }, { once: true });
+      const mp4 = SITE_BASE + (wide() ? d.src : d.srcSm || d.src);
+      let onAv1 = false;
+      video.addEventListener('error', () => {
+        if (onAv1) { onAv1 = false; video.src = mp4; if (wanted) go(); return; }   // AV1 failed to load or decode: MP4
+        ld.done(); release();                                                        // the poster stays
+      });
+      canAv1().then((ok) => {
+        const av1 = wide() ? d.av1 : d.av1Sm || d.av1;
+        onAv1 = !!(ok && av1);
+        video.preload = 'auto';
+        video.src = onAv1 ? SITE_BASE + av1 : mp4;
+        if (wanted) go();
+      });
+    };
     return {
       play() {
-        if (!loaded) {
-          loaded = true;
-          video.src = SITE_BASE + (wide() ? video.dataset.src : video.dataset.srcSm || video.dataset.src);
-          video.addEventListener('playing', () => video.classList.add('is-playing'), { once: true });
-        }
-        const p = video.play();
-        if (p && p.catch) p.catch(() => { /* autoplay refused: the still stays */ });
+        wanted = true;
+        if (state === 2) go();
+        else if (state === 0) { state = 1; ld = busy(box); takeLane(start); }
       },
-      pause() { if (loaded) video.pause(); },
+      pause() { wanted = false; if (state === 2) video.pause(); },
     };
   }
   function playWhileVisible(video, margin = '0px') {
@@ -155,11 +249,12 @@ const L = {
       if (started) return;
       started = true;
       turb.classList.add('is-loading');
+      const ld = busy(turb);
       loadScript()
-        .then(() => window.GESTurbine.mount(cvs, SITE_BASE + 'assets/3d/kaplan.glb?v=1', (f) => { pct.textContent = Math.round(f * 100) + '%'; }))
+        .then(() => window.GESTurbine.mount(cvs, SITE_BASE + 'assets/3d/kaplan.glb?v=1', (f) => { pct.textContent = Math.round(f * 100) + '%'; ld.pct(f); }))
         .then((v) => { view = v; turb.classList.add('is-3d'); view.setRunning(visible && !document.hidden); })
         .catch(() => { started = false; /* WebGL or network failed: the poster stays */ })
-        .finally(() => turb.classList.remove('is-loading'));
+        .finally(() => { turb.classList.remove('is-loading'); ld.done(); });
     };
     go.addEventListener('click', start);
     if (finePointer && !reduced && !lite && wide()) {

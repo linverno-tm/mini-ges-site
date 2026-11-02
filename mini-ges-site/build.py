@@ -132,6 +132,20 @@ def copy_tree(rel, keep):
                 shutil.copy2(s, d)
 
 
+_hashes = {}
+
+
+def versioned(text):
+    """Every local media / font URL gets ?v=<content hash>, so hosts can cache it for a year (_headers)."""
+    def add(m):
+        rel = m.group(2)
+        path = os.path.join(ROOT, rel)
+        if rel not in _hashes:
+            _hashes[rel] = hashlib.md5(open(path, 'rb').read()).hexdigest()[:8] if os.path.isfile(path) else None
+        return m.group(0) + (f'?v={_hashes[rel]}' if _hashes[rel] else '')
+    return re.sub(r'((?:\.\./)*)(assets/[\w./-]+\.(?:webp|jpg|png|mp4|webm|glb|woff2))(?![\w?])', add, text)
+
+
 def lqip(html):
     """Paint each lazy image's tiny blurred preview (data/lqip.json, tools/lqip.py) as its background."""
     path = os.path.join(ROOT, 'data', 'lqip.json')
@@ -146,7 +160,7 @@ def lqip(html):
         if not uri or ' style="' in tag:
             return tag
         return tag[:-1].rstrip('/').rstrip() + f' style="background:url({uri}) center/cover no-repeat">'
-    return re.sub(r'<img[^>]*loading="lazy"[^>]*>', add, html)
+    return re.sub(r'<img[^>]*(?:loading="lazy"|fetchpriority="high")[^>]*>', add, html)
 
 
 def main():
@@ -170,11 +184,20 @@ def main():
     assert '</style' not in css_inline and '</script' not in boot_inline
 
     def finish(html):
+        # AV1 WebM next to each clip that has one (main.js picks it where it decodes smoothly, MP4 otherwise)
+        def av1(m):
+            webm = re.sub(r'\.mp4$', '.webm', m.group(2))
+            if not os.path.exists(os.path.join(ROOT, webm.replace('../', '', 1))):
+                return m.group(0)
+            return f'{m.group(0)} data-av1{m.group(1)}="{webm}"'
+        html = re.sub(r'data-src(-sm)?="([^"]+\.mp4)"', av1, html)
+        html = versioned(html)
         html = re.sub(r'src="((?:\.\./)?js/main\.js)"', rf'src="\1?v={js_v}"', html)
         html = re.sub(r'(src="(?:\.\./)?js/vendor/[^"?]+)"', r'\1?v=1"', html)
         html = re.sub(r'\n\s*\n', '\n', html)
         # url(../assets/...) in the CSS is relative to css/; inline it is relative to the page
         css_here = css_inline if 'src="../js/main.js' in html else css_inline.replace('url(../assets/', 'url(assets/')
+        css_here = versioned(css_here)
         html, n1 = re.subn(r'<link rel="stylesheet" href="(?:\.\./)?css/style\.css">', lambda m: f'<style>{css_here}</style>', html)
         html, n2 = re.subn(r'<script src="(?:\.\./)?js/boot\.js"></script>', lambda m: f'<script>{boot_inline}</script>', html)
         html, n3 = re.subn(r"script-src 'self'", lambda m: f"script-src 'self' 'sha256-{boot_hash}'", html, count=1)
@@ -202,19 +225,28 @@ def main():
         write(f'{code}/index.html', finish(template(page)).replace('<!--NEWS-->', render_news(code)))
 
     for name in ('404.html', 'robots.txt', 'sitemap.xml', 'manifest.webmanifest'):
-        write(name, template(open(os.path.join(ROOT, name), encoding='utf-8').read()))
+        write(name, versioned(template(open(os.path.join(ROOT, name), encoding='utf-8').read())))
+
+    # Cloudflare Pages reads _headers (GitHub Pages ignores it): every asset URL carries ?v=<hash>,
+    # so media, fonts and scripts are cached for a year; pages and the service worker are always revalidated.
+    write('_headers', '\n'.join([
+        '/assets/*', '  Cache-Control: public, max-age=31536000, immutable',
+        '/js/*', '  Cache-Control: public, max-age=31536000, immutable',
+        '/sw.js', '  Cache-Control: no-cache',
+        '/*', '  X-Content-Type-Options: nosniff', '  Referrer-Policy: strict-origin-when-cross-origin',
+        '  Permissions-Policy: camera=(), microphone=(), geolocation=()', '']))
 
     # service worker: version = content hash of the pages, precache the shell (not the photos)
     build_id = hashlib.md5((css_v + js_v + open(os.path.join(DIST, 'index.html'), 'rb').read().hex()[:4000]).encode()).hexdigest()[:10]
-    precache = ['./', 'ru/', 'en/', f'js/main.js?v={js_v}', 'assets/fonts/unbounded-latin.woff2',
-                'assets/logo-ulugnor.webp', 'assets/logo-baliqchi.webp', 'assets/favicon.png', 'manifest.webmanifest']
+    precache = ['./', 'ru/', 'en/', f'js/main.js?v={js_v}', 'manifest.webmanifest'] + [versioned(a) for a in (
+                'assets/fonts/unbounded-latin.woff2', 'assets/logo-ulugnor.webp', 'assets/logo-baliqchi.webp', 'assets/favicon.png')]
     sw = open(os.path.join(ROOT, 'sw.js'), encoding='utf-8').read()
     sw = sw.replace('%BUILD_ID%', build_id)
     sw = re.sub(r'/\*PRECACHE\*/.*?/\*END\*/', json.dumps(precache), sw, flags=re.S)
     write('sw.js', sw)
 
     # only what pages reference: web images + icons (source PNG logos stay out)
-    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg', '.mp4', '.glb', '.woff2')) or f in (
+    copy_tree('assets', lambda f: f.endswith(('.webp', '.jpg', '.mp4', '.webm', '.glb', '.woff2')) and '-hd.' not in f or f in (
         'favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'))
     copy_tree('js/vendor', lambda f: f.endswith('.js'))
     shutil.copy2(os.path.join(ROOT, '.htaccess'), os.path.join(DIST, '.htaccess'))

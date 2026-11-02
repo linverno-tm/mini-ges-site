@@ -1,0 +1,10 @@
+// Cloudflare copy of the site (static assets on Workers; _headers sets the caching).
+// Deploy: SITE_URL=https://mini-ges.charm-bot.workers.dev/ python build.py && npx wrangler deploy
+{
+  "name": "mini-ges",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

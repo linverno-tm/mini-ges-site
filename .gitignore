@@ -24,3 +24,4 @@ video-ai/kadrlar-4k/
 
 # npm install in tools/3d
 node_modules/
+.wrangler/
