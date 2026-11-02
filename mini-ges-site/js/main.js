@@ -123,7 +123,8 @@ const L = {
   const takeLane = (fn) => { if (lane.busy) lane.wait.push(fn); else { lane.busy = true; fn(); } };
   const freeLane = () => { const next = lane.wait.shift(); if (next) next(); else lane.busy = false; };
 
-  function clip(video) {
+  // pre: a loading state already shown for this box (the hero shows it from the first paint of the script)
+  function clip(video, pre = null) {
     if (!video || lite || reduced) return { play() {}, pause() {} };
     const box = video.parentElement, d = video.dataset;
     let state = 0, wanted = false, ld = null;            // 0 idle · 1 waiting for the lane · 2 fetching or ready
@@ -172,20 +173,30 @@ const L = {
       play() {
         wanted = true;
         if (state === 2) go();
-        else if (state === 0) { state = 1; ld = busy(box); takeLane(start); }
+        else if (state === 0) { state = 1; ld = pre || busy(box); pre = null; takeLane(start); }
       },
       pause() { wanted = false; if (state === 2) video.pause(); },
     };
   }
-  function playWhileVisible(video, margin = '0px') {
-    const c = clip(video);
+  function playWhileVisible(video, margin = '0px', pre = null) {
+    const c = clip(video, pre);
     if (!video) return;
     io(([e]) => (e.isIntersecting && !document.hidden ? c.play() : c.pause()), { rootMargin: margin }).observe(video.parentElement);
   }
-  // the hero clip waits for the page to finish loading: the still (LCP) gets the bandwidth first
-  const startHero = () => playWhileVisible($('.hero__film'));
-  if (document.readyState === 'complete') setTimeout(startHero, 300);
-  else addEventListener('load', () => setTimeout(startHero, 300), { once: true });
+  // The hero clip starts once its still (the LCP) has arrived, so the still gets the bandwidth first.
+  // Until then the state is already on screen: the visitor sees that the real video is on its way.
+  const heroFilm = $('.hero__film'), heroStill = $('.hero__poster');
+  if (heroFilm) {
+    const pre = lite || reduced ? null : busy(heroFilm.parentElement);
+    let begun = false;
+    const startHero = () => { if (!begun) { begun = true; setTimeout(() => playWhileVisible(heroFilm, '0px', pre), 150); } };
+    if (!heroStill || heroStill.complete) startHero();
+    else {
+      heroStill.addEventListener('load', startHero, { once: true });
+      heroStill.addEventListener('error', startHero, { once: true });
+      addEventListener('load', startHero, { once: true });
+    }
+  }
   playWhileVisible($('.plant__film'), '100px');
 
   // ------------------------------------------------------------------ how it works: the step in the middle of the screen drives the stage
