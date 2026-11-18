@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-16",
+ "updated": "2026-11-18",
  "items": [
   {
    "title": "Қўл жанги бўйича Жўқорғи Кенгес раиси кубоги баҳслари бўлиб ўтди",
@@ -181,6 +181,14 @@
    "title": "Узбекистан ввел в эксплуатацию три малые ГЭС мощностью 24 МВт и построит еще девять",
    "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPTWUyaUF6SEp5bnRKRGhVc3hhb0laQXhWeTZxMWU1U2ItRnJGemhzS2JPQU9XTjgxZHA5a2FaY1hJMEpOdHU1X1A4Q1BzdUpRdVNPYTByRWQzQm9xYVRPZ2xQM25OWW1VSzFzMkJadnR4aU80aDJqSmtwZnNIaGZXeVhHbE5KZzNHYkdYUDZuNXpSaUpmU1N5S3VtNkxkR1pqVkdyUkhwQnItZFctUVNqdFJVcjlGNHVVaG50dXR4ZkhiY20xT0p3eVhOZHFCckdzeGV6Skc3bnZZa2c?oc=5",
    "source": "Neftegaz.RU",
+   "date": "2026-10-22",
+   "lang": "ru",
+   "tag": "news"
+  },
+  {
+   "title": "Минэнерго обследовало объекты малой и микроГЭС в Кашкадарьинской области — Тазабек CA",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE5yeFUydFprYkJ5MnF1eEFXZmFLbEl1b2M2LWtEa1d6d1Z2U0NJVm1PZ3d0b242cDg2bHEtVWtKZXlwcHh0eUlBNUctSExRdw?oc=5",
+   "source": "Tazabek.KG",
    "date": "2026-10-22",
    "lang": "ru",
    "tag": "news"
@@ -712,14 +720,6 @@
    "date": "2025-11-22",
    "lang": "uz",
    "tag": "project"
-  },
-  {
-   "title": "“Prezident qarori bilan ruxsat berilgan”. “O‘zbekgidroenergo” 104 mlrd so‘mlik tender haqida",
-   "url": "https://daryo.uz/2025/11/20/prezident-qarori-bilan-ruxsat-berilgan-ozbekgidroenergo-104-mlrd-somlik-tender-haqida/",
-   "source": "Daryo.uz",
-   "date": "2025-11-20",
-   "lang": "uz",
-   "tag": "law"
   }
  ]
 }
