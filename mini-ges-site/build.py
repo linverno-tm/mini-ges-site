@@ -70,24 +70,84 @@ def same_story_xlang(a, b):
     return days <= 2 and bool(nums(a['title']) & nums(b['title']))
 
 
+# Uzbek Cyrillic -> Latin (official 1995 alphabet), so the Uzbek page reads in one script
+_CYR = dict(zip('абвгджзийклмнопрстуфхшщчъыьэюяёўқғҳ',
+                'a b v g d j z i y k l m n o p r s t u f x sh sh ch ʼ i _ e yu ya yo o‘ q g‘ h'.split()))
+_VOWEL = set('аеёиоуўэюяaeiou')
+
+
+def uz_latin(text):
+    if not re.search(r'[А-Яа-яЁёЎўҚқҒғҲҳ]', text):
+        return text
+    out = []
+    for n, ch in enumerate(text):
+        low = ch.lower()
+        prev = text[n - 1].lower() if n else ' '
+        if low == 'е':
+            rep = 'ye' if not prev.isalpha() or prev in _VOWEL or prev == 'ъ' else 'e'
+        elif low == 'ц':
+            rep = 'ts' if prev in _VOWEL else 's'
+        elif low in _CYR:
+            rep = _CYR[low].replace('_', '')
+        else:
+            out.append(ch)
+            continue
+        if ch != low:   # capital: whole word in caps (ГЭС -> GES) or just the first letter (Шаҳар -> Shahar)
+            nxt = text[n + 1] if n + 1 < len(text) else ''
+            rep = rep.upper() if nxt.isupper() or prev.isupper() else rep[:1].upper() + rep[1:]
+        out.append(rep)
+    return ''.join(out)
+
+
+def same_story_uz(a, b):
+    """One story in Latin and in Cyrillic (or retold by two outlets): close dates, mostly the same word stems."""
+    def stems(t):
+        t = t.lower().translate(str.maketrans({'ö': 'o', 'ğ': 'g', 'ş': 's', 'ç': 'c', 'ı': 'i'}))
+        t = re.sub(r'[‘’ʼʻ\'`]|(?<=[sc])h', '', t)
+        return {w[:5] for w in re.findall(r'\w{4,}', t)}
+    days = abs((datetime.date.fromisoformat(a['date']) - datetime.date.fromisoformat(b['date'])).days)
+    sa, sb = stems(a['title']), stems(b['title'])
+    if sa and sa == sb:      # the same headline published again later
+        return True
+    return days <= 3 and bool(sa and sb) and len(sa & sb) / min(len(sa), len(sb)) >= 0.5
+
+
+def same_story_brand(a, b):
+    """A Cyrillic headline naming a company in Latin letters (Fitch, LinkMaster) on the same days: one story."""
+    days = abs((datetime.date.fromisoformat(a['date']) - datetime.date.fromisoformat(b['date'])).days)
+    latin = lambda t: {w.lower() for w in re.findall(r'[A-Za-z]{5,}', t)} if re.search(r'[А-Яа-я]', t) else set()
+    words = lambda t: {w.lower() for w in re.findall(r'[A-Za-z]{5,}', t)}
+    return days <= 2 and bool(latin(a['title']) & words(b['title']) or latin(b['title']) & words(a['title']))
+
+
+def clean_title(t):
+    m = re.fullmatch(r'(.{15,}?)\s*\1', t)     # some feeds send the headline twice in one field
+    return m.group(1) if m else t
+
+
 def render_news(lang):
     """Static HTML for the news section: no request to a third party when the page opens."""
     esc = html.escape
     t = NEWS_L[lang]
     path = os.path.join(ROOT, 'data', 'news.json')
     data = json.load(open(path, encoding='utf-8')) if os.path.exists(path) else {'updated': '', 'items': []}
-    items = [i for i in data['items'] if i['url'].startswith('https://')]
+    items = [dict(i, title=clean_title(i['title'])) for i in data['items'] if i['url'].startswith('https://')]
     if lang == 'ru':
         items = [i for i in items if i['lang'] == 'ru']      # Russian readers: Russian headlines only
-    else:
-        # Uzbek page: both languages, Uzbek first within a day; Russian retelling of an Uzbek item is dropped
-        items.sort(key=lambda i: (i['date'], i['lang'] == 'uz'), reverse=True)
-        kept = []
-        for i in items:
-            if i['lang'] == 'ru' and any(x['lang'] == 'uz' and same_story_xlang(i, x) for x in kept):
-                continue
+    # Uzbek page: both languages, Uzbek first within a day (Latin original before a Cyrillic copy);
+    # Uzbek Cyrillic is shown in Latin. A second copy of one story (other script, other outlet,
+    # Russian retelling, the same headline weeks later) is dropped on every page.
+    items.sort(key=lambda i: (i['date'], i['lang'] == 'uz', not re.search(r'[А-Яа-яЎўҚқҒғҲҳ]', i['title'])), reverse=True)
+    kept, seen = [], []
+    for i in items:
+        if i['lang'] == 'uz':
+            i = dict(i, title=uz_latin(i['title']))
+        dup = any(same_story_brand(i, x) or (same_story_uz(i, x) if x['lang'] == i['lang'] else
+                  i['lang'] == 'ru' and same_story_xlang(i, x)) for x in seen)
+        seen.append(i)
+        if not dup:
             kept.append(i)
-        items = kept
+    items = kept
     items = items[:NEWS_MAX]
 
     def day(iso):
@@ -155,6 +215,10 @@ def lqip(html):
 
     def add(m):
         tag = m.group(0)
+        late = re.search(r'\sdata-src="([^"]+)"', tag)     # fetched later by main.js: the preview is its src until then
+        if late:
+            uri = previews.get(late.group(1).split('?')[0])
+            return re.sub(r'\ssrc="data:[^"]*"', f' src="{uri}"', tag) if uri else tag
         src = re.search(r'\ssrc="([^"]+)"', tag)
         uri = src and previews.get(src.group(1).split('?')[0])
         if not uri or ' style="' in tag:
@@ -217,7 +281,7 @@ def main():
         page = page.replace('href="./" hreflang="uz" lang="uz" aria-current="page"', 'href="./" hreflang="uz" lang="uz"')
         page = page.replace(f'href="{code}/" hreflang="{code}" lang="{code}"', f'href="{code}/" hreflang="{code}" lang="{code}" aria-current="page"')
         page = re.sub(r'(\s(?:src|href|data-src|data-src-sm|poster|data-poster)=")(?!https?:|//|#|data:|tel:|mailto:|%SITE_URL%|/|\.\./)', r'\1../', page)
-        page = re.sub(r'(\ssrcset=")([^"]+)"', lambda m: m.group(1) + ', '.join(
+        page = re.sub(r'(\s(?:data-)?srcset=")([^"]+)"', lambda m: m.group(1) + ', '.join(
             p.strip() if p.strip().startswith(('http', '/', 'data:')) else '../' + p.strip()
             for p in m.group(2).split(',')) + '"', page)
         page = page.replace(f'href="../{code}/"', 'href="./"').replace('href=".././"', 'href="../"')

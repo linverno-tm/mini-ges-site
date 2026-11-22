@@ -6,7 +6,9 @@ Saytdagi hamma vizual — kompaniyaning o'z materiallari yoki ochiq litsenziyali
 |---|---|---|---|
 | `real/real-5*.mp4/.webp` (hero) | Andijon kanali, Baliqchi GES binosi, elektr uzatish liniyasi | Rahbariyatning o'z videosi (Telegram «Baliqchi GES media» guruhi, 2026-10-13) | Kompaniyaga tegishli |
 | `real/real-0…4*` («Qanday ishlaydi») | Bino, zatvor, kanal, turbina zali, generator | Rahbariyat suratlari asosida ComfyUI'da jonlantirilgan (Abdulqodir, @brxnw) — saytda «AI vizualizatsiya» deb belgilangan | Kompaniyaga tegishli |
-| `real/baliqchi-kech*` | Baliqchi GES kechqurun, tayyor holat | Haqiqiy surat asosida AI vizualizatsiya — saytda belgilangan | Kompaniyaga tegishli |
+| `real/baliqchi-kech*` | Baliqchi GES kechqurun, tayyor holat (22.11 dan saytda ishlatilmaydi) | Haqiqiy surat asosida AI vizualizatsiya | Kompaniyaga tegishli |
+| `real/baliqchi-ish*`, `timeline/tl-13*` | Baliqchi GES: turbinadan chiqqan suv havzasi; stansiyadan chiqayotgan suv | Telegram «Baliqchi GES media» guruhi, 2026-10-11 suratlari (Diyorbek Ozodbekov, 13.10 da tashlagan) | Kompaniyaga tegishli |
+| `real/ulugnor-turbina.webp` | Ulug'nor GES gidroagregati, ochilish kuni | Telegram «Ulug'nor GES media» guruhidagi 2024-08-29 ochilish jonli videosidan kadr (848 px; «LIVE» belgisi va yozuv kesib olingan) | Kompaniyaga tegishli |
 | `gallery/ges-*.webp` | Qurilish va montaj suratlari | Rahbariyat suratlari | Kompaniyaga tegishli |
 | `timeline/tl-*.webp` | Baliqchi GES yilnomasi (2025-may — 2026-oktyabr) | Rahbariyat suratlari | Kompaniyaga tegishli |
 | `team/*.webp` | Doniyorbek va Diyorbek Ozodbekov | Rahbariyatning o'z suratlari | Kompaniyaga tegishli |

@@ -1,6 +1,6 @@
 # MINI GES — sayt
 
-Ulug'nor GES (600 kVt, ishlab turibdi) va Baliqchi GES (1 000 kVt, 2026-yil oktyabr oxirida ishga tushadi)
+Ulug'nor GES (600 kVt, 2024-yil avgustdan) va Baliqchi GES (1 000 kVt, 2026-yil kuzidan) — ikkalasi ham ishlab turibdi
 mini gidroelektrostansiyalarini tanishtiruvchi va mini-GES qurish xizmatini sotuvchi sayt.
 
 **Jonli sayt:** https://linverno-tm.github.io/mini-ges-site/
@@ -21,13 +21,17 @@ Shriftlar: Unbounded (sarlavha) + Inter (matn). Bo'limlar: kanal (hero) → qand
 | Animatsiya kutubxonasiz (01.11 redizayn) | Harakat CSS'da (transition, keyframes, scroll-driven), JS faqat holatni almashtiradi. GSAP/Lenis olib tashlandi: telefonda ~130 KB kam JS |
 | "Qanday ishlaydi" — haqiqiy kadrlar + kichik SVG sxema | Qadam ekran o'rtasiga kelganda kadr almashadi; video faqat ko'rinib turganda o'ynaydi, data saver'da faqat surat |
 | 3D Kaplan turbinasi (Sketchfab CC BY, 0,3 MB) | Kompyuterda yaqinlashganda, telefonda faqat tugma bosilganda yuklanadi; avval poster |
-| Rasmlar WebP, 2 o'lcham (`srcset`), `loading="lazy"` | Birinchi ochilishda rasm yuklanmaydi, telefon kichik nusxani oladi |
+| Rasmlar WebP, 2 o'lcham (`srcset`), `loading="lazy"` | Birinchi ochilishda rasm yuklanmaydi, telefon kichik nusxani oladi. `sizes` telefonda `88vw`: 2,6x ekranli telefon 1440w emas, 960w faylni oladi (bosh rasm 122 → 67 KB) |
+| «Qanday ishlaydi»ning 2–5-kadrlari `data-srcset` da | Ular qadam almashmaguncha ko'rinmaydi; `main.js` ularni sahifa yuklangach (yoki bo'lim ekranga kelganda) oladi, bosh rasm bilan internetni talashmaydi |
+| Footer `content-visibility: auto` | Yangiliklardagi kirill va ş/ğ harflari Inter'ning yana 3 ta shrift faylini chaqiradi; footer ekranga yaqinlashguncha ular yuklanmaydi |
 | Yuklanish ekrani yo'q, sarlavha darhol ko'rinadi | LCP elementi (sarlavha yoki kanal kadri) hech qachon opacity:0 dan boshlanmaydi; video kadr yuklangandan keyin ustiga chiqadi |
 | `prefers-reduced-motion` | Harakatni kamaytirishni yoqqan foydalanuvchilarga animatsiyasiz versiya |
 | "Soha yangiliklari" build vaqtida HTML'ga yoziladi | Sahifa ochilganda begona saytga so'rov ketmaydi: tez, CSP buzilmaydi, oflaynda ham ko'rinadi |
-| UZ/RU almashtirish yuklanish ekranisiz | `js/boot.js` birinchi kadrdan oldin ishlaydi: Baliqchi GES holati (ishga tushgan/yo'q) va til almashganda o'sha bo'lim |
+| UZ/RU almashtirish yuklanish ekranisiz | `js/boot.js` birinchi kadrdan oldin ishlaydi: til almashganda o'sha bo'limga qaytaradi |
+| Ariza: avval bizning bot, bo'lmasa Telegram chat | `LEAD_API` (Cloudflare Worker, `tools/ariza/`) bo'lsa, ariza to'g'ridan-to'g'ri Telegram botga ketadi; Worker ishlamasa yoki sozlanmagan bo'lsa, mijozda Telegram chat ariza matni bilan ochiladi |
 
-**Performance budjeti** (telefon, birinchi ochilish): HTML+CSS+JS+shriftlar gzip bilan ≈ 60 KB, birinchi ekran rasmi ≈ 66 KB (telefon), video sahifa yuklangandan keyin.
+**Performance budjeti** (telefon, birinchi ochilish): HTML+CSS+JS+shriftlar gzip bilan ≈ 60 KB, birinchi ekran rasmi ≈ 67 KB (telefon), video sahifa yuklangandan keyin.
+22.11 o'lchov (`tools/perf`, sekin 4G + CPU 4x, lokal build): LCP mediani 2,4 s → 1,6 s; bosh rasm bilan parallel yuklanadigan narsa ~700 KB → ~110 KB.
 
 ## Tuzilishi
 
@@ -44,6 +48,8 @@ tools/check_site.py     statik sifat tekshiruvi (CI'da ishlaydi)
 tools/i18n.py           tarjima: o'zbekcha manbadan /ru/ sahifasi (lug'at: mini-ges-site/i18n/ru.json)
 tools/gen_iso.py        'Qanday ishlaydi' izometrik maketini yaratadi (SVG)
 tools/fetch_news.py     'Soha yangiliklari': RSS'dan GES xabarlarini yig'adi -> mini-ges-site/data/news.json
+tools/lqip.py           lazy rasmlar uchun 16 px xira oldindan ko'rinish -> mini-ges-site/data/lqip.json (rasm qo'shilsa ishga tushiring)
+tools/ariza/            arizani Telegram botga yuboruvchi Cloudflare Worker (sozlash: tools/ariza/README.md)
 .github/workflows/      CI: tekshiruv -> build -> GitHub Pages
 ```
 
@@ -80,6 +86,9 @@ Xabarlar saralanadi (chet el va yirik mintaqaviy loyihalar chiqariladi) va `mini
 keyin sayt qayta yig'ilib chiqariladi. O'zbekcha sahifada ikkala tildagi xabarlar chiqadi (bir kunda o'zbekchasi oldin),
 ruscha sahifada faqat ruschasi. Faqat sarlavha, manba, sana va havola saqlanadi, havola asl maqolaga olib boradi.
 
+- «GES/ГЭС» faqat alohida so'z sifatida (yoki «mikro» bilan) hisoblanadi: «Родригес», «Кенгес», «Gesellschaft» ichidagi harflar GES emas (22.11 gacha shular sabab saytga sport va boshqa xabarlar tushgan).
+- O'zbekcha sahifada kirill o'zbekcha sarlavhalar lotinga o'giriladi (`build.py`, `uz_latin`); bitta xabarning lotin, kirill va ruscha nusxalaridan faqat bittasi qoladi.
+
 - Hozir yangilash: repo → **Actions → CI / Deploy → Run workflow**.
 - Manbalar, kalit so'zlar va mavzular (`TAGS`) — `tools/fetch_news.py` boshida.
 - Bitta manba ishlamasa, qolganlari bilan davom etadi; birortasi ham ochilmasa, eski ro'yxat qoladi.
@@ -106,9 +115,9 @@ python mini-ges-site/build.py          # Node.js va Python kerak
 
 ## Muhim sozlamalar
 
-- **Baliqchi GES ishga tushish sanasi:** `js/main.js` boshidagi `LAUNCH`. Sana o'tgach, hisoblagichlar o'zi "Ishga tushirildi" ga almashadi.
 - **Kalkulyator koeffitsiyentlari:** `js/main.js` dagi `CALC` (FIK, yillik yuklama, xonadon iste'moli, CO₂).
-- **Ariza qabul qiluvchi Telegram:** `js/main.js` dagi `t.me/ozodbekov`.
+- **Ariza qabul qiluvchi Telegram:** `js/main.js` dagi `t.me/ozodbekov` (zaxira yo'l) va `LEAD_API` (bot orqali, `tools/ariza/README.md`).
+- **Yandex Metrika:** `js/main.js` dagi `YM_ID` ga hisoblagich raqamini yozing (0 — o'chiq). Maqsadlar: `call`, `telegram`, `lead`, `lead_bot`.
 
 ## Litsenziya
 

@@ -1,13 +1,14 @@
 {
  "assets/gallery/ges-07-sm.webp": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADwAQCdASoQAAkAAwBSJQBOgB7HG05YfQAA/rCs9vYCLNStZ44+h9mmnxSE7lHOSQXO6zJBjs5TJNq5KVAfN5/09hkb4km6WhAqNgqHJfdTMl7kqKR+9iFHgAA=",
  "assets/president/mirziyoyev-2025-12-05-sm.webp": "data:image/webp;base64,UklGRoIAAABXRUJQVlA4IHYAAADwAwCdASoQABQAPt1apkyopSOiMAgBEBuJZQC/OCHf3WWlJe2qojAAAP7sDnREwJ05fiBQhedHMOzg9S8uqC0v3qMJRKxit82MePvuzgazwTgoXa22Wmx2xpn1sOQJblrwxx8ualvslgPQx3QZHKKtJpV3QAAA",
- "assets/real/baliqchi-kech-sm.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAQCdASoQAAkAAwBSJZACdAC3gqzHfwAAzfLBuxXHWng7mtg+tUs5VwCcwY9pdhwtyUAnUsWoui2LKK6qnYHvJYK8VK2p2BgX1fKcpTmQYtGYkAA=",
+ "assets/real/baliqchi-ish-sm.webp": "data:image/webp;base64,UklGRk4AAABXRUJQVlA4IEIAAAAQAgCdASoQAAkAAwBSJYwCdAEPRRaZgXgAAPuly5cV03alvvFRjQO7OdX5PGgYzhc02Z+822vtVvV7SaYxTaJhAAA=",
  "assets/real/real-0-sm.webp": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAQAgCdASoQAAkAAwBSJYwCdAEfcebLg7uAAPw2wt5P384MZA7LjdWs8R3Juo9feyQZMMbm4Dq/wTY902k9o6SRK2xcRH66me/q0snJWUmhZDwhKlGM9PfAAAA=",
  "assets/real/real-1-sm.webp": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAADQAQCdASoQAAkAAwBSJQAAWOH/YY4vTAD5XhR77e+JlyPvwGzjoCtmyBuFUMPB3/V81xfEGW7G2uzMkVF8eherQGn/8N8SfX97IrGN/4cILDwA",
  "assets/real/real-2-sm.webp": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADwAQCdASoQAAkAAwBSJYwCdAEPDbnhdgAA/nk/FobRGpZRT37YCwSvNa9Vu0cuPBW+OltdqRnq5bsCXCk8SEDwS0XtAAAA",
  "assets/real/real-3-sm.webp": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQAgCdASoQAAkAAwBSJQBOgCPf/2mhDosAAP70XJTtZlbZFQIrLUwVh2U6+lgro1FP0W17RP7DXRrb8R/pa78vgM8eHl7Xl8ImgyCw7LQu51ZBjXz+w8MeHAAAAA==",
  "assets/real/real-4-sm.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAABwAgCdASoQAAkAAwBSJZQCdMn8LYAZB8ZcQ7RIAM4o1V6d+wKyVqEMBlPGgyGjH5u+zP69EQriu79bW70B4vhxoP0QajdkhVaB6FWvirPSspAYAAA=",
  "assets/real/real-5-xs.webp": "data:image/webp;base64,UklGRk4AAABXRUJQVlA4IEIAAADQAQCdASoQAAkAAwBSJZQAAt0OsXAjwAD8tP0TmrM9z418Wly6/ibbuFgSfL1G8nBto9Dcq/SrMzBfLoHNPjbrAAA=",
+ "assets/real/ulugnor-turbina.webp": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAADwAQCdASoOAAgAAwBSJQBYdh9xHGIJ8AAA/PAASgLUe2xirDpJGw+36pLl2z54JAPzwvdHMG/tLV1KZ9eqRpzdVmYQbPNQQ8rU87xaA0gAAA==",
  "assets/team/diyorbek-sm.webp": "data:image/webp;base64,UklGRpgAAABXRUJQVlA4IIwAAABQBACdASoQABQAPt1apkyopSOiMAgBEBuJYwCxDIjDHVWpbRpPvCJjE/sAAP7zepyUSUWNCXkmQV0EWA8Yc2J3ZiCIX67FRFjSiyLJXBOY8Zf7H+PYVX47g9w7F42R+aVBtWnECZUAZuBqdtsPObl7A3K6iuRDygoiGEhE1dKm+jt8ABg33gWd8oTAAA==",
  "assets/team/doniyorbek-sm.webp": "data:image/webp;base64,UklGRrAAAABXRUJQVlA4IKQAAABQBACdASoQABQAPt1apkyopSOiMAgBEBuJZgCdH8AgsxitXbznKyg02OZwAP7gazygJ8wU3aDrgMkZu0JuyRI/NLP706oaB0KFJFo/ltA5mc/FqWW0R8ymxkoi/OoD84rvuySDV7YzPQxmPU0Yit/vQOSa4OokwFL4yWBr6yifkz/wQYo/8QnG+EnlqHsPTI17BhXDEx9DvJE/T2cWIvFDnAAAAA==",
  "assets/timeline/tl-01-sm.webp": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADQAQCdASoQAAwAAwBSJYgCdAD2HW0sAAD799eYtEo3WJOdYMmx28D6uHo70RwLafmun4MOTP5JUgU3zJOkpcbyXK4UNSE43Vf4+rqSAAA=",
@@ -21,5 +22,6 @@
  "assets/timeline/tl-09-sm.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAQCdASoQAAwAAwBSJYwC7AELL3VLHwAA/vAUeUhL1GAW5Cb779nTEKd/+AnWhU6ysu60yQxQHSDyK/PtSfzc/r701nscm54Cl+/UXiWdyJ2AAAA=",
  "assets/timeline/tl-10-sm.webp": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAAAQAgCdASoQAAwAAwBSJQBOgCICUv4YSdwAAP5mhzP7pvc7iobSJZGD8/AZeOy8SuodchOyvsbwFTNcZkra9XRLqOnpH8kow0HWlT15pOB8YAAA",
  "assets/timeline/tl-11-sm.webp": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADwAQCdASoQAAwAAwBSJZQCsAD7Qtlt6AAA9A0MmxVLMalKqsyEbdoak9L6HTklToHJB4FSLL7PhCwVfZO0pCDQlRT0W62jqzJ9gEAA",
- "assets/timeline/tl-12-sm.webp": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAAAwAgCdASoQAAwAAwBSJagCdAD7j6nyrPNIAAD+lBsW2LigB/eh9037fB7Isl86nmpbXwu/7NhpGioQCm05IYHkvy2bjZiSkk3iaGsDmlVvhUq1MHFlAI2o4ZgLAAAA"
+ "assets/timeline/tl-12-sm.webp": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAAAwAgCdASoQAAwAAwBSJagCdAD7j6nyrPNIAAD+lBsW2LigB/eh9037fB7Isl86nmpbXwu/7NhpGioQCm05IYHkvy2bjZiSkk3iaGsDmlVvhUq1MHFlAI2o4ZgLAAAA",
+ "assets/timeline/tl-13-sm.webp": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAAAwAgCdASoQAAwAAwBSJYwCdAEOAUAcPhQ3QAD+6qlXhU1vxS1O5+k8sPY3VwII7Bl8z9BGeEQSRZ0M6SLQgUA11v7tvVSxoNn9ykAA"
 }

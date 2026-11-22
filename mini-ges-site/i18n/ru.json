@@ -445,6 +445,21 @@
     "Parraklar qiyaligi suv sarfiga moslashadi, shuning uchun kanalda suv kamaygan kunlarda ham turbina yaxshi FIK bilan ishlaydi.": "Угол лопастей подстраивается под расход воды, поэтому турбина работает с хорошим КПД даже в дни, когда воды в канале меньше.",
     "Suv kanaldan olinadi, turbinadan o'tadi, tok tarmoqqa ketadi": "Вода берётся из канала, проходит через турбину, ток уходит в сеть",
     "Tanlang": "Выберите",
-    "Yilnoma": "Хроника"
+    "Yilnoma": "Хроника",
+    "Ariza qabul qilindi": "Заявка принята",
+    "Ariza to'g'ridan-to'g'ri Doniyorbek Ozodbekovga boradi, u siz bilan o'zi bog'lanadi.": "Заявка придёт напрямую Дониёрбеку Озодбекову, он сам свяжется с вами.",
+    "Arizani yuborish": "Отправить заявку",
+    "Rahmat! Doniyorbek Ozodbekov ish vaqtida siz bilan bog'lanadi. Shoshilinch bo'lsa, qo'ng'iroq qiling:": "Спасибо! Дониёрбек Озодбеков свяжется с вами в рабочее время. Если срочно — позвоните:",
+    "Sayt manzili": "Адрес сайта",
+    "Mini-GES loyihalash, qurish va sotish. Ikki stansiyamiz ishlab turibdi: Ulug'nor GES (600 kVt, 2024-yildan) va Baliqchi GES (1 000 kVt, 2026-yildan).": "Проектирование, строительство и продажа мини-ГЭС. Обе наши станции работают: Улугнор ГЭС (600 кВт, с 2024 года) и Балыкчи ГЭС (1 000 кВт, с 2026 года).",
+    "MINI GES — sug'orish kanallari bo'yida mini gidroelektrostansiyalarni loyihalash, qurish va sotish. Ulug'nor GES (600 kVt) va Baliqchi GES (1 000 kVt) ishlab turibdi.": "MINI GES — проектирование, строительство и продажа мини-гидроэлектростанций на ирригационных каналах. Улугнор ГЭС (600 кВт) и Балыкчи ГЭС (1 000 кВт) уже работают.",
+    "2024-yil avgust": "август 2024",
+    "2026 · Kuz": "2026 · Осень",
+    "Baliqchi GES: turbinadan chiqqan suv havzadan kanalga qaytmoqda, orqada stansiya binosi": "Балыкчи ГЭС: вода после турбин возвращается из бассейна в канал, за ним — здание станции",
+    "Haqiqiy surat · 2024-yil avgust": "Реальное фото · август 2024",
+    "Haqiqiy surat · 2026-yil oktyabr": "Реальное фото · октябрь 2026",
+    "Stansiya ishga tushdi": "Станция запущена",
+    "Ulug'nor GES gidroagregati stansiya zalida, ochilish kuni": "Гидроагрегат Улугнор ГЭС в машинном зале, день открытия",
+    "Xitoylik hamkorlar bilan qurilgan ikkinchi obyekt. 2026-yil kuzida ishga tushirildi.": "Второй объект, построенный вместе с китайскими партнёрами. Запущен осенью 2026 года."
   }
 }

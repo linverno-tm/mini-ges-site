@@ -14,7 +14,7 @@ const LANG = ['ru', 'en'].includes(document.documentElement.lang) ? document.doc
 const L = {
   uz: {
     offline: "Internet yo'q — saqlangan versiya ko'rsatilmoqda", online: 'Internet tiklandi',
-    calcAdded: "Hisob-kitob arizaga qo'shildi", leadCopied: "Ariza matni nusxalandi: messenjerga qo'ying", copyFail: "Nusxalab bo'lmadi — matnni belgilab oling",
+    calcAdded: "Hisob-kitob arizaga qo'shildi", leadCopied: "Ariza matni nusxalandi: messenjerga qo'ying", copyFail: "Nusxalab bo'lmadi — matnni belgilab oling", sending: 'Yuborilmoqda…',
     errWrap: list => `Iltimos, ${list} kiriting.`, errName: 'ismingizni', errPhone: 'telefon raqamingizni (kamida 9 raqam)', errRegion: 'hududni',
     leadHello: "Assalomu alaykum! Mini-GES loyihasi bo'yicha ariza.", fName: 'Ism', fPhone: 'Telefon', fRegion: 'Hudud', fSource: "Yo'nalish", fMsg: 'Izoh',
     calcMsg: (q, h, p, e) => `Kalkulyator: Q = ${q} m³/s, H = ${h} m → taxminan ${p} kVt, ${e} kVt·soat/yil.`,
@@ -22,7 +22,7 @@ const L = {
   },
   ru: {
     offline: 'Нет интернета — показана сохранённая версия', online: 'Интернет восстановлен',
-    calcAdded: 'Расчёт добавлен в заявку', leadCopied: 'Текст заявки скопирован — вставьте в мессенджер', copyFail: 'Не удалось скопировать — выделите текст вручную',
+    calcAdded: 'Расчёт добавлен в заявку', leadCopied: 'Текст заявки скопирован — вставьте в мессенджер', copyFail: 'Не удалось скопировать — выделите текст вручную', sending: 'Отправляем…',
     errWrap: list => `Пожалуйста, укажите ${list}.`, errName: 'имя', errPhone: 'номер телефона (не меньше 9 цифр)', errRegion: 'регион',
     leadHello: 'Здравствуйте! Заявка по проекту мини-ГЭС.', fName: 'Имя', fPhone: 'Телефон', fRegion: 'Регион', fSource: 'Направление', fMsg: 'Комментарий',
     calcMsg: (q, h, p, e) => `Калькулятор: Q = ${q} м³/с, H = ${h} м → примерно ${p} кВт, ${e} кВт·ч/год.`,
@@ -30,7 +30,7 @@ const L = {
   },
   en: {
     offline: 'No internet — showing the saved version', online: 'Back online',
-    calcAdded: 'Estimate added to your enquiry', leadCopied: 'Enquiry text copied — paste it into a messenger', copyFail: 'Could not copy — please select the text',
+    calcAdded: 'Estimate added to your enquiry', leadCopied: 'Enquiry text copied — paste it into a messenger', copyFail: 'Could not copy — please select the text', sending: 'Sending…',
     errWrap: list => `Please enter ${list}.`, errName: 'your name', errPhone: 'your phone number (at least 9 digits)', errRegion: 'your region',
     leadHello: 'Hello! An enquiry about a small hydropower project.', fName: 'Name', fPhone: 'Phone', fRegion: 'Region', fSource: 'Type', fMsg: 'Comment',
     calcMsg: (q, h, p, e) => `Calculator: Q = ${q} m³/s, H = ${h} m → about ${p} kW, ${e} kWh/year.`,
@@ -42,7 +42,6 @@ const L = {
   'use strict';
 
   // ------------------------------------------------------------------ config
-  const LAUNCH = Date.parse('2026-10-31T23:59:59+05:00');   // Baliqchi GES (boot.js uses the same date)
   const CALC = { eff: 0.8, load: 0.9, household: 2200, co2: 0.77, coal: 0.4, capex: [1700, 2500], usd: 12700 };   // capex: $ per kW on our own plants; kg per kWh
   const root = document.documentElement;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -103,7 +102,21 @@ const L = {
   }
   waitPoster($('.hero__poster'), $('.hero__media'));
   $$('.shot').forEach(s => waitPoster($('img', s), s));
-  waitPoster($('.plant__photo'), $('.plant--new .plant__visual'));
+  // "How it works" frames 2–5 stay hidden until their step: fetched after the first screen has loaded
+  // (or as soon as the stage is on screen), so they never compete with the hero photo on a phone
+  const lateShots = $$('.shot img[data-srcset]');
+  if (lateShots.length) {
+    let fetched = false;
+    const fetchLate = () => {
+      if (fetched) return;
+      fetched = true;
+      lateShots.forEach((img) => { img.srcset = img.dataset.srcset; img.src = img.dataset.src; waitPoster(img, img.parentElement); });
+    };
+    if (document.readyState === 'complete') setTimeout(fetchLate, 300);
+    else addEventListener('load', () => setTimeout(fetchLate, 300), { once: true });
+    io(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); fetchLate(); } }).observe($('#howStage'));
+  }
+  $$('.plant__photo').forEach(img => waitPoster(img, img.parentElement));
   waitPoster($('.turb3d__poster'), $('#turb3d'));
 
   // ------------------------------------------------------------------ media: clips play only on screen, never on data saver
@@ -197,7 +210,6 @@ const L = {
       addEventListener('load', startHero, { once: true });
     }
   }
-  playWhileVisible($('.plant__film'), '100px');
 
   // ------------------------------------------------------------------ how it works: the step in the middle of the screen drives the stage
   const stage = $('#howStage');
@@ -276,8 +288,8 @@ const L = {
   }
 
   // ------------------------------------------------------------------ live energy counter (Ulug'nor GES)
-  // Estimate from the station's real annual output (5.2 GWh) since launch in September 2024.
-  const LIVE = { start: Date.parse('2024-09-01T00:00:00+05:00'), perSec: 5.2e6 / (365.25 * 86400), co2: CALC.co2 / 1000, coal: CALC.coal / 1000 };
+  // Estimate from the station's real annual output (5.2 GWh) since the opening on 29 August 2024.
+  const LIVE = { start: Date.parse('2024-08-29T12:00:00+05:00'), perSec: 5.2e6 / (365.25 * 86400), co2: CALC.co2 / 1000, coal: CALC.coal / 1000 };
   const liveKwh = $$('[data-live-kwh]'), liveCo2 = $$('[data-live-co2]'), liveCoal = $$('[data-live-coal]');
   const tickLive = () => {
     if (document.hidden) return;
@@ -288,21 +300,6 @@ const L = {
     liveCoal.forEach((el) => { el.textContent = fmt(kwh * LIVE.coal); });
   };
   if (liveKwh.length) { tickLive(); setInterval(tickLive, reduced ? 5000 : 250); }
-
-  // ------------------------------------------------------------------ countdown (only before the launch)
-  const countdowns = $$('[data-countdown]');
-  if (countdowns.length && Date.now() < LAUNCH) {
-    const pad = n => String(n).padStart(2, '0');
-    const tick = () => {
-      const diff = LAUNCH - Date.now();
-      if (diff <= 0) { root.classList.add('launched'); clearInterval(t); return; }
-      const s = Math.floor(diff / 1000);
-      const parts = { d: Math.floor(s / 86400), h: Math.floor(s / 3600) % 24, m: Math.floor(s / 60) % 60, s: s % 60 };
-      countdowns.forEach(c => $$('[data-cd]', c).forEach((b) => { b.textContent = pad(parts[b.dataset.cd]); }));
-    };
-    const t = setInterval(tick, 1000);
-    tick();
-  }
 
   // ------------------------------------------------------------------ chronicle: the canal under the photos fills as you swipe
   const strip = $('#chronTrack');
@@ -441,14 +438,21 @@ const L = {
   addEventListener('offline', () => toast(L.offline));
   addEventListener('online', () => toast(L.online));
 
-  // ------------------------------------------------------------------ enquiry form → Telegram chat with the text ready
+  // ------------------------------------------------------------------ enquiry form → our Telegram bot (tools/ariza), else a Telegram chat with the text ready
+  // Cloudflare Worker address once it is deployed (tools/ariza/README.md); empty: the Telegram chat way only.
+  const LEAD_API = '';
   const form = $('#leadForm');
   if (form) {
-    const err = $('#leadErr'), ok = $('#leadOk'), txt = $('#leadText');
+    const err = $('#leadErr'), ok = $('#leadOk'), txt = $('#leadText'), send = $('#leadSend');
     const fields = { name: $('#fName'), phone: $('#fPhone'), region: $('#fRegion') };
+    // which texts are shown: "bot" (the lead goes straight to us) or "tg" (the visitor sends it in Telegram)
+    const via = (scope, mode) => $$('[data-via]', scope).forEach((el) => { el.hidden = el.dataset.via !== mode; });
+    if (LEAD_API) via(form, 'bot');
+    let busy = false;
     Object.values(fields).forEach(f => f.addEventListener('input', () => { f.parentElement.classList.remove('is-bad'); f.removeAttribute('aria-invalid'); }));
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (busy) return;
       const name = fields.name.value.trim(), phone = fields.phone.value.trim(), region = fields.region.value;
       const source = (form.querySelector('input[name="source"]:checked') || {}).value || '';
       const msg = $('#fMsg').value.trim();
@@ -470,11 +474,36 @@ const L = {
       txt.textContent = text;
       const tg = 'https://t.me/ozodbekov?text=' + encodeURIComponent(text);
       $('#leadTg').href = tg;
-      window.open(tg, '_blank', 'noopener');
-      track('lead');
+      let sent = false;
+      if (LEAD_API) {
+        busy = true;
+        send.disabled = true;
+        send.setAttribute('aria-busy', 'true');
+        $$('span', send).forEach((s) => { if (!s.hidden) { s.dataset.label = s.textContent; s.textContent = L.sending; } });
+        const stop = new AbortController(), timer = setTimeout(() => stop.abort(), 8000);
+        try {
+          // text/plain keeps it a "simple" request: no CORS preflight round trip on a slow phone
+          const r = await fetch(LEAD_API, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, signal: stop.signal,
+            body: JSON.stringify({ name, phone, region, source, msg, lang: LANG, page: location.href, website: form.elements.website.value }),
+          });
+          sent = r.ok && (await r.json()).ok === true;
+        } catch (fail) { sent = false; }
+        clearTimeout(timer);
+        busy = false;
+        send.disabled = false;
+        send.removeAttribute('aria-busy');
+        $$('span', send).forEach((s) => { if (s.dataset.label) { s.textContent = s.dataset.label; delete s.dataset.label; } });
+      }
+      if (!sent) window.open(tg, '_blank', 'noopener');   // no bot (or it failed): the visitor sends it in Telegram
+      track(sent ? 'lead_bot' : 'lead');
+      via(ok, sent ? 'bot' : 'tg');
+      $('#leadCopy').hidden = sent;
+      txt.hidden = sent;
       ok.hidden = false;
-      $('h3', ok).setAttribute('tabindex', '-1');
-      $('h3', ok).focus();
+      const head = $('h3:not([hidden])', ok);
+      head.setAttribute('tabindex', '-1');
+      head.focus();
     });
     $('#leadCopy').addEventListener('click', () => copyText(txt.textContent).then(r => toast(r ? L.leadCopied : L.copyFail)));
     $('#leadBack').addEventListener('click', () => { ok.hidden = true; fields.name.focus(); });

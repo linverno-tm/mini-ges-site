@@ -36,7 +36,8 @@ def main():
     html = open(os.path.join(SITE, 'index.html'), encoding='utf-8').read()
     out = {}
     for tag in re.findall(r'<img[^>]*(?:loading="lazy"|fetchpriority="high")[^>]*>', html):   # + the hero still
-        src = re.search(r'\ssrc="([^"]+)"', tag)
+        # images main.js fetches later keep the real file in data-src (their src is a placeholder)
+        src = re.search(r'\sdata-src="([^"]+)"', tag) or re.search(r'\ssrc="([^"]+)"', tag)
         if not src or src.group(1).startswith(('http', 'data:', '//')):
             continue
         rel = src.group(1).split('?')[0]

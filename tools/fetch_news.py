@@ -43,10 +43,12 @@ NAMES = {'kun.uz': 'Kun.uz', 'daryo.uz': 'Daryo.uz', 'gazeta.uz': 'Gazeta.uz', '
          'podrobno.uz': 'Podrobno.uz', 'uzdaily.uz': 'UzDaily.uz', 'nuz.uz': 'Nuz.uz', 'xabar.uz': 'Xabar.uz',
          'review.uz': 'Review.uz', 'aniq.uz': 'Aniq.uz', 'zamin.uz': 'Zamin.uz'}
 
-HYDRO = re.compile(r'ГЭС|ГЕС|гидроэлектр|гидроэнерг|\bGES|mikroGES|gidroelektr|gidroenerg|закупочн\w* тариф', re.I)
+# GES/ГЭС only as a word of its own (or after "mikro"): inside "Родригес", "Кенгес", "Gesellschaft" it is not a plant
+HYDRO = re.compile(r'(?-i:(?<![A-Za-zА-Яа-яЁёЎўҚқҒғҲҳ])(?:ГЭС|ГЕС|GES)|(?<=[Мм]икро)ГЭС|(?<=[Mm]ikro)GES)'
+                   r'|гидроэлектр|гидроэнерг|gidroelektr|gidroenerg|закупочн\w* тариф', re.I)
 UZBEK = re.compile(r'Узбек|Ўзбек|O.?zbek|Uzbek|Ташкент|Toshkent|Андижан|Andijon|Наманган|Namangan|Ферган|Farg|Сурхандар|Surxondar|Кашкадар|Qashqadar|Самарканд|Samarqand|Бухар|Buxoro|Хорезм|Xorazm|Джизак|Jizzax|Навои|Navoiy|Сырдар|Sirdaryo|Каракалпак|Qoraqalpo|Чирчик|Chirchiq|Пскем|Сох', re.I)
 # the audience builds small plants: regional mega-projects and grid incidents abroad are noise here
-NOISE = re.compile(r'Камбар|Kambar|Qambar|kutubxona|библиотек|ESG|yilligi|юбилей|tayinlandi|назначен|Рогун|Rog.?un|Токтогул|Toktog|Кайраккум|Qayroqqum|блэкаут|blackout|АЭС|\bAES\b|железн|temir yo', re.I)
+NOISE = re.compile(r'Камбар|Kambar|Qambar|kutubxona|библиотек|ESG|yilligi|юбилей|tayinlandi|назначен|Ро[гғ]ун|Ro[gğ]\W?un|Нурек|Norak|Nurek|Токтогул|Toktog|Кайраккум|Qayroqqum|блэкаут|blackout|АЭС|\bAES\b|железн|temir yo', re.I)
 # plants abroad: kept only when the headline also ties them to Uzbekistan
 FOREIGN = re.compile(r'Xitoy|Китай|Moldov|Молдов|Tojik|Таджик|Qirg.?iz|Кыргыз|Киргиз|Qozog|Казах|Rossiya|Росси|Afg.?on|Афган|Hindiston|Инди|Turkiya|Турци|Eron|Иран|Gruziya|Грузи|Pokiston|Пакистан|Nepal|Непал|Braziliya|Бразил|Efiopiya|Эфиоп|Misr|Египет|Dag.?iston|Дагестан|Norvegiya|Норвег|Shveytsar|Швейцар|AQSH|США|Yevropa|Европ', re.I)
 SMALL = re.compile(r'мал\w* (?:и микро)?ГЭС|мал\w* и микро|микро\s?ГЭС|микрогидро|малой гидро|kichik GES|mikro\s?GES|kichik gidro|кичик ГЭС', re.I)
