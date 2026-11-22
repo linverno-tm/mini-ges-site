@@ -8,6 +8,7 @@
     <xhtml:link rel="alternate" hreflang="uz" href="%SITE_URL%"/>
     <xhtml:link rel="alternate" hreflang="ru" href="%SITE_URL%ru/"/>
     <xhtml:link rel="alternate" hreflang="en" href="%SITE_URL%en/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="%SITE_URL%zh/"/>
   </url>
   <url>
     <loc>%SITE_URL%ru/</loc>
@@ -17,6 +18,7 @@
     <xhtml:link rel="alternate" hreflang="uz" href="%SITE_URL%"/>
     <xhtml:link rel="alternate" hreflang="ru" href="%SITE_URL%ru/"/>
     <xhtml:link rel="alternate" hreflang="en" href="%SITE_URL%en/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="%SITE_URL%zh/"/>
   </url>
   <url>
     <loc>%SITE_URL%en/</loc>
@@ -26,5 +28,16 @@
     <xhtml:link rel="alternate" hreflang="uz" href="%SITE_URL%"/>
     <xhtml:link rel="alternate" hreflang="ru" href="%SITE_URL%ru/"/>
     <xhtml:link rel="alternate" hreflang="en" href="%SITE_URL%en/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="%SITE_URL%zh/"/>
+  </url>
+  <url>
+    <loc>%SITE_URL%zh/</loc>
+    <lastmod>%BUILD_DATE%</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="uz" href="%SITE_URL%"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="%SITE_URL%ru/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="%SITE_URL%en/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="%SITE_URL%zh/"/>
   </url>
 </urlset>

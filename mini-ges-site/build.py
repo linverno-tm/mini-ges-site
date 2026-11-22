@@ -59,6 +59,12 @@ NEWS_L = {
            'tags': {'tariff': 'Tariffs', 'law': 'Regulation', 'invest': 'Investment', 'project': 'Projects', 'news': 'Industry'},
            'months': 'January February March April May June July August September October November December'.split(),
            'date': '{d} {m} {y}'},
+    'zh': {'filters': '按主题筛选',
+           'all': '全部', 'more': '显示更多', 'less': '收起', 'newtab': '在新窗口打开',
+           'empty': '暂无新消息。',
+           'tags': {'tariff': '电价', 'law': '政策法规', 'invest': '投资', 'project': '项目', 'news': '行业'},
+           'months': [f'{n}月' for n in range(1, 13)],
+           'date': '{y}年{m}{d}日'},
 }
 
 
@@ -271,7 +277,7 @@ def main():
     write('index.html', finish(template(source)).replace('<!--NEWS-->', render_news('uz')))
 
     # Russian and English pages: same source, translated at build time, one folder deeper
-    for code, locale in (('ru', 'ru_RU'), ('en', 'en_US')):
+    for code, locale in (('ru', 'ru_RU'), ('en', 'en_US'), ('zh', 'zh_CN')):
         page, missing = i18n.translate(source, code)
         assert not missing, f'untranslated for {code}: {missing[:5]}'
         page = page.replace('<html lang="uz"', f'<html lang="{code}"', 1)
@@ -281,7 +287,8 @@ def main():
         page = page.replace('href="./" hreflang="uz" lang="uz" aria-current="page"', 'href="./" hreflang="uz" lang="uz"')
         page = page.replace(f'href="{code}/" hreflang="{code}" lang="{code}"', f'href="{code}/" hreflang="{code}" lang="{code}" aria-current="page"')
         page = re.sub(r'(\s(?:src|href|data-src|data-src-sm|poster|data-poster)=")(?!https?:|//|#|data:|tel:|mailto:|%SITE_URL%|/|\.\./)', r'\1../', page)
-        page = re.sub(r'(\s(?:data-)?srcset=")([^"]+)"', lambda m: m.group(1) + ', '.join(
+        # srcset, data-srcset and the hero preload's imagesrcset (missing it made /ru/ and /en/ preload a 404)
+        page = re.sub(r'(\s(?:data-|image)?srcset=")([^"]+)"', lambda m: m.group(1) + ', '.join(
             p.strip() if p.strip().startswith(('http', '/', 'data:')) else '../' + p.strip()
             for p in m.group(2).split(',')) + '"', page)
         page = page.replace(f'href="../{code}/"', 'href="./"').replace('href=".././"', 'href="../"')

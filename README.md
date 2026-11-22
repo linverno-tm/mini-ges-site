@@ -7,27 +7,32 @@ mini gidroelektrostansiyalarini tanishtiruvchi va mini-GES qurish xizmatini sotu
 
 [![CI / Deploy](https://github.com/linverno-tm/mini-ges-site/actions/workflows/deploy.yml/badge.svg)](https://github.com/linverno-tm/mini-ges-site/actions/workflows/deploy.yml)
 
-## Dizayn g'oyasi (01.11.2026 redizayn)
+## Dizayn g'oyasi (22.11.2026 redizayn: «yorug' va haqiqiy»)
 
-**Suv kuchi → elektr.** Sahifa — kanal: yuqorida suv (chuqur kanal ko'ki, azure), turbina bo'limidan keyin tok (volt yashil).
-Chap chetdagi ingichka oqim chizig'i, «Qanday ishlaydi»dagi sxema va kalkulyatordagi jonli chizma — bitta g'oya.
-Shriftlar: Unbounded (sarlavha) + Inter (matn). Bo'limlar: kanal (hero) → qanday ishlaydi → turbina 3D → ikki obyekt → yilnoma → hisob-kitob → aloqa.
+Egasi 01.11 dagi qorong'i dizaynni yoqtirmadi: qorong'i ranglar, keng shrift, ortiqcha harakat va «shablon» ko'rinishi.
+Yangi yo'nalish: **kunduzgi beton va haqiqiy suratlar**. Oq va kanal-beton kulrang fon, yagona rang — ikkala stansiya
+binosidagi ko'k (`#004AAD`, logodagi tomchi ham shu), ikkinchi daraja — kanal suvi (`#0E6F7C`), yashil faqat «Ishlab turibdi».
+Shrift bitta: IBM Plex Sans (variable, eni 85–100%). Sarlavha va raqamlar tor, matn odatiy enida. Lotin, kirill va ʻ to'liq.
+Xitoycha sahifada tizimdagi CJK shriftlari ishlatiladi.
+Sahifaning yagona «baland ovozli» joyi — ko'k «Aloqa» bloki. Hech narsa o'z-o'zidan harakatlanmaydi: video faqat
+«Videoni ko'rish» tugmasi bosilganda o'ynaydi. Menyu, savollar va forma faqat bosilganda o'zgaradi.
+Bo'limlar: bosh ekran (surat, taklif, 3 ta raqam) → qanday ishlaydi (5 qadam, haqiqiy suratlar) → ikki obyekt → yilnoma →
+hisob-kitob → aloqa → savollar va yangiliklar. Tillar: o'zbekcha, ruscha, inglizcha, xitoycha.
 
 ## Texnik qarorlar
 
 | Qaror | Sabab |
 |---|---|
 | Framework'siz statik HTML/CSS/JS | Bitta sahifali marketing sayti: server ham, build zanjiri ham minimal. Istalgan statik hostingda ishlaydi |
-| Animatsiya kutubxonasiz (01.11 redizayn) | Harakat CSS'da (transition, keyframes, scroll-driven), JS faqat holatni almashtiradi. GSAP/Lenis olib tashlandi: telefonda ~130 KB kam JS |
-| "Qanday ishlaydi" — haqiqiy kadrlar + kichik SVG sxema | Qadam ekran o'rtasiga kelganda kadr almashadi; video faqat ko'rinib turganda o'ynaydi, data saver'da faqat surat |
-| 3D Kaplan turbinasi (Sketchfab CC BY, 0,3 MB) | Kompyuterda yaqinlashganda, telefonda faqat tugma bosilganda yuklanadi; avval poster |
+| Animatsiyasiz (22.11 redizayn) | O'z-o'zidan harakatlanadigan narsa yo'q: aylantirishda ravon (telefonda >50 ms kadrlar 8 → 3), egasi «ortiqcha harakat»ni yoqtirmadi |
+| "Qanday ishlaydi" — 5 qadam, har birida Baliqchi GES'ning haqiqiy surati (`assets/steps/`) | Sticky sahna va AI kadrlar o'rniga oddiy ro'yxat: telefonda 112 px kichik rasm, kompyuterda 5 ustun |
+| 3D turbina va AI videolar olib tashlandi (22.11) | Fayllari repoda qoldi (`js/vendor/`, `assets/3d/`, `assets/real/real-0…4*`), sahifada ishlatilmaydi |
 | Rasmlar WebP, 2 o'lcham (`srcset`), `loading="lazy"` | Birinchi ochilishda rasm yuklanmaydi, telefon kichik nusxani oladi. `sizes` telefonda `88vw`: 2,6x ekranli telefon 1440w emas, 960w faylni oladi (bosh rasm 122 → 67 KB) |
-| «Qanday ishlaydi»ning 2–5-kadrlari `data-srcset` da | Ular qadam almashmaguncha ko'rinmaydi; `main.js` ularni sahifa yuklangach (yoki bo'lim ekranga kelganda) oladi, bosh rasm bilan internetni talashmaydi |
-| Footer `content-visibility: auto` | Yangiliklardagi kirill va ş/ğ harflari Inter'ning yana 3 ta shrift faylini chaqiradi; footer ekranga yaqinlashguncha ular yuklanmaydi |
+| Footer yuklanishda o'tkazib yuboriladi (`content-visibility`), sahifa ochilgach bo'sh vaqtda chiziladi | Yangiliklardagi kirill va ş/ğ harflari qo'shimcha shrift fayllarini chaqiradi; ular bosh rasm bilan talashmaydi. Faqat ekranga kelganda chizish telefonda ~0,3 s qotish berardi (22.11 tuzatildi) |
 | Yuklanish ekrani yo'q, sarlavha darhol ko'rinadi | LCP elementi (sarlavha yoki kanal kadri) hech qachon opacity:0 dan boshlanmaydi; video kadr yuklangandan keyin ustiga chiqadi |
 | `prefers-reduced-motion` | Harakatni kamaytirishni yoqqan foydalanuvchilarga animatsiyasiz versiya |
 | "Soha yangiliklari" build vaqtida HTML'ga yoziladi | Sahifa ochilganda begona saytga so'rov ketmaydi: tez, CSP buzilmaydi, oflaynda ham ko'rinadi |
-| UZ/RU almashtirish yuklanish ekranisiz | `js/boot.js` birinchi kadrdan oldin ishlaydi: til almashganda o'sha bo'limga qaytaradi |
+| Til almashtirish (UZ/RU/EN/中文) yuklanish ekranisiz | `js/boot.js` birinchi kadrdan oldin ishlaydi: til almashganda o'sha bo'limga qaytaradi |
 | Ariza: avval bizning bot, bo'lmasa Telegram chat | `LEAD_API` (Cloudflare Worker, `tools/ariza/`) bo'lsa, ariza to'g'ridan-to'g'ri Telegram botga ketadi; Worker ishlamasa yoki sozlanmagan bo'lsa, mijozda Telegram chat ariza matni bilan ochiladi |
 
 **Performance budjeti** (telefon, birinchi ochilish): HTML+CSS+JS+shriftlar gzip bilan ≈ 60 KB, birinchi ekran rasmi ≈ 67 KB (telefon), video sahifa yuklangandan keyin.
@@ -45,7 +50,7 @@ mini-ges-site/
   404.html  robots.txt  sitemap.xml  manifest.webmanifest  .htaccess
   build.py              production build -> dist/
 tools/check_site.py     statik sifat tekshiruvi (CI'da ishlaydi)
-tools/i18n.py           tarjima: o'zbekcha manbadan /ru/ sahifasi (lug'at: mini-ges-site/i18n/ru.json)
+tools/i18n.py           tarjima: o'zbekcha manbadan /ru/, /en/, /zh/ sahifalari (lug'at: mini-ges-site/i18n/*.json)
 tools/gen_iso.py        'Qanday ishlaydi' izometrik maketini yaratadi (SVG)
 tools/fetch_news.py     'Soha yangiliklari': RSS'dan GES xabarlarini yig'adi -> mini-ges-site/data/news.json
 tools/lqip.py           lazy rasmlar uchun 16 px xira oldindan ko'rinish -> mini-ges-site/data/lqip.json (rasm qo'shilsa ishga tushiring)

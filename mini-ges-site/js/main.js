@@ -10,7 +10,7 @@ const SITE_BASE = (() => {
 })();
 
 // UI strings created by script (static text is localised at build time, see tools/i18n.py)
-const LANG = ['ru', 'en'].includes(document.documentElement.lang) ? document.documentElement.lang : 'uz';
+const LANG = ['ru', 'en', 'zh'].includes(document.documentElement.lang) ? document.documentElement.lang : 'uz';
 const L = {
   uz: {
     offline: "Internet yo'q — saqlangan versiya ko'rsatilmoqda", online: 'Internet tiklandi',
@@ -36,6 +36,14 @@ const L = {
     calcMsg: (q, h, p, e) => `Calculator: Q = ${q} m³/s, H = ${h} m → about ${p} kW, ${e} kWh/year.`,
     uQ: ' m³/s', uH: ' m', usdM: ' mln $', usdK: 'k $', yr: ' yrs',
   },
+  zh: {
+    offline: '无网络连接，显示已保存的版本', online: '网络已恢复',
+    calcAdded: '测算结果已加入申请', leadCopied: '申请内容已复制，可粘贴到聊天软件', copyFail: '无法复制，请手动选择文字', sending: '正在发送…',
+    errWrap: list => `请填写${list}。`, errName: '您的姓名', errPhone: '电话号码（至少 9 位数字）', errRegion: '所在地区',
+    leadHello: '您好！咨询小水电站项目。', fName: '姓名', fPhone: '电话', fRegion: '地区', fSource: '方向', fMsg: '备注',
+    calcMsg: (q, h, p, e) => `测算：Q = ${q} m³/s，H = ${h} m → 约 ${p} 千瓦，${e} 千瓦时/年。`,
+    uQ: ' m³/s', uH: ' m', usdM: ' 百万美元', usdK: ' 千美元', yr: ' 年',
+  },
 }[LANG];
 
 (function mainGES() {
@@ -45,7 +53,6 @@ const L = {
   const CALC = { eff: 0.8, load: 0.9, household: 2200, co2: 0.77, coal: 0.4, capex: [1700, 2500], usd: 12700 };   // capex: $ per kW on our own plants; kg per kWh
   const root = document.documentElement;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const wide = () => matchMedia('(min-width: 900px)').matches;
   const conn = navigator.connection || {};
   // data saver / 2G / weak device: photos instead of clips, no 3D unless asked
@@ -53,16 +60,9 @@ const L = {
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const fmt = (n, d = 0) => Number(n).toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/ /g, ' ');
+  const fmt = (n, d = 0) => Number(n).toLocaleString({ en: 'en-US', zh: 'zh-CN' }[LANG] || 'ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/ /g, ' ');
   const io = (cb, opts) => new IntersectionObserver(cb, opts);
   if (reduced) root.classList.add('reduced');
-
-  // ------------------------------------------------------------------ the stream: water until the turbine, current after it
-  const PHASE = { hero: 'suv', how: 'suv', turbina: 'tok', projects: 'beton', yilnoma: 'beton', calc: 'tok', contact: 'tok', faq: 'tok', news: 'tok' };
-  const phaseObs = io((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) root.dataset.phase = PHASE[e.target.id] || 'suv'; });
-  }, { rootMargin: '-50% 0px -50% 0px' });
-  Object.keys(PHASE).forEach((id) => { const el = document.getElementById(id); if (el) phaseObs.observe(el); });
 
   // ------------------------------------------------------------------ loading state: shimmer over the poster + bar (CSS .ld)
   // busy(box) → { pct(0..1), done() }. Several waits can share a box (poster + clip); the layer fades when all are done.
@@ -101,23 +101,7 @@ const L = {
     io(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); watch(); } }, { rootMargin: '200px 0px' }).observe(box);
   }
   waitPoster($('.hero__poster'), $('.hero__media'));
-  $$('.shot').forEach(s => waitPoster($('img', s), s));
-  // "How it works" frames 2–5 stay hidden until their step: fetched after the first screen has loaded
-  // (or as soon as the stage is on screen), so they never compete with the hero photo on a phone
-  const lateShots = $$('.shot img[data-srcset]');
-  if (lateShots.length) {
-    let fetched = false;
-    const fetchLate = () => {
-      if (fetched) return;
-      fetched = true;
-      lateShots.forEach((img) => { img.srcset = img.dataset.srcset; img.src = img.dataset.src; waitPoster(img, img.parentElement); });
-    };
-    if (document.readyState === 'complete') setTimeout(fetchLate, 300);
-    else addEventListener('load', () => setTimeout(fetchLate, 300), { once: true });
-    io(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); fetchLate(); } }).observe($('#howStage'));
-  }
   $$('.plant__photo').forEach(img => waitPoster(img, img.parentElement));
-  waitPoster($('.turb3d__poster'), $('#turb3d'));
   // the footer is skipped during load (CSS); lay it out once the page is idle, not mid-scroll
   const foot = $('.foot');
   if (foot) {
@@ -144,9 +128,9 @@ const L = {
   const takeLane = (fn) => { if (lane.busy) lane.wait.push(fn); else { lane.busy = true; fn(); } };
   const freeLane = () => { const next = lane.wait.shift(); if (next) next(); else lane.busy = false; };
 
-  // pre: a loading state already shown for this box (the hero shows it from the first paint of the script)
-  function clip(video, pre = null) {
-    if (!video || lite || reduced) return { play() {}, pause() {} };
+  // pre: a loading state already shown for this box. force: the visitor asked for it (plays even on data saver)
+  function clip(video, pre = null, force = false) {
+    if (!video || (!force && (lite || reduced))) return { play() {}, pause() {} };
     const box = video.parentElement, d = video.dataset;
     let state = 0, wanted = false, ld = null;            // 0 idle · 1 waiting for the lane · 2 fetching or ready
     const go = () => {
@@ -199,100 +183,21 @@ const L = {
       pause() { wanted = false; if (state === 2) video.pause(); },
     };
   }
-  function playWhileVisible(video, margin = '0px', pre = null) {
-    const c = clip(video, pre);
-    if (!video) return;
-    io(([e]) => (e.isIntersecting && !document.hidden ? c.play() : c.pause()), { rootMargin: margin }).observe(video.parentElement);
-  }
-  // The hero clip starts once its still (the LCP) has arrived, so the still gets the bandwidth first.
-  // Until then the state is already on screen: the visitor sees that the real video is on its way.
-  const heroFilm = $('.hero__film'), heroStill = $('.hero__poster');
-  if (heroFilm) {
-    const pre = lite || reduced ? null : busy(heroFilm.parentElement);
-    let begun = false;
-    const startHero = () => { if (!begun) { begun = true; setTimeout(() => playWhileVisible(heroFilm, '0px', pre), 150); } };
-    if (!heroStill || heroStill.complete) startHero();
-    else {
-      heroStill.addEventListener('load', startHero, { once: true });
-      heroStill.addEventListener('error', startHero, { once: true });
-      addEventListener('load', startHero, { once: true });
-    }
-  }
-
-  // ------------------------------------------------------------------ how it works: the step in the middle of the screen drives the stage
-  const stage = $('#howStage');
-  if (stage) {
-    const shots = $$('.shot', stage), nodes = $$('.scheme__node', stage), steps = $$('.hstep');
-    const clips = shots.map(s => clip($('video', s)));
-    let current = 0, stageVisible = false;
-    const setStep = (n) => {
-      if (n === current) return;
-      current = n;
-      stage.dataset.step = n;
-      steps.forEach(s => s.classList.toggle('is-on', +s.dataset.step === n));
-      shots.forEach((s, i) => {
-        const on = i === n - 1;
-        s.classList.toggle('is-on', on);
-        if (on && stageVisible) clips[i].play(); else clips[i].pause();
-      });
-      nodes.forEach(nd => nd.classList.toggle('is-lit', +nd.dataset.n <= n));
-    };
-    // active step = the one whose text is closest to the reading line (screen middle; on phones the
-    // middle of the area left under the sticky stage). Measured on scroll, only while the section is near.
-    let near = false, ticking = false;
-    const pick = () => {
-      ticking = false;
-      const line = wide() ? innerHeight * 0.5 : (stage.getBoundingClientRect().bottom + innerHeight) / 2;
-      let best = 1, dist = Infinity;
-      steps.forEach((s) => {
-        const h = $('h3', s).getBoundingClientRect(), d = Math.abs(h.top + h.height / 2 - line);
-        if (d < dist) { dist = d; best = +s.dataset.step; }
-      });
-      setStep(best);
-    };
-    addEventListener('scroll', () => { if (near && !ticking) { ticking = true; requestAnimationFrame(pick); } }, { passive: true });
-    io(([e]) => { near = e.isIntersecting; if (near) pick(); }).observe($('.how__grid'));
-    io(([e]) => {
-      stageVisible = e.isIntersecting;
-      clips.forEach((c, i) => (stageVisible && i === current - 1 ? c.play() : c.pause()));
-    }).observe($('.how__frame', stage));
-    // the next still is fetched ahead so a step never shows an empty frame
-    io(([e], obs) => {
-      if (!e.isIntersecting) return;
-      obs.disconnect();
-      $$('img', stage).forEach(img => { img.loading = 'eager'; });
-    }, { rootMargin: '600px 0px' }).observe(stage);
-    setStep(1);
-  }
-
-  // ------------------------------------------------------------------ 3D turbine (Sketchfab CC BY model, ~0.3 MB + three.js)
-  // Desktop: fetched when the block is near. Phone / data saver: only after the button is pressed.
-  const turb = $('#turb3d');
-  if (turb) {
-    const cvs = $('.turb3d__cvs', turb), pct = $('.turb3d__pct', turb), go = $('.turb3d__go', turb);
-    let view = null, visible = false, started = false;
-    const loadScript = () => new Promise((ok, fail) => {
-      const s = document.createElement('script');
-      s.src = SITE_BASE + 'js/vendor/turbine3d.min.js?v=2'; s.onload = ok; s.onerror = fail;
-      document.head.appendChild(s);
+  // The hero film plays only when asked ("Videoni ko'rish"); it pauses while off screen.
+  const heroFilm = $('.hero__film'), heroPlay = $('.hero__play');
+  if (heroFilm && heroPlay) {
+    const film = clip(heroFilm, null, true);
+    let watching = false, onScreen = true;
+    heroPlay.addEventListener('click', () => {
+      watching = true;
+      $('#hero').classList.add('is-film');
+      heroFilm.controls = true;
+      film.play();
+      track('video');
     });
-    const start = () => {
-      if (started) return;
-      started = true;
-      turb.classList.add('is-loading');
-      const ld = busy(turb);
-      loadScript()
-        .then(() => window.GESTurbine.mount(cvs, SITE_BASE + 'assets/3d/kaplan.glb?v=1', (f) => { pct.textContent = Math.round(f * 100) + '%'; ld.pct(f); }))
-        .then((v) => { view = v; turb.classList.add('is-3d'); view.setRunning(visible && !document.hidden); })
-        .catch(() => { started = false; /* WebGL or network failed: the poster stays */ })
-        .finally(() => { turb.classList.remove('is-loading'); ld.done(); });
-    };
-    go.addEventListener('click', start);
-    if (finePointer && !reduced && !lite && wide()) {
-      io(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); start(); } }, { rootMargin: '600px 0px' }).observe(turb);
-    }
-    io(([e]) => { visible = e.isIntersecting; if (view) view.setRunning(visible && !document.hidden); }).observe(turb);
-    document.addEventListener('visibilitychange', () => { if (view) view.setRunning(visible && !document.hidden); });
+    io(([e]) => { onScreen = e.isIntersecting; if (watching) (onScreen ? film.play() : film.pause()); }).observe(heroFilm.parentElement);
+    heroFilm.addEventListener('pause', () => { if (onScreen) watching = false; });
+    heroFilm.addEventListener('play', () => { watching = true; });
   }
 
   // ------------------------------------------------------------------ live energy counter (Ulug'nor GES)
@@ -302,12 +207,12 @@ const L = {
   const tickLive = () => {
     if (document.hidden) return;
     const kwh = (Date.now() - LIVE.start) / 1000 * LIVE.perSec;
-    const whole = fmt(Math.floor(kwh)), frac = Math.floor((kwh % 1) * 10);
-    liveKwh.forEach((el) => { el.innerHTML = `${whole}<small>${LANG === 'en' ? '.' : ','}${frac}</small>`; });
+    const whole = fmt(Math.floor(kwh));
+    liveKwh.forEach((el) => { el.textContent = whole; });
     liveCo2.forEach((el) => { el.textContent = fmt(kwh * LIVE.co2); });
     liveCoal.forEach((el) => { el.textContent = fmt(kwh * LIVE.coal); });
   };
-  if (liveKwh.length) { tickLive(); setInterval(tickLive, reduced ? 5000 : 250); }
+  if (liveKwh.length) { tickLive(); setInterval(tickLive, reduced ? 10000 : 2000); }   // calm: every 2 s, whole kWh
 
   // ------------------------------------------------------------------ chronicle: the canal under the photos fills as you swipe
   const strip = $('#chronTrack');
@@ -519,18 +424,12 @@ const L = {
 
   // ------------------------------------------------------------------ nav, mobile menu, thumb CTA
   const nav = $('#nav'), dock = $('.dock'), heroEl = $('#hero'), contact = $('#contact');
-  // the bar stays put: the sticky stage in "How it works" sits right under it
   let menuOpen = false, pastHero = false, atContact = false;
-  const onScroll = () => nav.classList.toggle('is-solid', scrollY > 24);
+  const onScroll = () => nav.classList.toggle('is-solid', scrollY > 8);
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-  // hidden over the interactive stages (step frames, 3D button) and at the form itself
-  let overStage = 0;
-  const syncDock = () => dock && dock.classList.toggle('is-on', pastHero && !atContact && !menuOpen && !overStage);
-  ['#how', '#turbina'].forEach((sel) => {
-    const el = $(sel);
-    if (el) io(([e]) => { overStage += e.isIntersecting ? 1 : -1; overStage = Math.max(0, overStage); syncDock(); }).observe(el);
-  });
+  // the phone CTA: shown after the hero, hidden at the form itself and under the open menu
+  const syncDock = () => dock && dock.classList.toggle('is-on', pastHero && !atContact && !menuOpen);
   if (heroEl) io(([e]) => { pastHero = !e.isIntersecting; syncDock(); }).observe(heroEl);
   if (contact) io(([e]) => { atContact = e.isIntersecting; syncDock(); }, { rootMargin: '0px 0px -20% 0px' }).observe(contact);
 

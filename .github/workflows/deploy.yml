@@ -37,8 +37,8 @@ jobs:
         run: npx --yes html-validate@8.24.1 mini-ges-site/index.html mini-ges-site/404.html
       - name: Links, assets, ids, alt text, labels
         run: python tools/check_site.py
-      - name: Translations complete (ru)
-        run: python tools/i18n.py extract ru && python tools/i18n.py extract en
+      - name: Translations complete (ru, en, zh)
+        run: python tools/i18n.py extract ru && python tools/i18n.py extract en && python tools/i18n.py extract zh
       - name: Service worker syntax
         run: node --check mini-ges-site/sw.js
 
