@@ -118,6 +118,14 @@ const L = {
   }
   $$('.plant__photo').forEach(img => waitPoster(img, img.parentElement));
   waitPoster($('.turb3d__poster'), $('#turb3d'));
+  // the footer is skipped during load (CSS); lay it out once the page is idle, not mid-scroll
+  const foot = $('.foot');
+  if (foot) {
+    const idle = window.requestIdleCallback || (fn => setTimeout(fn, 1));
+    const ready = () => idle(() => foot.classList.add('is-ready'), { timeout: 2000 });
+    if (document.readyState === 'complete') setTimeout(ready, 800);
+    else addEventListener('load', () => setTimeout(ready, 800), { once: true });
+  }
 
   // ------------------------------------------------------------------ media: clips play only on screen, never on data saver
   // A clip is fetched the first time it is needed (phone-size file under 900 px), AV1 WebM where it decodes smoothly,

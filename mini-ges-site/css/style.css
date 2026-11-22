@@ -494,9 +494,10 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius
 
 /* ---------------- footer: faq + news ---------------- */
 .foot { background: var(--deep); color: var(--on-dark); padding: var(--sec) 0 calc(28px + env(safe-area-inset-bottom)); border-top: 1px solid var(--hair-d); }
-/* the footer (answers + news, with Cyrillic and Latin-extended headlines) is laid out only near the viewport:
-   its extra font files no longer compete with the first screen */
-.foot { content-visibility: auto; contain-intrinsic-size: auto 1800px; }
+/* the footer (answers + news, with Cyrillic and Latin-extended headlines) is skipped while the first screen loads,
+   so its extra font files do not compete with the hero; main.js lays it out in idle time right after load
+   (laying it out only when scrolled to made a ~0.3 s hitch on phones) */
+.foot:not(.is-ready) { content-visibility: auto; contain-intrinsic-size: auto 1800px; }
 .foot__grid { display: grid; gap: 56px; }
 .foot__h { font: 700 clamp(22px, 2.6vw, 32px)/1.15 var(--f-display); letter-spacing: -.02em; color: #fff; margin-bottom: 20px; }
 .acc { border-top: 1px solid var(--hair-d); }
