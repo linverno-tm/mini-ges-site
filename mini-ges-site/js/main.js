@@ -183,36 +183,53 @@ const L = {
       pause() { wanted = false; if (state === 2) video.pause(); },
     };
   }
-  // The hero film plays only when asked ("Videoni ko'rish"); it pauses while off screen.
-  const heroFilm = $('.hero__film'), heroPlay = $('.hero__play');
-  if (heroFilm && heroPlay) {
+  // The hero film: the real canal plays by itself once the still (the LCP) has arrived, muted, only while on
+  // screen. On data saver / 2G / reduced motion it waits for "Videoni ko'rish".
+  const heroFilm = $('.hero__film'), heroPlay = $('.hero__play'), heroStill = $('.hero__poster');
+  if (heroFilm) {
     const film = clip(heroFilm, null, true);
     let watching = false, onScreen = true;
-    heroPlay.addEventListener('click', () => {
-      watching = true;
-      $('#hero').classList.add('is-film');
-      heroFilm.controls = true;
-      film.play();
-      track('video');
-    });
-    io(([e]) => { onScreen = e.isIntersecting; if (watching) (onScreen ? film.play() : film.pause()); }).observe(heroFilm.parentElement);
-    heroFilm.addEventListener('pause', () => { if (onScreen) watching = false; });
-    heroFilm.addEventListener('play', () => { watching = true; });
+    const start = () => { watching = true; $('#hero').classList.add('is-film'); if (onScreen && !document.hidden) film.play(); };
+    io(([e]) => { onScreen = e.isIntersecting; if (watching) (onScreen && !document.hidden ? film.play() : film.pause()); }).observe(heroFilm.parentElement);
+    document.addEventListener('visibilitychange', () => { if (watching) (onScreen && !document.hidden ? film.play() : film.pause()); });
+    if (heroPlay) heroPlay.addEventListener('click', () => { heroFilm.controls = true; start(); track('video'); });
+    if (!lite && !reduced) {
+      const go = () => setTimeout(start, 200);
+      if (!heroStill || heroStill.complete) go();
+      else { heroStill.addEventListener('load', go, { once: true }); heroStill.addEventListener('error', go, { once: true }); }
+    }
   }
 
   // ------------------------------------------------------------------ live energy counter (Ulug'nor GES)
   // Estimate from the station's real annual output (5.2 GWh) since the opening on 29 August 2024.
   const LIVE = { start: Date.parse('2024-08-29T12:00:00+05:00'), perSec: 5.2e6 / (365.25 * 86400), co2: CALC.co2 / 1000, coal: CALC.coal / 1000 };
   const liveKwh = $$('[data-live-kwh]'), liveCo2 = $$('[data-live-co2]'), liveCoal = $$('[data-live-coal]');
+  // On load the figures count up from zero (1.2 s), then tick once a second. Each number box keeps its final
+  // width from the start, so the unit next to it never moves (no layout shift).
+  const INTRO = reduced ? 0 : 1200, T0 = performance.now();
   const tickLive = () => {
     if (document.hidden) return;
-    const kwh = (Date.now() - LIVE.start) / 1000 * LIVE.perSec;
-    const whole = fmt(Math.floor(kwh));
-    liveKwh.forEach((el) => { el.textContent = whole; });
+    const k = INTRO ? Math.min(1, (performance.now() - T0) / INTRO) : 1;
+    const kwh = (Date.now() - LIVE.start) / 1000 * LIVE.perSec * (1 - Math.pow(1 - k, 3));
+    liveKwh.forEach((el) => { el.textContent = fmt(Math.floor(kwh)); });
     liveCo2.forEach((el) => { el.textContent = fmt(kwh * LIVE.co2); });
     liveCoal.forEach((el) => { el.textContent = fmt(kwh * LIVE.coal); });
   };
-  if (liveKwh.length) { tickLive(); setInterval(tickLive, reduced ? 10000 : 2000); }   // calm: every 2 s, whole kWh
+  if (liveKwh.length) {
+    const fixed = [...liveKwh, ...liveCo2, ...liveCoal];
+    fixed.forEach((el) => { el.classList.add('live-num'); });
+    if (INTRO) {
+      // the final figures (a little ahead) first: measure them, pin the widths, then count up
+      const full = (Date.now() - LIVE.start) / 1000 * LIVE.perSec * 1.0001;
+      liveKwh.forEach((el) => { el.textContent = fmt(Math.floor(full)); });
+      liveCo2.forEach((el) => { el.textContent = fmt(full * LIVE.co2); });
+      liveCoal.forEach((el) => { el.textContent = fmt(full * LIVE.coal); });
+      fixed.forEach((el) => { el.style.minWidth = Math.ceil(el.getBoundingClientRect().width) + 'px'; });
+      const intro = setInterval(() => { tickLive(); if (performance.now() - T0 > INTRO) clearInterval(intro); }, 40);
+    }
+    tickLive();
+    setInterval(tickLive, reduced ? 10000 : 1000);
+  }
 
   // ------------------------------------------------------------------ chronicle: the canal under the photos fills as you swipe
   const strip = $('#chronTrack');
@@ -239,7 +256,9 @@ const L = {
   let lastCalc = null;
   if (inQ) {
     const out = { P: $('#rP'), E: $('#rE'), R: $('#rR'), Hh: $('#rHh'), C: $('#rC'), Cap: $('#rCap'), Pay: $('#rPay') };
-    const rig = $('#rig'), water = $('#rigWater'), PMAX = 9.81 * 10 * 30 * CALC.eff;
+    const rig = $('#rigWrap'), water = $('#rigWater'), PMAX = 9.81 * 10 * 30 * CALC.eff;
+    // the rotor spins only while the rig is on screen
+    io(([e]) => rig.classList.toggle('is-run', e.isIntersecting)).observe(rig);
     const shown = { P: 0, E: 0, R: 0, Hh: 0, C: 0 };
     let from = null, target = null, t0 = 0, raf = 0;
     const fillRange = (el) => el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min)) * 100 + '%');

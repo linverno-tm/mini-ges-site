@@ -137,7 +137,7 @@
       </li>
       <li class="fact fact--count">
         <span class="fact__name">Ulug'nor GES ishga tushganidan beri</span>
-        <b class="fact__num"><span data-live-kwh>10 934 000</span> <small>kVt·soat</small></b>
+        <b class="fact__num"><span data-live-kwh>11 600 000</span> <small>kVt·soat</small></b>
       </li>
     </ul>
   </div>
@@ -206,7 +206,7 @@
           <p class="plant__lead">O'zbekistondagi birinchi xususiy mini-GESlardan biri.</p>
           <div class="live" role="group" aria-label="Ulug'nor GES ishga tushganidan beri ishlab chiqargan energiya (taxminiy)">
             <span class="live__label">Ishga tushganidan beri ishlab chiqarildi</span>
-            <span class="live__num"><b data-live-kwh>10 934 000</b> <span>kVt·soat</span></span>
+            <span class="live__num"><b data-live-kwh>11 600 000</b> <span>kVt·soat</span></span>
             <span class="live__row"><span><b data-live-co2>8 400</b> t CO₂ chiqmadi</span><span><b data-live-coal>4 400</b> t ko'mir tejaldi</span></span>
           </div>
           <dl class="specs">
@@ -324,16 +324,19 @@
 
       <div class="calc__out" aria-live="polite">
         <!-- live picture of the inputs: water depth = Q, drop = H, rotor speed and glow = P -->
+        <div class="rig-wrap" id="rigWrap">
         <svg class="rig" id="rig" viewBox="0 0 360 220" aria-hidden="true">
           <path class="rig__bank" d="M10 40h120v120h140"/>
           <rect class="rig__water" id="rigWater" x="10" y="40" width="120" height="0"/>
           <path class="rig__fall" id="rigFall" d="M130 60 C150 60 160 80 160 160"/>
           <g class="rig__drop"><path d="M150 44v116"/><path d="M144 50l6-6 6 6M144 154l6 6 6-6"/></g>
           <text class="rig__h" id="rigH" x="174" y="104">H</text>
-          <g class="rig__rotor" id="rigRotor"><circle cx="210" cy="170" r="22"/><path d="M210 148v44M188 170h44M194 154l32 32M226 154l-32 32"/></g>
           <path class="rig__wire" d="M232 170h40V70h70"/>
           <path class="rig__bolt" id="rigBolt" d="m318 40-16 26h12l-6 22 18-30h-12l6-18Z"/>
         </svg>
+        <!-- the rotor sits on its own layer (an HTML box), so spinning it costs the phone almost nothing -->
+        <svg class="rig__rotor" viewBox="-2 -2 48 48" aria-hidden="true"><circle cx="22" cy="22" r="22"/><path d="M22 0v44M0 22h44M6 6l32 32M38 6 6 38"/></svg>
+        </div>
         <div class="calc__big"><b id="rP">0</b><span>kVt quvvat</span></div>
         <div class="results">
           <div><span>Yiliga ishlab chiqarish</span><b><em id="rE">0</em> kVt·soat</b></div>

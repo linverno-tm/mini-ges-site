@@ -140,7 +140,7 @@ main:focus { outline: none; }
 .hero__play:hover { background: #fff; }
 .hero.is-film .hero__play { display: none; }
 .hero__media .tag { top: 10px; bottom: auto; }   /* the play button owns the bottom edge */
-.hero.is-film .hero__media .tag { display: none; }
+.hero.is-film .hero__play { display: none; }
 @media (min-width: 900px) {
   .hero { padding-top: 32px; }
   .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(32px, 4vw, 64px); }
@@ -278,13 +278,15 @@ input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius
 .field-t__src { font-size: 13px; color: var(--muted); max-width: 62ch; }
 
 .calc__out { display: grid; gap: 18px; align-content: start; padding: clamp(20px, 3vw, 32px); border-radius: var(--r); background: var(--paper); }
-.rig { width: 100%; height: auto; max-height: 220px; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.rig-wrap { position: relative; width: 100%; max-width: 440px; }
+.rig { width: 100%; height: auto; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .rig__bank { stroke: var(--ink); stroke-width: 2.5; opacity: .5; }
 .rig__water { fill: rgba(14, 111, 124, .35); stroke: none; transition: y .3s, height .3s; }
 .rig__fall { stroke: var(--water); stroke-width: var(--fw, 6); transition: stroke-width .3s; }
 .rig__drop { stroke: var(--brand); stroke-width: 1.6; }
 .rig__h { fill: var(--brand); stroke: none; font: 700 18px var(--f-head); }
-.rig__rotor { stroke: var(--ink); stroke-width: 2.2; }
+/* rotor layer: its box matches the old circle (cx 210, cy 170, r 22 + stroke) in the 360x220 drawing */
+.rig__rotor { position: absolute; left: 51.667%; top: 66.364%; width: 13.333%; height: auto; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; }
 .rig__wire { stroke: var(--brand); stroke-width: 2.5; opacity: var(--glow, .5); }
 .rig__bolt { fill: var(--brand); stroke: none; opacity: var(--glow, .5); }
 .calc__big { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
@@ -403,6 +405,57 @@ input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius
 
 .toast { position: fixed; z-index: 60; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); translate: -50% 0; max-width: calc(100vw - 32px); padding: 12px 18px; border-radius: var(--r-s); background: var(--ink); color: #fff; font-size: 15px; opacity: 0; pointer-events: none; transition: opacity var(--t); }
 .toast.is-on { opacity: 1; }
+
+/* ================= motion (22.11 evening): few, meaningful, compositor-only =================
+   1 hero: the real canal film plays by itself (main.js; not on data saver / reduced motion), the offer and
+     the nameplate rise in once on load — the headline and photo never start hidden (LCP)
+   2 "how": a water line joins the five steps and fills as you scroll; after the turbine it turns to current
+   3 signs of life: the "running" dot breathes, the kWh counter counts up and ticks
+   4 answers to input: the calculator's rotor spins with the power, the fall flows; photos lean in on hover */
+.live-num { display: inline-block; font-variant-numeric: tabular-nums; }
+.steps { position: relative; }
+.step:nth-child(n+4) h3::before { color: var(--ok); }      /* water up to the turbine, current after it */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 1 — once, on load */
+  .hero__ctas { animation: rise .7s .12s cubic-bezier(.22, 1, .36, 1) both; }
+  .fact { animation: rise .7s cubic-bezier(.22, 1, .36, 1) both; }
+  .fact:nth-child(1) { animation-delay: .22s; }
+  .fact:nth-child(2) { animation-delay: .3s; }
+  .fact:nth-child(3) { animation-delay: .38s; }
+
+  /* 3 — the dot breathes (a ring that fades out, transform + opacity only) */
+  .facts .pill--live i { position: relative; }
+  .facts .pill--live i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: currentColor; animation: ping 2.4s cubic-bezier(0, 0, .2, 1) infinite; }
+
+  /* 4 — answers to input */
+  /* the rotor (its own layer) spins with the power, only while the calculator is on screen */
+  .rig-wrap.is-run .rig__rotor { animation: spin var(--spin, 2s) linear infinite; }
+  .plant__photo { transition: scale .6s cubic-bezier(.22, 1, .36, 1); }
+  @media (hover: hover) { .plant:hover .plant__photo { scale: 1.035; } }
+
+  /* 2 + bars — scroll-driven, progressive enhancement (decorative: no fallback, the static page is complete) */
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .steps { view-timeline: --steps block; }
+    .steps::before, .steps::after { content: ""; position: absolute; pointer-events: none; border-radius: 2px; }
+    .steps::before { background: var(--line); }
+    .steps::after { background: linear-gradient(var(--water), var(--brand) 55%, var(--ok) 78%); transform-origin: top; animation: fill-y linear both; animation-timeline: --steps; animation-range: entry 70% cover 70%; }
+    .steps::before, .steps::after { left: 124px; top: 6px; bottom: 6px; width: 2px; }
+    .step h3, .step p, .step__tag { padding-left: 14px; }
+    @media (min-width: 700px) {
+      .steps::before, .steps::after { left: 0; right: 0; top: -22px; bottom: auto; width: auto; height: 3px; }
+      .steps::after { background: linear-gradient(90deg, var(--water), var(--brand) 55%, var(--ok) 78%); transform-origin: left; animation-name: fill-x; animation-range: entry 80% cover 55%; }
+      .step h3, .step p, .step__tag { padding-left: 0; }
+    }
+    .eco__bar i { transform-origin: left; animation: fill-x linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
+  }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes ping { 0% { transform: scale(1); opacity: .55; } 80%, 100% { transform: scale(2.8); opacity: 0; } }
+@keyframes spin { to { rotate: 360deg; } }
+@keyframes dash { to { stroke-dashoffset: -36; } }
+@keyframes fill-x { from { transform: scaleX(0); } }
+@keyframes fill-y { from { transform: scaleY(0); } }
 
 /* language switch: arrive in the same place without a jump */
 .lang-switch body { opacity: 0; animation: appear 0s 1.5s forwards; }
