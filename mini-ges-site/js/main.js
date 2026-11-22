@@ -160,7 +160,10 @@ const L = {
       video.addEventListener('progress', share);
       video.addEventListener('loadedmetadata', share);
       video.addEventListener('playing', () => { share(); video.classList.add('is-playing'); ld.done(); }, { once: true });
-      const mp4 = SITE_BASE + (wide() ? d.src : d.srcSm || d.src);
+      // data-src is relative to the page (build.py prefixes ../ on /ru/ /en/ /zh/), so resolve it against the page,
+      // not SITE_BASE (that gave /assets/… on the language pages: a 404, the film never played there)
+      const here = (p) => new URL(p, document.baseURI).href;
+      const mp4 = here(wide() ? d.src : d.srcSm || d.src);
       let onAv1 = false;
       video.addEventListener('error', () => {
         if (onAv1) { onAv1 = false; video.src = mp4; if (wanted) go(); return; }   // AV1 failed to load or decode: MP4
@@ -170,7 +173,7 @@ const L = {
         const av1 = wide() ? d.av1 : d.av1Sm || d.av1;
         onAv1 = !!(ok && av1);
         video.preload = 'auto';
-        video.src = onAv1 ? SITE_BASE + av1 : mp4;
+        video.src = onAv1 ? here(av1) : mp4;
         if (wanted) go();
       });
     };
